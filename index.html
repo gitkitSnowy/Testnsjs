@@ -2,675 +2,85 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Room Rolls | TON Casino</title>
-    <!-- Telegram WebApp JS -->
-    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
-    <!-- TON Connect 2.0 SDK -->
-    <script src="https://unpkg.com/@tonconnect/sdk@2.0.5/dist/tonconnect-sdk.min.js"></script>
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, get, update, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyDQgyNz7P5K4_dlNQsKqniO-kEALW3_OWg",
-            authDomain: "casino-213b9.firebaseapp.com",
-            databaseURL: "https://casino-213b9-default-rtdb.firebaseio.com",
-            projectId: "casino-213b9",
-            storageBucket: "casino-213b9.firebasestorage.app",
-            messagingSenderId: "104292026196",
-            appId: "1:104292026196:web:4b33abbb085143ce69eac1"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        
-        window.db = db;
-        window.ref = ref;
-        window.set = set;
-        window.get = get;
-        window.update = update;
-        window.push = push;
-        window.onValue = onValue;
-        window.remove = remove;
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Технические работы</title>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%);
-            font-family: 'Segoe UI', 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: #fff;
-            min-height: 100vh;
-            padding: 16px;
-            padding-bottom: 80px;
-        }
-        .card {
-            background: rgba(20, 28, 40, 0.7);
-            backdrop-filter: blur(12px);
-            border-radius: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .profile-row {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .avatar {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ffb347, #ff6b6b);
-            display: flex;
-            align-items: center;
             justify-content: center;
-            font-size: 28px;
-            font-weight: bold;
-            background-size: cover;
-            background-position: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #0f172a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f8fafc;
         }
-        .username {
-            font-size: 16px;
-            font-weight: 600;
-            background: rgba(255,255,255,0.1);
-            padding: 6px 14px;
-            border-radius: 40px;
-        }
-        .balance {
-            background: rgba(0,0,0,0.5);
-            padding: 8px 16px;
-            border-radius: 32px;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        .wallet-btn {
-            background: linear-gradient(90deg, #0098ea, #0088cc);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 32px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            margin-left: auto;
-        }
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-        .tab {
-            flex: 1;
-            background: rgba(255,255,255,0.05);
-            border: none;
-            padding: 10px;
-            border-radius: 40px;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .tab.active {
-            background: linear-gradient(90deg, #ffb347, #ff6b6b);
-            box-shadow: 0 4px 12px rgba(255,107,107,0.3);
-        }
-        .game-container {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        .game-container.active {
-            display: block;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px);}
-            to { opacity: 1; transform: translateY(0);}
-        }
-        .roulette-wheel {
-            position: relative;
-            width: 260px;
-            height: 260px;
-            margin: 20px auto;
-            border-radius: 50%;
-            background: #1e2a3a;
-            box-shadow: 0 0 0 8px rgba(255,255,255,0.1), 0 20px 40px rgba(0,0,0,0.5);
-            overflow: hidden;
-        }
-        .wheel-svg {
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-        }
-        .bet-input {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 12px;
-            border-radius: 40px;
-            color: white;
-            font-size: 18px;
-            width: 100%;
-            margin: 12px 0;
+
+        .container {
             text-align: center;
+            padding: 20px;
         }
-        .btn {
-            background: linear-gradient(90deg, #ffb347, #ff6b6b);
-            border: none;
-            padding: 14px;
-            border-radius: 40px;
-            font-weight: bold;
-            font-size: 16px;
-            color: white;
-            width: 100%;
-            cursor: pointer;
-            transition: transform 0.1s;
-            margin-top: 8px;
+
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
         }
-        .btn:active { transform: scale(0.97);}
-        .btn-secondary {
-            background: linear-gradient(90deg, #4a6fa5, #3a5a8a);
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
         }
-        .tower-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin: 20px 0;
+
+        p {
+            font-size: 1.1rem;
+            color: #94a3b8;
         }
-        .tower-cell {
-            background: rgba(255,215,0,0.2);
-            aspect-ratio: 1;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.1s;
-            border: 1px solid rgba(255,255,255,0.2);
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
         }
-        .tower-cell.revealed { background: #4caf50; box-shadow: 0 0 12px #4caf50;}
-        .tower-cell.bomb { background: #f44336; }
-        .admin-panel, .support-chat {
-            max-height: 400px;
-            overflow-y: auto;
+
+        /* Индикатор загрузки */
+        .loader {
+            width: 50px;
+            height: 5px;
+            background: #334155;
+            margin: 30px auto 0;
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px;
         }
-        .support-msg {
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 10px;
-            margin: 8px 0;
+
+        .loader-line {
+            position: absolute;
+            width: 40%;
+            height: 100%;
+            background: #38bdf8;
+            animation: slide 1.5s infinite ease-in-out;
         }
-        .badge {
-            background: gold;
-            color: black;
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 12px;
-        }
-        .input-small {
-            background: rgba(0,0,0,0.6);
-            border: none;
-            padding: 10px;
-            border-radius: 30px;
-            color: white;
-            width: 100%;
-            margin: 5px 0;
-        }
-        .flex {
-            display: flex;
-            gap: 8px;
-        }
-        .ton-address {
-            font-size: 11px;
-            opacity: 0.7;
-            word-break: break-all;
-        }
-        .deposit-box {
-            background: rgba(0,0,0,0.3);
-            border-radius: 20px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-        .withdraw-box {
-            margin-top: 15px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 15px;
+
+        @keyframes slide {
+            0% { left: -40%; }
+            100% { left: 100%; }
         }
     </style>
 </head>
 <body>
-<div id="app">
-    <div class="card">
-        <div class="profile-row">
-            <div class="avatar" id="avatarDiv">👤</div>
-            <div class="username" id="usernameDisplay">Загрузка...</div>
-            <div class="balance" id="balanceDisplay">💰 0 TON</div>
-            <button class="wallet-btn" id="walletBtn">🔌 Подключить кошелек</button>
-        </div>
-        <div id="walletInfo" class="ton-address" style="text-align:center; margin-top:5px;"></div>
-        <div class="tabs">
-            <button class="tab active" data-tab="roulette">🎡 Рулетка</button>
-            <button class="tab" data-tab="tower">🗼 Tower</button>
-            <button class="tab" data-tab="profile">👤 Профиль</button>
-            <button class="tab admin-tab" data-tab="admin" style="display:none;">👑 Админ</button>
-        </div>
-    </div>
 
-    <!-- РУЛЕТКА -->
-    <div id="rouletteTab" class="game-container active">
-        <div class="card">
-            <h3>🎲 Room Rolls — Дуэль на ставках</h3>
-            <div class="roulette-wheel" id="wheelContainer">
-                <svg class="wheel-svg" viewBox="0 0 100 100" id="wheelSvg">
-                    <circle cx="50" cy="50" r="48" fill="#2c3e50" stroke="white" stroke-width="1"/>
-                    <circle cx="50" cy="50" r="12" fill="#f1c40f"/>
-                </svg>
-            </div>
-            <div id="duelInfo" style="text-align:center; margin:10px 0;">⚔️ Нет активного дуэля</div>
-            <input type="number" id="betAmount" class="bet-input" placeholder="Ставка в TON" value="1" step="0.1">
-            <button class="btn" id="createDuelBtn">🔥 Создать дуэль</button>
-            <button class="btn btn-secondary" id="joinDuelBtn">🎯 Присоединиться к дуэли</button>
-        </div>
-    </div>
-
-    <!-- TOWER -->
-    <div id="towerTab" class="game-container">
-        <div class="card">
-            <h3>🗼 Tower — Поднимись выше, забери x2.5</h3>
-            <input type="number" id="towerBet" class="bet-input" placeholder="Ставка в TON" value="0.5" step="0.1">
-            <button class="btn" id="startTowerBtn">🎮 Начать игру</button>
-            <button class="btn btn-secondary" id="cashoutTowerBtn" style="display:none;">💎 Забрать выигрыш</button>
-            <div class="tower-grid" id="towerGrid" style="display:none;"></div>
-            <div id="towerStatus" style="margin-top:12px; text-align:center;"></div>
-            <div id="towerMultiplier" style="font-size:28px; font-weight:bold; text-align:center; margin-top:10px;">x1</div>
-        </div>
-    </div>
-
-    <!-- ПРОФИЛЬ -->
-    <div id="profileTab" class="game-container">
-        <div class="card">
-            <h3>👤 Мой профиль</h3>
-            <div id="verifyBadge"></div>
-            <div class="deposit-box">
-                <h4>💰 Внести TON</h4>
-                <button class="btn" id="depositBtn">💎 Пополнить баланс (1 TON = 1 кредит)</button>
-                <div class="withdraw-box">
-                    <h4>💸 Вывести TON</h4>
-                    <input type="number" id="withdrawAmount" class="input-small" placeholder="Сумма в TON">
-                    <button class="btn btn-secondary" id="withdrawBtn">Вывести на кошелек</button>
-                </div>
-            </div>
-            <button class="btn" id="supportBtn" style="background:#4a6fa5; margin-top:15px;">💬 Открыть чат с поддержкой</button>
-            <div id="supportChatBox" style="display:none; margin-top:16px;">
-                <div id="supportMessages" style="max-height:200px; overflow-y:auto; margin-bottom:10px;"></div>
-                <div class="flex">
-                    <input type="text" id="supportMsgInput" class="input-small" placeholder="Сообщение...">
-                    <button id="sendSupportMsg" class="btn" style="width:auto; padding:10px 20px;">➤</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- АДМИН ПАНЕЛЬ -->
-    <div id="adminTab" class="game-container">
-        <div class="card admin-panel">
-            <h3>👑 Админ панель</h3>
-            <button id="giveGiftBtn" class="btn" style="background:#f39c12;">🎁 Подарок всем (+5 TON)</button>
-            <button id="grantVerifyBtn" class="btn" style="background:#2ecc71;">✅ Дать галочку</button>
-            <input id="adminTargetUser" class="input-small" placeholder="Username цели">
-            <button id="makeAdminBtn" class="btn" style="background:#e67e22;">👑 Выдать админку</button>
-            <button id="makeSupportBtn" class="btn" style="background:#3498db;">🛡️ Выдать техподдержку</button>
-            <hr style="margin:15px 0;">
-            <h4>💬 Тикеты поддержки</h4>
-            <div id="ticketsList"></div>
-        </div>
-    </div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, get, update, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    
-    const firebaseConfig = {
-        apiKey: "AIzaSyDQgyNz7P5K4_dlNQsKqniO-kEALW3_OWg",
-        authDomain: "casino-213b9.firebaseapp.com",
-        databaseURL: "https://casino-213b9-default-rtdb.firebaseio.com",
-        projectId: "casino-213b9",
-        storageBucket: "casino-213b9.firebasestorage.app",
-        messagingSenderId: "104292026196",
-        appId: "1:104292026196:web:4b33abbb085143ce69eac1"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.enableClosingConfirmation();
-    
-    // TON Connect
-    let tonConnector = null;
-    let walletAddress = null;
-    
-    async function initTonConnect() {
-        if(window.TonConnect) {
-            tonConnector = new window.TonConnect.TonConnect({
-                manifestUrl: "https://raw.githubusercontent.com/ton-connect/demo-dapp/main/tonconnect-manifest.json"
-            });
-            tonConnector.onStatusChange((wallet) => {
-                if(wallet) {
-                    walletAddress = wallet.account.address;
-                    document.getElementById("walletInfo").innerHTML = `💳 ${walletAddress.slice(0,6)}...${walletAddress.slice(-4)}`;
-                    document.getElementById("walletBtn").innerHTML = "🔌 Отключить";
-                } else {
-                    walletAddress = null;
-                    document.getElementById("walletInfo").innerHTML = "";
-                    document.getElementById("walletBtn").innerHTML = "🔌 Подключить кошелек";
-                }
-            });
-        }
-    }
-    
-    document.getElementById("walletBtn").onclick = async () => {
-        if(!tonConnector) await initTonConnect();
-        if(walletAddress) {
-            await tonConnector.disconnect();
-        } else {
-            try {
-                await tonConnector.connect({
-                    bridgeUrl: "https://bridge.tonapi.io/bridge",
-                    universalLink: "https://app.tonkeeper.com/ton-connect"
-                });
-            } catch(e) { tg.showPopup({title:"Ошибка", message:"Не удалось подключить кошелек"}); }
-        }
-    };
-    
-    initTonConnect();
-    
-    let currentUser = null;
-    let userData = { balance: 5, verified: false, isAdmin: false, isSupport: false };
-    let activeDuel = null;
-    let towerGameActive = false;
-    let towerCells = [];
-    let currentMultiplier = 1;
-    let towerBetAmount = 0;
-    
-    async function initUser() {
-        const user = tg.initDataUnsafe?.user;
-        if(!user) { document.getElementById("usernameDisplay").innerText = "Guest"; return; }
-        currentUser = { id: user.id, username: user.username || user.first_name, photo: user.photo_url };
-        document.getElementById("usernameDisplay").innerText = "@" + currentUser.username;
-        if(currentUser.photo) document.getElementById("avatarDiv").style.backgroundImage = `url(${currentUser.photo})`;
-        else document.getElementById("avatarDiv").innerText = currentUser.username[0].toUpperCase();
+    <div class="container">
+        <div class="icon">⚙️</div>
+        <h1>Идут технические работы</h1>
+        <p>Пожалуйста, ожидайте. Мы скоро вернемся.</p>
         
-        const userRef = ref(db, `users/${currentUser.id}`);
-        const snap = await get(userRef);
-        if(snap.exists()) {
-            userData = snap.val();
-        } else {
-            userData = { balance: 10, verified: false, isAdmin: false, isSupport: false, username: currentUser.username };
-            await set(userRef, userData);
-        }
-        if(currentUser.username === "Kegovich") {
-            userData.isAdmin = true;
-            await update(userRef, { isAdmin: true });
-        }
-        updateUI();
-        listenForDuels();
-        loadTickets();
-    }
-    
-    function updateUI() {
-        document.getElementById("balanceDisplay").innerHTML = `💰 ${userData.balance.toFixed(2)} TON`;
-        if(userData.verified) document.getElementById("verifyBadge").innerHTML = '<span class="badge">✅ Верифицирован</span>';
-        if(userData.isAdmin || userData.isSupport) document.querySelector(".admin-tab").style.display = "block";
-        if(userData.isAdmin) document.getElementById("adminTab").style.display = "block";
-    }
-    
-    async function updateBalance(amount) {
-        const userRef = ref(db, `users/${currentUser.id}`);
-        userData.balance += amount;
-        await update(userRef, { balance: userData.balance });
-        updateUI();
-    }
-    
-    // Депозит
-    document.getElementById("depositBtn").onclick = async () => {
-        if(!walletAddress) { tg.showPopup({title:"Ошибка", message:"Сначала подключите TON кошелек!"}); return; }
-        try {
-            const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 600,
-                messages: [{
-                    address: "EQD___demo_casino_wallet_address", // demo адрес, в реальности заменишь
-                    amount: "1000000000" // 1 TON = 10^9 nanoTON
-                }]
-            };
-            await tonConnector.sendTransaction(transaction);
-            tg.showPopup({title:"Успех", message:"Депозит 1 TON обрабатывается!"});
-            await updateBalance(1);
-        } catch(e) { tg.showPopup({title:"Ошибка", message:"Транзакция отклонена"}); }
-    };
-    
-    // Вывод
-    document.getElementById("withdrawBtn").onclick = async () => {
-        if(!walletAddress) { tg.showPopup({message:"Подключи кошелек"}); return; }
-        let amount = parseFloat(document.getElementById("withdrawAmount").value);
-        if(isNaN(amount) || amount <=0 || amount > userData.balance) { tg.showPopup({message:"Некорректная сумма"}); return; }
-        tg.showPopup({title:"Вывод", message:`Запрос на вывод ${amount} TON на ${walletAddress.slice(0,8)}... отправлен. Админ обработает.`});
-        await updateBalance(-amount);
-    };
-    
-    // РУЛЕТКА
-    document.getElementById("createDuelBtn").onclick = async () => {
-        let bet = parseFloat(document.getElementById("betAmount").value);
-        if(isNaN(bet) || bet<=0 || bet > userData.balance) { tg.showPopup({message:"Недостаточно средств!"}); return; }
-        const duelRef = ref(db, "duels/active");
-        const snap = await get(duelRef);
-        if(snap.exists() && snap.val().status === "waiting") { tg.showPopup({message:"Дуэль уже есть!"}); return; }
-        await updateBalance(-bet);
-        await set(duelRef, { creator: currentUser.id, creatorBet: bet, status: "waiting", creatorName: currentUser.username });
-        document.getElementById("duelInfo").innerHTML = `⚔️ Дуэль создана! Ставка ${bet} TON`;
-    };
-    
-    document.getElementById("joinDuelBtn").onclick = async () => {
-        const duelRef = ref(db, "duels/active");
-        const snap = await get(duelRef);
-        if(!snap.exists() || snap.val().status !== "waiting") { tg.showPopup({message:"Нет дуэли"}); return; }
-        let duel = snap.val();
-        if(duel.creator === currentUser.id) return;
-        let joinBet = duel.creatorBet;
-        if(joinBet > userData.balance) { tg.showPopup({message:`Нужно ${joinBet} TON`}); return; }
-        await updateBalance(-joinBet);
-        await update(duelRef, { opponent: currentUser.id, opponentBet: joinBet, status: "active" });
-        let winnerId = duel.creatorBet >= joinBet ? duel.creator : currentUser.id;
-        let prize = duel.creatorBet + joinBet;
-        await update(duelRef, { winner: winnerId, prize: prize, status: "finished" });
-        await update(ref(db, `users/${winnerId}`), { balance: (await get(ref(db, `users/${winnerId}`))).val().balance + prize });
-        tg.showPopup({title:"Победа!", message:`Ты выиграл ${prize} TON!`});
-        await remove(duelRef);
-        initUser();
-        drawWheel(duel.creatorBet, joinBet);
-    };
-    
-    function drawWheel(b1, b2) {
-        let total = b1+b2;
-        let angle1 = (b1/total)*360;
-        let svg = document.getElementById("wheelSvg");
-        let existing = svg.querySelectorAll("#playerSlice,#opponentSlice");
-        existing.forEach(el=>el.remove());
-        let pSlice = document.createElementNS("http://www.w3.org/2000/svg","path");
-        pSlice.setAttribute("d", `M 50 50 L 50 2 A 48 48 0 ${angle1>180?1:0} 1 ${50+48*Math.cos(angle1*Math.PI/180)} ${50+48*Math.sin(angle1*Math.PI/180)} Z`);
-        pSlice.setAttribute("fill","#ff6b6b");
-        pSlice.setAttribute("id","playerSlice");
-        svg.appendChild(pSlice);
-    }
-    
-    function listenForDuels() {
-        onValue(ref(db, "duels/active"), (snap) => {
-            if(snap.exists() && snap.val().status === "waiting") document.getElementById("duelInfo").innerHTML = `🎲 Есть дуэль! Ставка ${snap.val().creatorBet} TON`;
-            else if(!snap.exists()) document.getElementById("duelInfo").innerHTML = `⚔️ Нет активной дуэли`;
-        });
-    }
-    
-    // TOWER
-    document.getElementById("startTowerBtn").onclick = async () => {
-        let bet = parseFloat(document.getElementById("towerBet").value);
-        if(bet > userData.balance || bet <=0) { tg.showPopup({message:"Недостаточно TON"}); return; }
-        await updateBalance(-bet);
-        towerBetAmount = bet;
-        currentMultiplier = 1;
-        towerGameActive = true;
-        document.getElementById("towerMultiplier").innerHTML = "x1";
-        document.getElementById("towerStatus").innerHTML = "🏆 Нажми на безопасную плиту!";
-        document.getElementById("startTowerBtn").style.display = "none";
-        document.getElementById("cashoutTowerBtn").style.display = "block";
-        let grid = document.getElementById("towerGrid");
-        grid.style.display = "grid";
-        grid.innerHTML = "";
-        towerCells = [];
-        for(let i=0;i<9;i++) {
-            let cell = document.createElement("div");
-            cell.className = "tower-cell";
-            cell.innerText = "❓";
-            cell.dataset.index = i;
-            cell.onclick = () => towerReveal(i);
-            grid.appendChild(cell);
-            towerCells.push({revealed:false, isBomb: Math.random() < 0.2 && i>2});
-        }
-    };
-    
-    function towerReveal(idx) {
-        if(!towerGameActive) return;
-        if(towerCells[idx].revealed) return;
-        if(towerCells[idx].isBomb) {
-            document.getElementById("towerStatus").innerHTML = "💥 Ты наткнулся на бомбу! Потеряно!";
-            towerGameActive = false;
-            document.getElementById("startTowerBtn").style.display = "block";
-            document.getElementById("cashoutTowerBtn").style.display = "none";
-        } else {
-            towerCells[idx].revealed = true;
-            document.querySelectorAll(".tower-cell")[idx].classList.add("revealed");
-            document.querySelectorAll(".tower-cell")[idx].innerText = "✅";
-            currentMultiplier = 1 + (towerCells.filter(c=>c.revealed).length * 0.2);
-            document.getElementById("towerMultiplier").innerHTML = `x${currentMultiplier.toFixed(1)}`;
-            if(towerCells.filter(c=>c.revealed).length >= 7) {
-                let win = towerBetAmount * currentMultiplier;
-                updateBalance(win);
-                document.getElementById("towerStatus").innerHTML = `🎉 ПОБЕДА! +${win.toFixed(2)} TON`;
-                towerGameActive = false;
-                document.getElementById("startTowerBtn").style.display = "block";
-                document.getElementById("cashoutTowerBtn").style.display = "none";
-            }
-        }
-    }
-    
-    document.getElementById("cashoutTowerBtn").onclick = async () => {
-        if(!towerGameActive) return;
-        let win = towerBetAmount * currentMultiplier;
-        await updateBalance(win);
-        document.getElementById("towerStatus").innerHTML = `💎 Выигрыш забран! +${win.toFixed(2)} TON`;
-        towerGameActive = false;
-        document.getElementById("startTowerBtn").style.display = "block";
-        document.getElementById("cashoutTowerBtn").style.display = "none";
-    };
-    
-    // Техподдержка
-    document.getElementById("supportBtn").onclick = () => {
-        let box = document.getElementById("supportChatBox");
-        box.style.display = box.style.display === "none" ? "block" : "none";
-        loadSupportMessages();
-    };
-    
-    async function loadSupportMessages() {
-        const msgsRef = ref(db, `support/${currentUser.id}`);
-        onValue(msgsRef, (snap) => {
-            let container = document.getElementById("supportMessages");
-            container.innerHTML = "";
-            snap.forEach(child => {
-                let msg = child.val();
-                let div = document.createElement("div");
-                div.className = "support-msg";
-                div.innerHTML = `<b>${msg.from}</b>: ${msg.text}<br><small>${new Date(msg.time).toLocaleTimeString()}</small>`;
-                container.appendChild(div);
-            });
-        });
-    }
-    
-    document.getElementById("sendSupportMsg").onclick = async () => {
-        let text = document.getElementById("supportMsgInput").value;
-        if(!text) return;
-        await push(ref(db, `support/${currentUser.id}`), { from: currentUser.username, text: text, time: Date.now() });
-        document.getElementById("supportMsgInput").value = "";
-        if(userData.isAdmin || userData.isSupport) await push(ref(db, "adminTickets"), { userId: currentUser.id, msg: text });
-    };
-    
-    async function loadTickets() {
-        if(!userData.isAdmin) return;
-        onValue(ref(db, "adminTickets"), (snap) => {
-            let div = document.getElementById("ticketsList");
-            div.innerHTML = "";
-            snap.forEach(t => {
-                let ticket = t.val();
-                div.innerHTML += `<div class="support-msg">${ticket.userId}: ${ticket.msg} <button class="btn" style="width:auto; padding:5px;" onclick="replyToTicket('${ticket.userId}')">Ответить</button></div>`;
-            });
-        });
-    }
-    
-    window.replyToTicket = async (userId) => {
-        let reply = prompt("Ответ пользователю:");
-        if(reply) await push(ref(db, `support/${userId}`), { from: "Админ", text: reply, time: Date.now() });
-    };
-    
-    // Админ функции
-    document.getElementById("giveGiftBtn").onclick = async () => {
-        const users = await get(ref(db, "users"));
-        users.forEach(async (u) => {
-            await update(ref(db, `users/${u.key}`), { balance: (u.val().balance || 0) + 5 });
-        });
-        tg.showPopup({title:"Подарок", message:"+5 TON всем!"});
-    };
-    document.getElementById("grantVerifyBtn").onclick = async () => {
-        let target = document.getElementById("adminTargetUser").value;
-        const users = await get(ref(db, "users"));
-        let found = false;
-        users.forEach(async (u) => {
-            if(u.val().username === target) { await update(ref(db, `users/${u.key}`), { verified: true }); found = true; }
-        });
-        tg.showPopup({message: found ? "Галочка выдана" : "Не найден"});
-    };
-    document.getElementById("makeAdminBtn").onclick = async () => {
-        let target = document.getElementById("adminTargetUser").value;
-        const users = await get(ref(db, "users"));
-        users.forEach(async (u) => { if(u.val().username === target) await update(ref(db, `users/${u.key}`), { isAdmin: true }); });
-    };
-    document.getElementById("makeSupportBtn").onclick = async () => {
-        let target = document.getElementById("adminTargetUser").value;
-        const users = await get(ref(db, "users"));
-        users.forEach(async (u) => { if(u.val().username === target) await update(ref(db, `users/${u.key}`), { isSupport: true }); });
-    };
-    
-    // Табы
-    document.querySelectorAll(".tab").forEach(tab => {
-        tab.onclick = () => {
-            let tabName = tab.dataset.tab;
-            document.querySelectorAll(".game-container").forEach(cont => cont.classList.remove("active"));
-            document.getElementById(tabName + "Tab").classList.add("active");
-            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
-        };
-    });
-    
-    initUser();
-</script>
+        <div class="loader">
+            <div class="loader-line"></div>
+        </div>
+    </div>
+
 </body>
 </html>
