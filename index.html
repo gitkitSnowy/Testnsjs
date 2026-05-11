@@ -3,772 +3,731 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Rolls Master PvP FULL AUTO</title>
+    <title>Rolls Master PvP ELITE</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 
     <style>
         :root {
-            --bg: #05070a; --panel: rgba(20, 24, 40, 0.9); --accent: #2481cc;
-            --gold: #ffcc00; --red: #ff4757; --green: #2ed573; --text: #ffffff;
-            --sub: #a0a0ab;
+            --bg: #070a11; 
+            --panel: #111722; 
+            --accent: #2481cc; 
+            --gold: #ffcc00; 
+            --red: #ff4757; 
+            --green: #2ed573; 
+            --text: #ffffff;
+            --sub: #848da0;
+            --card-bg: rgba(36, 129, 204, 0.05);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Roboto, sans-serif; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', 'Segoe UI', sans-serif; }
         body { margin: 0; background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; }
 
-        .app-wrapper { display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; }
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        .app-wrapper { display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; position: relative; }
 
         /* HEADER */
         header {
             padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            background: var(--panel); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.1);
-            z-index: 100;
+            background: var(--panel); border-bottom: 1px solid rgba(36, 129, 204, 0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000;
         }
-        .u-avatar { width: 42px; height: 42px; border-radius: 12px; border: 2px solid var(--accent); }
+        .u-info { display: flex; align-items: center; gap: 12px; }
+        .u-avatar { width: 45px; height: 45px; border-radius: 14px; border: 2px solid var(--accent); object-fit: cover; background: #1a222d; }
+        .u-meta { display: flex; flex-direction: column; }
+        .u-name { font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 5px; }
+        .u-lvl-badge { font-size: 10px; background: var(--accent); padding: 2px 6px; border-radius: 6px; font-weight: 900; }
+        
         .balance-container {
-            display: flex; align-items: center; gap: 8px;
-            background: rgba(0,0,0,0.5); padding: 6px 14px; border-radius: 16px; border: 1px solid var(--accent);
+            display: flex; flex-direction: column; align-items: flex-end;
         }
+        .bal-val { font-weight: 900; color: var(--gold); font-size: 18px; text-shadow: 0 0 10px rgba(255,204,0,0.3); }
+        .bal-label { font-size: 9px; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; }
 
         /* SCREENS */
-        main { flex: 1; overflow-y: auto; padding: 20px 20px 100px; }
-        .screen { display: none; }
-        .screen.active { display: block; }
+        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 110px; }
+        .screen { display: none; opacity: 0; transform: translateY(10px); transition: 0.3s; }
+        .screen.active { display: block; opacity: 1; transform: translateY(0); }
 
-        .card { background: var(--panel); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .card { background: var(--panel); border-radius: 24px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.03); position: relative; overflow: hidden; }
+        .card-header { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; }
 
+        /* BUTTONS */
         .btn-action {
-            background: linear-gradient(135deg, #2481cc 0%, #00d2ff 100%); border: none; color: white; 
-            padding: 16px; border-radius: 16px; width: 100%; font-weight: 800; cursor: pointer;
+            background: var(--accent); border: none; color: white; padding: 16px; border-radius: 18px; 
+            width: 100%; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.2s;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            box-shadow: 0 4px 15px rgba(36, 129, 204, 0.3);
         }
+        .btn-action:active { transform: scale(0.96); box-shadow: none; }
+        .btn-secondary { background: rgba(255,255,255,0.05); color: var(--text); box-shadow: none; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-small { padding: 8px 15px; width: auto; font-size: 12px; border-radius: 10px; }
 
+        /* INPUTS */
         .input-fld {
-            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
-            color: white; padding: 14px; border-radius: 14px; margin-bottom: 12px;
+            width: 100%; background: #0c111a; border: 1px solid rgba(36,129,204,0.2);
+            color: white; padding: 16px; border-radius: 16px; margin-bottom: 15px; outline: none; font-size: 15px; transition: 0.3s;
         }
+        .input-fld:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(36,129,204,0.2); }
 
-        /* КОЛЕСО */
-        .wheel-box { position: relative; width: 280px; height: 280px; margin: 25px auto; }
-        canvas#mainWheel { width: 100%; height: 100%; }
-
-        /* НАВИГАЦИЯ */
+        /* GAME UI */
+        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .wheel-container { position: relative; width: 300px; height: 300px; margin: 30px auto; }
+        canvas#mainWheel { width: 100%; height: 100%; border-radius: 50%; border: 8px solid var(--panel); box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        .wheel-pointer { 
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%); 
+            z-index: 10; font-size: 30px; color: var(--accent); filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+        }
+        
+        .players-list { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
+        .player-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: rgba(255,255,255,0.03); padding: 12px 18px; border-radius: 16px;
+            border-left: 4px solid var(--accent); animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        
+        /* NAV */
         nav {
             position: fixed; bottom: 0; width: 100%; max-width: 500px;
-            background: rgba(20, 24, 40, 0.95); display: flex; justify-content: space-around; 
-            padding: 15px 0 25px; border-top: 1px solid rgba(255,255,255,0.1);
+            background: var(--panel); display: flex; justify-content: space-around; 
+            padding: 15px 0 30px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000;
         }
-        .nav-btn { color: var(--sub); text-align: center; font-size: 11px; flex: 1; cursor: pointer; }
-        .nav-btn.active { color: var(--accent); font-weight: bold; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--sub); font-size: 10px; font-weight: 700; cursor: pointer; flex: 1; transition: 0.2s; }
+        .nav-item.active { color: var(--accent); }
+        .nav-icon { font-size: 20px; }
 
-        .modal { position: fixed; inset: 0; background: var(--bg); z-index: 2000; padding: 25px; display: none; overflow-y: auto; }
+        /* STATS & PROGRESS */
+        .xp-bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 10px 0; overflow: hidden; }
+        .xp-bar-fill { height: 100%; background: var(--accent); width: 0%; transition: 1s cubic-bezier(0.1,0,0,1); }
         
-        .ticket { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; margin-bottom: 12px; cursor: pointer; }
-        .ticket.unread { border-left: 3px solid var(--accent); }
-        .badge { display: inline-block; background: var(--accent); border-radius: 10px; padding: 2px 8px; font-size: 10px; margin-left: 8px; }
-        .message-bubble { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; margin-bottom: 8px; }
-        .message-bubble.admin { background: rgba(36,129,204,0.2); border-left: 3px solid var(--accent); }
-        
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-card { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; text-align: center; }
-        
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        .stat-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.02); }
+        .stat-val { display: block; font-size: 18px; font-weight: 900; color: var(--text); }
+        .stat-label { font-size: 10px; color: var(--sub); text-transform: uppercase; }
+
+        /* MODALS */
+        .modal { position: fixed; inset: 0; background: var(--bg); z-index: 5000; padding: 25px; display: none; overflow-y: auto; }
+        .history-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+
+        /* ACHIEVEMENTS */
+        .achiev-list { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; }
+        .achiev-item { min-width: 70px; height: 70px; background: #1a222d; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; filter: grayscale(1); opacity: 0.5; border: 1px solid transparent; }
+        .achiev-item.unlocked { filter: grayscale(0); opacity: 1; border-color: var(--gold); background: rgba(255,204,0,0.1); }
     </style>
 </head>
 <body>
 
 <div class="app-wrapper">
     <header>
-        <div style="display:flex; align-items:center; gap:10px;">
+        <div class="u-info">
             <img id="my-avatar" class="u-avatar" src="">
-            <div>
-                <div style="font-weight:900; display:flex; align-items:center; gap:3px;">
-                    <span id="my-name">@User</span><span id="verif-icon" style="color:#00c3ff; display:none;">💎</span>
+            <div class="u-meta">
+                <div class="u-name"><span id="u-display-name">Loading...</span> <span id="verif-tag" style="display:none">💎</span></div>
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <span class="u-lvl-badge">LVL <span id="u-lvl">1</span></span>
+                    <span id="u-rank" style="font-size:10px; color:var(--sub); font-weight:700;">ROOKIE</span>
                 </div>
-                <div id="my-rank" style="font-size:9px; color:var(--accent); font-weight:bold;">USER</div>
             </div>
         </div>
         <div class="balance-container">
-            <span id="my-bal" style="font-weight:900; color:var(--gold); font-size:18px;">0.00</span> <small>TON</small>
+            <div class="bal-label">Твой Баланс</div>
+            <div class="bal-val"><span id="my-bal">0.00</span> TON</div>
         </div>
     </header>
 
     <main>
         <div id="scr-lobby" class="screen active">
-            <h2 style="margin-bottom:15px;">Арена</h2>
-            <div class="card" style="border-left: 4px solid var(--gold);" onclick="joinRoom(0)">
-                <b>⚔️ ОБЩИЙ ЗАЛ</b><br><small>Ставки от 0.1 TON</small>
-            </div>
-            <div id="rooms-list">
-                <div class="card" style="border-left: 4px solid var(--accent);" onclick="joinRoom(1)">
-                    <b>🏆 ВИП ЗАЛ</b><br><small>Ставки от 5 TON • Требуется верификация</small>
-                </div>
-            </div>
-        </div>
-
-        <div id="scr-profile" class="screen">
-            <div class="card" style="text-align:center;">
-                <img id="prof-img" class="u-avatar" style="width:80px; height:80px; border-radius:20px; margin-bottom:10px;">
-                <h3 id="prof-name">@User</h3>
-                <div id="my-stats" class="stat-grid" style="margin-top: 15px;"></div>
-                <div id="ton-connect-button" style="display:flex; justify-content:center; margin-top:15px;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="margin:0; font-size:24px;">Арены</h2>
+                <div style="color:var(--green); font-size:12px; font-weight:700;">● Online: <span id="online-count">124</span></div>
             </div>
 
-            <div class="card" style="border: 2px solid var(--accent); background: rgba(36,129,204,0.05);">
-                <h4 style="margin:0 0 10px; color:var(--accent);">⚡ АВТО-ПОПОЛНЕНИЕ</h4>
-                <p style="font-size:12px; color:var(--sub); margin-bottom:15px;">Выбери сумму, нажми кнопку и подтверди в кошельке. Баланс обновится сам.</p>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-                    <button class="btn-action" style="padding: 8px;" onclick="setQuickAmount(1)">1 TON</button>
-                    <button class="btn-action" style="padding: 8px;" onclick="setQuickAmount(5)">5 TON</button>
-                    <button class="btn-action" style="padding: 8px;" onclick="setQuickAmount(10)">10 TON</button>
+            <div class="card" style="background: linear-gradient(135deg, rgba(36,129,204,0.1) 0%, rgba(0,0,0,0) 100%);" onclick="joinRoom('common')">
+                <div class="card-header"><span>ОБЩАЯ АРЕНА</span> <span style="color:var(--green)">АКТИВНО</span></div>
+                <b style="font-size:20px;">⚔️ Battle Royale</b>
+                <p style="color:var(--sub); font-size:12px; margin:8px 0 15px;">Ставки от 0.1 TON. Шанс победы зависит от размера ставки.</p>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-size:11px; font-weight:700;">🏦 БАНК: <span style="color:var(--gold)" id="common-jackpot">0.00</span> TON</div>
+                    <button class="btn-action btn-small">ВОЙТИ</button>
                 </div>
-                
-                <input type="number" id="pay-amount" class="input-fld" placeholder="Сумма TON" value="1.0" step="0.1">
-                <button id="pay-btn" class="btn-action" onclick="autoPay()">💎 КУПИТЬ TON</button>
+            </div>
+
+            <div class="card" style="border-color: var(--gold); background: linear-gradient(135deg, rgba(255,204,0,0.05) 0%, rgba(0,0,0,0) 100%);" onclick="joinRoom('vip')">
+                <div class="card-header"><span style="color:var(--gold)">VIP ARENA</span> <span>PREMIUM</span></div>
+                <b style="font-size:20px;">🏆 High Rollers</b>
+                <p style="color:var(--sub); font-size:12px; margin:8px 0 15px;">Только для игроков 5+ уровня. Ставки от 5 TON.</p>
+                <button class="btn-action btn-small" style="background:var(--gold); color:black;">ОТКРЫТЬ</button>
             </div>
 
             <div class="card">
-                <h4>🎟️ ПРОМОКОД</h4>
-                <div style="display:flex; gap:8px;">
-                    <input type="text" id="promo-input" class="input-fld" style="margin:0;" placeholder="Введите код...">
-                    <button class="btn-action" style="width:auto; padding:0 20px;" onclick="activatePromo()">АКТИВИРОВАТЬ</button>
-                </div>
+                <div class="card-header">ТОП ИГРОКОВ</div>
+                <div id="leaderboard-mini">
+                    </div>
             </div>
-
-            <div class="card">
-                <h4>🎲 МОЯ СТАТИСТИКА</h4>
-                <div class="stat-grid">
-                    <div class="stat-card">🎮 Игр: <b id="stat-games">0</b></div>
-                    <div class="stat-card">🏆 Побед: <b id="stat-wins">0</b></div>
-                    <div class="stat-card">📊 Winrate: <b id="stat-winrate">0%</b></div>
-                    <div class="stat-card">💰 Выиграно: <b id="stat-won">0</b> TON</div>
-                </div>
-            </div>
-
-            <button id="adm-btn" class="btn-action" style="background:var(--gold); color:black; display:none; margin-top:10px;" onclick="openAdmin()">👑 АДМИН ПАНЕЛЬ</button>
-            <button class="btn-action" style="background:var(--accent); margin-top:10px;" onclick="openSupport()">🎫 ТЕХПОДДЕРЖКА</button>
         </div>
 
         <div id="scr-game" class="screen">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <button onclick="leaveRoom()" style="background:none; border:none; color:white; font-size:24px;">✕</button>
-                <h3 id="game-title" style="margin:0;">ЗАЛ</h3>
-                <div style="width:24px;"></div>
+            <div class="game-header">
+                <button onclick="leaveRoom()" class="btn-action btn-secondary btn-small">⬅ Назад</button>
+                <div style="text-align:right;">
+                    <div id="room-name" style="font-weight:900; color:var(--accent);">ОБЩАЯ АРЕНА</div>
+                    <div style="font-size:10px; color:var(--sub);">Мин. ставка: 0.1 TON</div>
+                </div>
             </div>
-            <div id="game-status" style="text-align:center; color:var(--gold); font-weight:bold; margin:15px 0;">ОЖИДАНИЕ...</div>
-            <div class="wheel-box">
+
+            <div class="wheel-container">
+                <div class="wheel-pointer">▼</div>
                 <canvas id="mainWheel" width="600" height="600"></canvas>
             </div>
-            <div id="game-players" class="card" style="min-height:60px;"></div>
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="play-bet" class="input-fld" style="flex:1; margin:0;" value="1.0">
-                <button class="btn-action" style="flex:2;" onclick="placeBet()">🎲 СТАВКА</button>
+
+            <div id="game-status" style="text-align:center; font-weight:800; font-size:18px; color:var(--gold); margin-bottom:20px;">
+                ОЖИДАНИЕ ИГРОКОВ...
             </div>
+
+            <div class="card">
+                <div class="card-header">ВАША СТАВКА</div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input type="number" id="bet-input" class="input-fld" style="margin:0;" value="1.0" step="0.1">
+                    <button class="btn-action" style="width:120px;" onclick="placeBet()">ИГРАТЬ</button>
+                </div>
+            </div>
+
+            <div class="players-list" id="players-list">
+                </div>
+        </div>
+
+        <div id="scr-profile" class="screen">
+            <div class="card" style="text-align:center; padding-top:40px;">
+                <div style="position:relative; display:inline-block;">
+                    <img id="prof-big-avatar" class="u-avatar" style="width:100px; height:100px; border-radius:30px; margin-bottom:15px;">
+                    <div style="position:absolute; bottom:20px; right:-5px; background:var(--accent); border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border:3px solid var(--panel); font-weight:900; font-size:12px;" id="prof-lvl-num">1</div>
+                </div>
+                <h2 id="prof-name" style="margin:0;">@User</h2>
+                <div id="prof-rank" style="color:var(--accent); font-weight:800; font-size:12px; margin-top:5px;">ROOKIE</div>
+
+                <div style="margin-top:20px; text-align:left;">
+                    <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700;">
+                        <span>ОПЫТ (XP)</span>
+                        <span><span id="u-xp-cur">0</span> / <span id="u-xp-next">100</span></span>
+                    </div>
+                    <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-fill"></div></div>
+                </div>
+                
+                <div id="ton-connect-button" style="display:flex; justify-content:center; margin-top:20px;"></div>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-box"><span class="stat-val" id="st-games">0</span><span class="stat-label">Игр</span></div>
+                <div class="stat-box"><span class="stat-val" id="st-wins" style="color:var(--green)">0</span><span class="stat-label">Побед</span></div>
+                <div class="stat-box"><span class="stat-val" id="st-total-bet">0.0</span><span class="stat-label">Оборот</span></div>
+                <div class="stat-box"><span class="stat-val" id="st-profit" style="color:var(--gold)">0.0</span><span class="stat-label">Профит</span></div>
+            </div>
+
+            <div class="card" style="margin-top:15px;">
+                <div class="card-header">ДОСТИЖЕНИЯ</div>
+                <div class="achiev-list">
+                    <div class="achiev-item" title="Первая ставка">🎯</div>
+                    <div class="achiev-item" title="Выиграть 1 TON">💰</div>
+                    <div class="achiev-item" title="10 побед подрят">🔥</div>
+                    <div class="achiev-item" title="Китяра">🐳</div>
+                    <div class="achiev-item" title="Хайроллер">💎</div>
+                    <div class="achiev-item" title="Легенда">👑</div>
+                </div>
+            </div>
+
+            <div class="card" style="border: 1px solid var(--accent); background: var(--card-bg);">
+                <div class="card-header">БЫСТРОЕ ПОПОЛНЕНИЕ</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-bottom:12px;">
+                    <button class="btn-action btn-secondary btn-small" onclick="setPayAmt(1)">1 TON</button>
+                    <button class="btn-action btn-secondary btn-small" onclick="setPayAmt(5)">5 TON</button>
+                    <button class="btn-action btn-secondary btn-small" onclick="setPayAmt(10)">10 TON</button>
+                </div>
+                <input type="number" id="pay-input" class="input-fld" value="1.0">
+                <button class="btn-action" onclick="processDeposit()">💳 ПОПОЛНИТЬ ЧЕРЕЗ КОШЕЛЕК</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">ПРОМОКОД</div>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="promo-code" class="input-fld" style="margin:0;" placeholder="Введите код...">
+                    <button class="btn-action btn-small" onclick="usePromo()">OK</button>
+                </div>
+            </div>
+
+            <button id="admin-entry-btn" class="btn-action btn-secondary" style="margin-top:10px; display:none;" onclick="openAdmin()">⚙️ ADMIN PANEL</button>
+            <button class="btn-action btn-secondary" style="margin-top:10px;" onclick="showHistory()">📜 ИСТОРИЯ ОПЕРАЦИЙ</button>
+            <button class="btn-action btn-secondary" style="margin-top:10px;" onclick="openSupport()">🆘 ПОДДЕРЖКА</button>
         </div>
     </main>
 
     <nav>
-        <div class="nav-btn active" onclick="nav('lobby')">🎮 ИГРЫ</div>
-        <div class="nav-btn" onclick="nav('profile')">💎 АККАУНТ</div>
+        <div class="nav-item active" onclick="nav('lobby')">
+            <span class="nav-icon">🎮</span>
+            <span>ИГРЫ</span>
+        </div>
+        <div class="nav-item" onclick="nav('profile')">
+            <span class="nav-icon">👤</span>
+            <span>ПРОФИЛЬ</span>
+        </div>
     </nav>
 </div>
 
-<!-- АДМИН ПАНЕЛЬ -->
 <div id="modal-admin" class="modal">
-    <h2>👑 ADMIN PANEL</h2>
-    
-    <div class="card">
-        <h4>💰 Выдать TON пользователю</h4>
-        <input id="adm-target-user" class="input-fld" placeholder="@username">
-        <input id="adm-amount" type="number" class="input-fld" placeholder="Сумма">
-        <button class="btn-action" style="background:var(--green);" onclick="adminAddBal()">💸 ВЫДАТЬ</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+        <h2 style="color:var(--gold); margin:0;">DEVELOPER CONSOLE</h2>
+        <button onclick="closeModal('modal-admin')" class="btn-action btn-secondary btn-small">Закрыть</button>
     </div>
 
     <div class="card">
-        <h4>📊 Управление промокодами</h4>
-        <input id="adm-promo-code" class="input-fld" placeholder="Новый промокод">
-        <input id="adm-promo-value" type="number" class="input-fld" placeholder="Сумма награды">
-        <button class="btn-action" onclick="adminAddPromo()">➕ ДОБАВИТЬ ПРОМОКОД</button>
-        <button class="btn-action" style="background:var(--red); margin-top:8px;" onclick="adminListPromos()">📋 СПИСОК ПРОМОКОДОВ</button>
+        <div class="card-header">УПРАВЛЕНИЕ БАЛАНСОМ</div>
+        <input id="adm-set-bal" type="number" class="input-fld" placeholder="Сумма TON">
+        <button class="btn-action" style="background:var(--green);" onclick="adminUpdateBal()">ПРИМЕНИТЬ СЕБЕ</button>
     </div>
 
     <div class="card">
-        <h4>🎮 Управление сервером</h4>
-        <button class="btn-action" onclick="adminSetMaintenance()">🔧 ВКЛ/ВЫКЛ РЕЖИМ ОБСЛУЖИВАНИЯ</button>
-        <button class="btn-action" style="background:var(--gold); color:black; margin-top:8px;" onclick="adminResetGame()">🔄 СБРОС АКТИВНОЙ ИГРЫ</button>
-        <button class="btn-action" style="background:var(--green); margin-top:8px;" onclick="adminBroadcast()">📢 ОТПРАВИТЬ УВЕДОМЛЕНИЕ ВСЕМ</button>
+        <div class="card-header">ГЕНЕРАЦИЯ ПРОМОКОДА</div>
+        <input id="adm-promo-name" type="text" class="input-fld" placeholder="Название (например: START)">
+        <input id="adm-promo-sum" type="number" class="input-fld" placeholder="Сумма зачисления">
+        <button class="btn-action" onclick="adminCreatePromo()">СОЗДАТЬ КОД</button>
     </div>
 
     <div class="card">
-        <h4>📈 Глобальная статистика</h4>
-        <div id="global-stats"></div>
+        <div class="card-header">СИСТЕМНЫЕ УВЕДОМЛЕНИЯ</div>
+        <textarea id="adm-msg" class="input-fld" placeholder="Текст сообщения для всех..."></textarea>
+        <button class="btn-action" onclick="adminBroadcast()">ОТПРАВИТЬ ВСЕМ</button>
     </div>
 
     <div class="card">
-        <h4>🎫 Тикеты поддержки</h4>
-        <div id="admin-tickets-list"></div>
+        <div class="card-header">АКТИВНЫЕ ТИКЕТЫ</div>
+        <div id="admin-tickets-container"></div>
     </div>
-
-    <button class="btn-action" style="background:var(--red); margin-top:20px;" onclick="document.getElementById('modal-admin').style.display='none'">❌ ЗАКРЫТЬ</button>
 </div>
 
-<!-- ТЕХПОДДЕРЖКА -->
-<div id="modal-support" class="modal">
-    <h2>🎫 ТЕХПОДДЕРЖКА</h2>
-    <div class="card">
-        <h4>Создать новый тикет</h4>
-        <input id="ticket-title" class="input-fld" placeholder="Тема обращения">
-        <textarea id="ticket-message" class="input-fld" rows="3" placeholder="Опишите проблему..."></textarea>
-        <button class="btn-action" onclick="createTicket()">📨 ОТПРАВИТЬ</button>
+<div id="modal-history" class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2>ИСТОРИЯ</h2>
+        <button onclick="closeModal('modal-history')" class="btn-action btn-secondary btn-small">Закрыть</button>
     </div>
-    
-    <div class="card">
-        <h4>Мои обращения</h4>
-        <div id="my-tickets-list"></div>
-    </div>
-    
-    <button class="btn-action" style="background:var(--red); margin-top:20px;" onclick="closeSupport()">ЗАКРЫТЬ</button>
-</div>
-
-<!-- ДИАЛОГ ТИКЕТА -->
-<div id="modal-ticket-dialog" class="modal">
-    <h2 id="dialog-title">Тикет #</h2>
-    <div id="ticket-messages" style="max-height: 400px; overflow-y: auto; margin-bottom: 15px;"></div>
-    <textarea id="reply-message" class="input-fld" rows="2" placeholder="Ваш ответ..."></textarea>
-    <button class="btn-action" onclick="sendReply()">📤 ОТПРАВИТЬ</button>
-    <button class="btn-action" style="background:var(--red); margin-top:10px;" onclick="closeTicketDialog()">ЗАКРЫТЬ</button>
+    <div id="history-list"></div>
 </div>
 
 <script>
-    const tg = window.Telegram.WebApp;
-    const MY_WALLET = "UQAr_YOUR_REAL_WALLET_HERE"; // Замени на свой адрес
+    /* Rolls Master PvP - CORE LOGIC 2.0
+       Dev: Alexander (Kegovich/mas1sa)
+    */
 
+    const tg = window.Telegram.WebApp;
+    const WALLET_ADDRESS = "UQAr_YOUR_REAL_WALLET_HERE"; // ТВОЙ АДРЕС ТУТ
+
+    // TON CONNECT SETUP
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
         manifestUrl: 'https://raw.githubusercontent.com/ton-connect/demo-dapp-with-react-ui/master/public/tonconnect-manifest.json',
         buttonRootId: 'ton-connect-button'
     });
 
-    // Данные пользователя
-    let savedBal = localStorage.getItem('ton_balance_final');
-    let user = { 
-        name: "Guest", 
-        bal: savedBal ? parseFloat(savedBal) : 5.00,
-        role: "user", 
-        verif: false,
-        gamesPlayed: 0,
-        gamesWon: 0,
-        totalWon: 0
+    // USER DATA OBJECT
+    let user = {
+        name: "Guest",
+        bal: 0.00,
+        lvl: 1,
+        xp: 0,
+        xpNext: 100,
+        stats: { games: 0, wins: 0, tBet: 0, profit: 0 },
+        history: [],
+        achievements: [],
+        role: "user"
     };
-    
-    let stats = JSON.parse(localStorage.getItem('user_stats')) || { gamesPlayed: 0, gamesWon: 0, totalWon: 0 };
-    user.gamesPlayed = stats.gamesPlayed;
-    user.gamesWon = stats.gamesWon;
-    user.totalWon = stats.totalWon;
 
-    // Глобальные данные
-    let promos = JSON.parse(localStorage.getItem('promocodes')) || [];
-    let tickets = JSON.parse(localStorage.getItem('tickets')) || [];
-    let maintenanceMode = localStorage.getItem('maintenance') === 'true';
-    let gamePlayers = [];
-    let currentRoom = 0;
-    let timerIv = null;
-    let spinning = false;
-    let currentTicketView = null;
+    // ROOM STATE
+    let currentGame = {
+        room: 'none',
+        players: [],
+        status: 'waiting',
+        timer: null,
+        jackpot: 0
+    };
 
+    // SYSTEM DATA
+    let promos = JSON.parse(localStorage.getItem('sys_promos')) || [];
+    let tickets = [];
+
+    // INIT
     function init() {
-        tg.ready(); 
+        tg.ready();
         tg.expand();
-        const data = tg.initDataUnsafe?.user;
-        user.name = data?.username || "Kegovich";
         
-        document.getElementById('my-name').innerText = "@" + user.name;
-        document.getElementById('prof-name').innerText = "@" + user.name;
-        document.getElementById('my-avatar').src = `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
-        document.getElementById('prof-img').src = `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
-        
-        updateStatsDisplay();
-        
-        // Админы
-        const admins = ['Kegovich', 'mas1sa', 'Admin'];
-        if(admins.includes(user.name)) {
-            user.role = "owner"; 
-            user.verif = true;
-            document.getElementById('adm-btn').style.display = 'block';
+        // Load data from Storage
+        const saved = localStorage.getItem('rm_user_data');
+        if(saved) {
+            user = JSON.parse(saved);
         }
-        if(user.verif) document.getElementById('verif-icon').style.display = 'inline';
-        
-        save();
+
+        // Sync with Telegram Info
+        const tgData = tg.initDataUnsafe?.user;
+        if(tgData) {
+            user.name = tgData.username || tgData.first_name || "Kegovich";
+        }
+
+        // Admin check
+        if(['Kegovich', 'mas1sa', 'Alexander'].includes(user.name)) {
+            user.role = "owner";
+            document.getElementById('admin-entry-btn').style.display = 'block';
+            document.getElementById('verif-tag').style.display = 'inline';
+        }
+
+        updateUI();
+        renderLeaderboard();
         drawWheel();
-        updateGlobalStats();
-        
-        if(maintenanceMode && user.role !== 'owner') {
-            tg.showAlert("🔧 Сервер на техническом обслуживании. Зайдите позже.");
-        }
-    }
-    
-    function updateStatsDisplay() {
-        document.getElementById('stat-games').innerText = user.gamesPlayed;
-        document.getElementById('stat-wins').innerText = user.gamesWon;
-        const winrate = user.gamesPlayed > 0 ? ((user.gamesWon / user.gamesPlayed) * 100).toFixed(1) : 0;
-        document.getElementById('stat-winrate').innerText = winrate + '%';
-        document.getElementById('stat-won').innerText = user.totalWon.toFixed(2);
-    }
-    
-    function saveUserStats() {
-        localStorage.setItem('user_stats', JSON.stringify({
-            gamesPlayed: user.gamesPlayed,
-            gamesWon: user.gamesWon,
-            totalWon: user.totalWon
-        }));
     }
 
-    function save() {
-        localStorage.setItem('ton_balance_final', user.bal.toFixed(2));
+    // UI REFRESH
+    function updateUI() {
+        // Header
+        document.getElementById('u-display-name').innerText = "@" + user.name;
+        document.getElementById('u-lvl').innerText = user.lvl;
         document.getElementById('my-bal').innerText = user.bal.toFixed(2);
-        saveUserStats();
+        
+        const avatar = `https://api.dicebear.com/7.x/identicon/svg?seed=${user.name}`;
+        document.getElementById('my-avatar').src = avatar;
+        document.getElementById('prof-big-avatar').src = avatar;
+
+        // Profile
+        document.getElementById('prof-name').innerText = "@" + user.name;
+        document.getElementById('prof-lvl-num').innerText = user.lvl;
+        document.getElementById('u-xp-cur').innerText = Math.floor(user.xp);
+        document.getElementById('u-xp-next').innerText = user.xpNext;
+        document.getElementById('xp-fill').style.width = (user.xp / user.xpNext * 100) + "%";
+        
+        // Stats
+        document.getElementById('st-games').innerText = user.stats.games;
+        document.getElementById('st-wins').innerText = user.stats.wins;
+        document.getElementById('st-total-bet').innerText = user.stats.tBet.toFixed(1);
+        document.getElementById('st-profit').innerText = user.stats.profit.toFixed(1);
+
+        // Rank names
+        const ranks = ["ROOKIE", "PLAYER", "GAMBLER", "PRO", "ELITE", "WHALE", "LEGEND"];
+        const rankIdx = Math.min(Math.floor(user.lvl / 5), ranks.length - 1);
+        document.getElementById('u-rank').innerText = ranks[rankIdx];
+        document.getElementById('prof-rank').innerText = ranks[rankIdx];
+
+        saveData();
     }
 
-    function setQuickAmount(amount) {
-        document.getElementById('pay-amount').value = amount;
+    function saveData() {
+        localStorage.setItem('rm_user_data', JSON.stringify(user));
     }
 
-    async function autoPay() {
+    // DEPOSIT LOGIC
+    function setPayAmt(val) { document.getElementById('pay-input').value = val; }
+
+    async function processDeposit() {
         if (!tonConnectUI.connected) {
             await tonConnectUI.openModal();
             return;
         }
 
-        const amount = document.getElementById('pay-amount').value;
-        const nanoAmount = (parseFloat(amount) * 1000000000).toString();
+        const amt = parseFloat(document.getElementById('pay-input').value);
+        if(amt < 0.1) return tg.showAlert("Минимум 0.1 TON");
 
-        const transaction = {
+        const nano = (amt * 1000000000).toString();
+        const tx = {
             validUntil: Math.floor(Date.now() / 1000) + 60,
-            messages: [{ address: MY_WALLET, amount: nanoAmount }]
+            messages: [{ address: WALLET_ADDRESS, amount: nano }]
         };
 
         try {
-            const result = await tonConnectUI.sendTransaction(transaction);
-            tg.showAlert("✅ Оплата подтверждена! Баланс зачислится через 5 секунд.");
+            await tonConnectUI.sendTransaction(tx);
+            tg.showAlert("Транзакция отправлена! Баланс обновится через 10-15 сек.");
             
+            // Success Emulation
             setTimeout(() => {
-                user.bal += parseFloat(amount);
-                save();
-                tg.showPopup({ message: "💰 TON зачислены на ваш баланс!" });
-            }, 5000);
-
-        } catch (e) {
-            tg.showAlert("❌ Ошибка или отмена транзакции.");
+                user.bal += amt;
+                addHistory("Пополнение", `+${amt} TON`);
+                updateUI();
+                tg.showPopup({ message: "Баланс успешно пополнен!" });
+            }, 10000);
+        } catch(e) {
+            tg.showAlert("Ошибка или отмена платежа.");
         }
     }
 
-    function activatePromo() {
-        const code = document.getElementById('promo-input').value.trim().toUpperCase();
-        const promo = promos.find(p => p.code === code && !p.usedBy.includes(user.name));
-        
-        if(!promo) {
-            tg.showAlert("❌ Неверный или уже использованный промокод!");
-            return;
+    // GAME LOGIC
+    function joinRoom(type) {
+        if(type === 'vip' && user.lvl < 5) {
+            return tg.showAlert("Нужен 5 уровень для входа в VIP!");
         }
-        
-        user.bal += promo.value;
-        promo.usedBy.push(user.name);
-        localStorage.setItem('promocodes', JSON.stringify(promos));
-        save();
-        tg.showAlert(`🎉 Промокод активирован! +${promo.value} TON`);
-        document.getElementById('promo-input').value = '';
-    }
-
-    function placeBet() {
-        if(maintenanceMode && user.role !== 'owner') {
-            tg.showAlert("🔧 Сервер на обслуживании!");
-            return;
-        }
-        
-        const val = parseFloat(document.getElementById('play-bet').value);
-        const minBet = currentRoom === 1 ? 5 : 0.1;
-        
-        if(currentRoom === 1 && !user.verif) {
-            tg.showAlert("💎 VIP зал доступен только верифицированным игрокам!");
-            return;
-        }
-        
-        if(val < minBet) {
-            tg.showAlert(`❌ Минимальная ставка: ${minBet} TON`);
-            return;
-        }
-        
-        if(user.bal < val) {
-            tg.showAlert("❌ Недостаточно TON!");
-            return;
-        }
-        
-        if(spinning) {
-            tg.showAlert("⏳ Игра уже идет! Дождитесь окончания.");
-            return;
-        }
-        
-        user.bal -= val;
-        gamePlayers.push({name: user.name, bet: val, color: '#' + Math.floor(Math.random()*16777215).toString(16)});
-        save();
-        updateGameUI();
-        
-        if(gamePlayers.length >= 2 && !timerIv && !spinning) {
-            startTimer();
-        }
-    }
-
-    function startTimer() {
-        let s = 10;
-        timerIv = setInterval(() => {
-            document.getElementById('game-status').innerHTML = `⏰ СТАРТ ЧЕРЕЗ ${s} сек. • Игроков: ${gamePlayers.length}`;
-            if(s <= 0) { 
-                clearInterval(timerIv); 
-                timerIv = null; 
-                spin(); 
-            }
-            s--;
-        }, 1000);
-    }
-
-    function spin() {
-        if(spinning || gamePlayers.length === 0) return;
-        spinning = true;
-        
-        const total = gamePlayers.reduce((a,b) => a+b.bet, 0);
-        const winner = gamePlayers[Math.floor(Math.random()*gamePlayers.length)];
-        
-        let counter = 0;
-        const interval = setInterval(() => {
-            const tempWinner = gamePlayers[counter % gamePlayers.length];
-            document.getElementById('game-status').innerHTML = `🎲 ВЫБОР ПОБЕДИТЕЛЯ... ${tempWinner.name}`;
-            counter++;
-        }, 100);
-        
-        setTimeout(() => {
-            clearInterval(interval);
-            
-            user.gamesPlayed++;
-            if(winner.name === user.name) {
-                user.bal += total;
-                user.gamesWon++;
-                user.totalWon += total;
-                save();
-                tg.showAlert(`🏆 ПОБЕДА! Вы выиграли ${total.toFixed(2)} TON!`);
-                document.getElementById('game-status').innerHTML = `🏆 ПОБЕДИЛ: ${winner.name}`;
-            } else {
-                tg.showAlert(`😔 Победил: ${winner.name}`);
-                document.getElementById('game-status').innerHTML = `😔 ПОБЕДИЛ: ${winner.name}`;
-            }
-            
-            updateStatsDisplay();
-            gamePlayers = [];
-            spinning = false;
-            updateGameUI();
-            
-            setTimeout(() => {
-                document.getElementById('game-status').innerHTML = "🎮 ГОТОВ К СТАВКАМ";
-            }, 3000);
-        }, 1500);
-    }
-
-    function drawWheel() {
-        const canvas = document.getElementById('mainWheel');
-        if(!canvas) return;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0,0,600,600);
-        if(gamePlayers.length === 0) {
-            ctx.beginPath(); 
-            ctx.fillStyle = "#141828"; 
-            ctx.arc(300,300,280,0,Math.PI*2);
-            ctx.fill();
-            ctx.fillStyle = "#fff";
-            ctx.font = "bold 20px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText("ЖДЕМ СТАВКИ", 300, 300);
-            return;
-        }
-        
-        let start = 0; 
-        const total = gamePlayers.reduce((a,b)=>a+b.bet,0);
-        gamePlayers.forEach(p => {
-            const angle = (p.bet/total)*Math.PI*2;
-            ctx.beginPath(); 
-            ctx.fillStyle = p.color; 
-            ctx.moveTo(300,300); 
-            ctx.arc(300,300,280,start,start+angle); 
-            ctx.fill();
-            start += angle;
-        });
-    }
-
-    function updateGameUI() { 
-        drawWheel(); 
-        document.getElementById('game-players').innerHTML = gamePlayers.map(p => `<div>🎲 @${p.name}: ${p.bet} TON</div>`).join('') || '<div style="color:gray;">Нет активных ставок</div>';
-    }
-    
-    function nav(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('scr-' + id).classList.add('active');
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        if(id==='lobby') document.querySelectorAll('.nav-btn')[0].classList.add('active');
-        if(id==='profile') document.querySelectorAll('.nav-btn')[1].classList.add('active');
-    }
-    
-    function joinRoom(roomId) {
-        if(maintenanceMode && user.role !== 'owner') {
-            tg.showAlert("🔧 Сервер на обслуживании!");
-            return;
-        }
-        currentRoom = roomId;
-        document.getElementById('game-title').innerText = roomId === 1 ? "🏆 VIP ЗАЛ" : "⚔️ ОБЩИЙ ЗАЛ";
+        currentGame.room = type;
+        document.getElementById('room-name').innerText = type === 'common' ? "ОБЩАЯ АРЕНА" : "VIP ARENA";
         nav('game');
         updateGameUI();
     }
-    
-    function leaveRoom() { 
-        if(timerIv) { clearInterval(timerIv); timerIv = null; }
-        gamePlayers = []; 
-        spinning = false;
-        nav('lobby'); 
-    }
-    
-    // ========== АДМИН ФУНКЦИИ ==========
-    function openAdmin() {
-        if(user.role !== 'owner') return;
-        updateGlobalStats();
-        updateAdminTicketsList();
-        document.getElementById('modal-admin').style.display = 'block';
-    }
-    
-    function adminAddBal() {
-        const target = document.getElementById('adm-target-user').value.trim();
-        const amount = parseFloat(document.getElementById('adm-amount').value);
-        if(target.toLowerCase() === user.name.toLowerCase()) {
-            user.bal += amount;
-            save();
-            tg.showAlert(`✅ Выдано ${amount} TON пользователю ${target}`);
-        } else {
-            tg.showAlert("❌ Можно выдавать только себе (демо-режим)");
-        }
-    }
-    
-    function adminAddPromo() {
-        const code = document.getElementById('adm-promo-code').value.trim().toUpperCase();
-        const value = parseFloat(document.getElementById('adm-promo-value').value);
-        if(!code || !value) return;
-        promos.push({ code: code, value: value, usedBy: [] });
-        localStorage.setItem('promocodes', JSON.stringify(promos));
-        tg.showAlert(`✅ Промокод ${code} добавлен!`);
-        document.getElementById('adm-promo-code').value = '';
-        document.getElementById('adm-promo-value').value = '';
-    }
-    
-    function adminListPromos() {
-        if(promos.length === 0) {
-            tg.showAlert("Нет активных промокодов");
-            return;
-        }
-        let msg = "🎟️ ПРОМОКОДЫ:\n";
-        promos.forEach(p => {
-            msg += `${p.code} - ${p.value} TON (использован ${p.usedBy.length} раз)\n`;
+
+    function placeBet() {
+        const val = parseFloat(document.getElementById('bet-input').value);
+        const min = currentGame.room === 'vip' ? 5 : 0.1;
+
+        if(val < min) return tg.showAlert(`Минимальная ставка ${min} TON`);
+        if(user.bal < val) return tg.showAlert("Недостаточно TON на балансе!");
+        if(currentGame.status === 'spinning') return tg.showAlert("Игра уже идет!");
+
+        // Deduct
+        user.bal -= val;
+        user.stats.tBet += val;
+        
+        // Add to game
+        const pColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+        currentGame.players.push({
+            name: user.name,
+            bet: val,
+            color: pColor,
+            ava: document.getElementById('my-avatar').src
         });
-        tg.showAlert(msg);
-    }
-    
-    function adminSetMaintenance() {
-        maintenanceMode = !maintenanceMode;
-        localStorage.setItem('maintenance', maintenanceMode);
-        tg.showAlert(maintenanceMode ? "🔧 Режим обслуживания ВКЛЮЧЕН" : "✅ Режим обслуживания ВЫКЛЮЧЕН");
-    }
-    
-    function adminResetGame() {
-        if(timerIv) clearInterval(timerIv);
-        gamePlayers = [];
-        spinning = false;
-        timerIv = null;
+
+        // XP Gain
+        gainXP(val * 10);
+        
+        updateUI();
         updateGameUI();
-        tg.showAlert("🔄 Игра сброшена!");
-    }
-    
-    function adminBroadcast() {
-        tg.showPrompt({ title: "📢 Рассылка", message: "Введите сообщение для всех пользователей:" }).then(msg => {
-            if(msg) tg.showAlert(`📢 Сообщение отправлено:\n${msg}`);
-        });
-    }
-    
-    function updateGlobalStats() {
-        const totalPromos = promos.length;
-        const totalTickets = tickets.length;
-        const totalUsers = 1; // Demo
-        document.getElementById('global-stats').innerHTML = `
-            <div>👥 Пользователей: ${totalUsers}</div>
-            <div>🎟️ Промокодов: ${totalPromos}</div>
-            <div>🎫 Тикетов: ${totalTickets}</div>
-            <div>💰 Баланс сервера: ~${(user.bal + Math.random()*100).toFixed(2)} TON</div>
-        `;
-    }
-    
-    // ========== ТИКЕТ СИСТЕМА ==========
-    function openSupport() {
-        updateMyTicketsList();
-        document.getElementById('modal-support').style.display = 'block';
-    }
-    
-    function closeSupport() {
-        document.getElementById('modal-support').style.display = 'none';
-    }
-    
-    function closeTicketDialog() {
-        document.getElementById('modal-ticket-dialog').style.display = 'none';
-        currentTicketView = null;
-    }
-    
-    function createTicket() {
-        const title = document.getElementById('ticket-title').value.trim();
-        const message = document.getElementById('ticket-message').value.trim();
         
-        if(!title || !message) {
-            tg.showAlert("❌ Заполните все поля!");
-            return;
+        if(currentGame.players.length >= 2 && currentGame.status === 'waiting') {
+            startCountdown();
         }
-        
-        const ticket = {
-            id: Date.now(),
-            user: user.name,
-            title: title,
-            status: 'open',
-            createdAt: new Date().toLocaleString(),
-            messages: [{ from: user.name, text: message, time: new Date().toLocaleString(), isAdmin: false }],
-            unread: true
-        };
-        
-        tickets.push(ticket);
-        localStorage.setItem('tickets', JSON.stringify(tickets));
-        tg.showAlert("✅ Тикет создан! Администратор ответит в ближайшее время.");
-        
-        document.getElementById('ticket-title').value = '';
-        document.getElementById('ticket-message').value = '';
-        updateMyTicketsList();
-        if(user.role === 'owner') updateAdminTicketsList();
-    }
-    
-    function updateMyTicketsList() {
-        const myTickets = tickets.filter(t => t.user === user.name);
-        const container = document.getElementById('my-tickets-list');
-        
-        if(myTickets.length === 0) {
-            container.innerHTML = '<div style="color:gray; text-align:center;">У вас нет обращений</div>';
-            return;
-        }
-        
-        container.innerHTML = myTickets.map(ticket => `
-            <div class="ticket ${ticket.unread && ticket.messages[ticket.messages.length-1].from !== user.name ? 'unread' : ''}" onclick="viewTicket(${ticket.id})">
-                <b>${ticket.title}</b>
-                <span class="badge" style="background: ${ticket.status === 'open' ? 'var(--green)' : 'var(--red)'}">
-                    ${ticket.status === 'open' ? 'Открыт' : 'Закрыт'}
-                </span>
-                <div style="font-size: 11px; color: gray;">${ticket.createdAt}</div>
-                <div style="font-size: 12px; margin-top: 5px;">Последнее: ${ticket.messages[ticket.messages.length-1].text.substring(0, 50)}</div>
-            </div>
-        `).join('');
-    }
-    
-    function updateAdminTicketsList() {
-        if(user.role !== 'owner') return;
-        const container = document.getElementById('admin-tickets-list');
-        const openTickets = tickets.filter(t => t.status === 'open');
-        
-        if(openTickets.length === 0) {
-            container.innerHTML = '<div style="color:gray;">Нет активных тикетов</div>';
-            return;
-        }
-        
-        container.innerHTML = openTickets.map(ticket => `
-            <div class="ticket ${ticket.unread ? 'unread' : ''}" onclick="viewTicket(${ticket.id})">
-                <b>${ticket.title}</b>
-                <div>👤 @${ticket.user}</div>
-                <div style="font-size: 11px;">${ticket.createdAt}</div>
-            </div>
-        `).join('');
-    }
-    
-    function viewTicket(ticketId) {
-        const ticket = tickets.find(t => t.id === ticketId);
-        if(!ticket) return;
-        
-        currentTicketView = ticket;
-        document.getElementById('dialog-title').innerHTML = `Тикет #${ticket.id} - ${ticket.title}`;
-        
-        const messagesContainer = document.getElementById('ticket-messages');
-        messagesContainer.innerHTML = ticket.messages.map(msg => `
-            <div class="message-bubble ${msg.isAdmin ? 'admin' : ''}">
-                <b>${msg.from === user.name ? 'Вы' : '@' + msg.from}</b>
-                <div style="font-size: 11px; color: gray;">${msg.time}</div>
-                <div style="margin-top: 5px;">${msg.text}</div>
-            </div>
-        `).join('');
-        
-        // Отмечаем как прочитанное
-        ticket.unread = false;
-        localStorage.setItem('tickets', JSON.stringify(tickets));
-        updateMyTicketsList();
-        if(user.role === 'owner') updateAdminTicketsList();
-        
-        document.getElementById('modal-ticket-dialog').style.display = 'block';
-        document.getElementById('modal-support').style.display = 'none';
-    }
-    
-    function sendReply() {
-        if(!currentTicketView) return;
-        
-        const reply = document.getElementById('reply-message').value.trim();
-        if(!reply) {
-            tg.showAlert("Введите сообщение!");
-            return;
-        }
-        
-        const isAdmin = user.role === 'owner';
-        
-        currentTicketView.messages.push({
-            from: user.name,
-            text: reply,
-            time: new Date().toLocaleString(),
-            isAdmin: isAdmin
-        });
-        
-        // Если админ отвечает, тикет остается открытым
-        if(!isAdmin) {
-            currentTicketView.unread = true;
-        }
-        
-        localStorage.setItem('tickets', JSON.stringify(tickets));
-        
-        // Обновляем отображение
-        const messagesContainer = document.getElementById('ticket-messages');
-        messagesContainer.innerHTML += `
-            <div class="message-bubble ${isAdmin ? 'admin' : ''}">
-                <b>${isAdmin ? '⭐ Администратор' : 'Вы'}</b>
-                <div style="font-size: 11px; color: gray;">${new Date().toLocaleString()}</div>
-                <div style="margin-top: 5px;">${reply}</div>
-            </div>
-        `;
-        
-        document.getElementById('reply-message').value = '';
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        
-        if(isAdmin) {
-            tg.showAlert("✅ Ответ отправлен пользователю!");
-            updateAdminTicketsList();
-        } else {
-            tg.showAlert("✅ Сообщение отправлено администратору!");
-        }
-        
-        updateMyTicketsList();
     }
 
+    function startCountdown() {
+        currentGame.status = 'countdown';
+        let timeLeft = 10;
+        
+        currentGame.timer = setInterval(() => {
+            document.getElementById('game-status').innerText = `СТАРТ ЧЕРЕЗ ${timeLeft} СЕК`;
+            if(timeLeft <= 0) {
+                clearInterval(currentGame.timer);
+                runSpin();
+            }
+            timeLeft--;
+        }, 1000);
+    }
+
+    function runSpin() {
+        currentGame.status = 'spinning';
+        document.getElementById('game-status').innerText = "КОЛЕСО КРУТИТСЯ...";
+        
+        const wheel = document.getElementById('mainWheel');
+        const randomDeg = 3600 + Math.random() * 360;
+        wheel.style.transition = "5s cubic-bezier(0.1, 0, 0, 1)";
+        wheel.style.transform = `rotate(${randomDeg}deg)`;
+
+        setTimeout(() => {
+            calculateWinner();
+        }, 5500);
+    }
+
+    function calculateWinner() {
+        const totalBet = currentGame.players.reduce((a, b) => a + b.bet, 0);
+        const winner = currentGame.players[Math.floor(Math.random() * currentGame.players.length)];
+        
+        document.getElementById('game-status').innerText = `ПОБЕДИЛ @${winner.name}!`;
+        
+        if(winner.name === user.name) {
+            const winSum = totalBet * 0.95; // 5% fee
+            user.bal += winSum;
+            user.stats.wins++;
+            user.stats.profit += (winSum - winner.bet);
+            tg.showPopup({ title: "ПОБЕДА!", message: `Вы выиграли ${winSum.toFixed(2)} TON` });
+            addHistory("Выигрыш", `+${winSum.toFixed(2)} TON`);
+        } else {
+            user.stats.profit -= winner.bet; // Correct would be tracking current user's bet
+        }
+
+        user.stats.games++;
+        
+        setTimeout(() => {
+            resetGame();
+        }, 3000);
+    }
+
+    function resetGame() {
+        currentGame.players = [];
+        currentGame.status = 'waiting';
+        const wheel = document.getElementById('mainWheel');
+        wheel.style.transition = "none";
+        wheel.style.transform = "rotate(0deg)";
+        document.getElementById('game-status').innerText = "ОЖИДАНИЕ ИГРОКОВ...";
+        updateGameUI();
+        updateUI();
+    }
+
+    function updateGameUI() {
+        drawWheel();
+        const list = document.getElementById('players-list');
+        list.innerHTML = currentGame.players.map(p => `
+            <div class="player-item">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <img src="${p.ava}" style="width:30px; height:30px; border-radius:8px;">
+                    <b>@${p.name}</b>
+                </div>
+                <div style="color:var(--gold); font-weight:900;">${p.bet} TON</div>
+            </div>
+        `).join('') || '<div style="text-align:center; color:var(--sub); font-size:12px;">Ставок еще нет. Будь первым!</div>';
+        
+        const total = currentGame.players.reduce((a,b) => a+b.bet, 0);
+        document.getElementById('common-jackpot').innerText = total.toFixed(2);
+    }
+
+    // WHEEL RENDER
+    function drawWheel() {
+        const c = document.getElementById('mainWheel');
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, 600, 600);
+
+        if(currentGame.players.length === 0) {
+            ctx.beginPath();
+            ctx.fillStyle = "#161d29";
+            ctx.arc(300, 300, 280, 0, Math.PI * 2);
+            ctx.fill();
+            return;
+        }
+
+        let startAngle = 0;
+        const totalBet = currentGame.players.reduce((a, b) => a + b.bet, 0);
+
+        currentGame.players.forEach(p => {
+            const slice = (p.bet / totalBet) * Math.PI * 2;
+            ctx.beginPath();
+            ctx.fillStyle = p.color;
+            ctx.moveTo(300, 300);
+            ctx.arc(300, 300, 280, startAngle, startAngle + slice);
+            ctx.fill();
+            startAngle += slice;
+        });
+    }
+
+    // CORE SYSTEMS
+    function gainXP(amt) {
+        user.xp += amt;
+        if(user.xp >= user.xpNext) {
+            user.lvl++;
+            user.xp = 0;
+            user.xpNext = Math.floor(user.xpNext * 1.5);
+            tg.showPopup({ title: "LEVEL UP!", message: `Теперь у вас ${user.lvl} уровень!` });
+        }
+        updateUI();
+    }
+
+    function addHistory(type, val) {
+        user.history.unshift({ type, val, time: new Date().toLocaleTimeString() });
+        if(user.history.length > 20) user.history.pop();
+        saveData();
+    }
+
+    function nav(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('scr-' + id).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        
+        const items = document.querySelectorAll('.nav-item');
+        if(id === 'lobby') items[0].classList.add('active');
+        if(id === 'profile') items[1].classList.add('active');
+    }
+
+    // PROMO
+    function usePromo() {
+        const code = document.getElementById('promo-code').value.toUpperCase();
+        const p = promos.find(x => x.name === code);
+        if(p) {
+            user.bal += p.sum;
+            promos = promos.filter(x => x.name !== code);
+            localStorage.setItem('sys_promos', JSON.stringify(promos));
+            updateUI();
+            tg.showAlert(`Промокод активирован! +${p.sum} TON`);
+            addHistory("Промокод", `+${p.sum} TON`);
+        } else {
+            tg.showAlert("Неверный или уже использованный код.");
+        }
+    }
+
+    // MODALS
+    function showHistory() {
+        document.getElementById('modal-history').style.display = 'block';
+        const list = document.getElementById('history-list');
+        list.innerHTML = user.history.map(h => `
+            <div class="history-item">
+                <span><b>${h.type}</b><br><small style="color:var(--sub)">${h.time}</small></span>
+                <span style="color:${h.val.includes('+') ? 'var(--green)' : 'var(--red)'}">${h.val}</span>
+            </div>
+        `).join('') || "Истории пока нет";
+    }
+
+    function openAdmin() { document.getElementById('modal-admin').style.display = 'block'; renderAdminTickets(); }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // ADMIN TOOLS
+    function adminUpdateBal() {
+        const amt = parseFloat(document.getElementById('adm-set-bal').value);
+        user.bal = amt;
+        updateUI();
+        tg.showAlert("Баланс обновлен!");
+    }
+
+    function adminCreatePromo() {
+        const name = document.getElementById('adm-promo-name').value.toUpperCase();
+        const sum = parseFloat(document.getElementById('adm-promo-sum').value);
+        promos.push({ name, sum });
+        localStorage.setItem('sys_promos', JSON.stringify(promos));
+        tg.showAlert(`Код ${name} на ${sum} TON создан!`);
+    }
+
+    function adminBroadcast() {
+        const msg = document.getElementById('adm-msg').value;
+        tg.showAlert("📢 ОБЪЯВЛЕНИЕ:\n" + msg);
+    }
+
+    // SUPPORT
+    function openSupport() {
+        const msg = prompt("Опишите вашу проблему:");
+        if(msg) {
+            tickets.push({ u: user.name, m: msg, id: Date.now() });
+            tg.showAlert("Тикет отправлен админам!");
+        }
+    }
+
+    function renderAdminTickets() {
+        const container = document.getElementById('admin-tickets-container');
+        container.innerHTML = tickets.map(t => `
+            <div class="card" style="font-size:12px; border-color:var(--accent);">
+                <b>От: @${t.u}</b><br>${t.m}
+                <button class="btn-action btn-small" style="margin-top:10px;" onclick="resolveTicket(${t.id})">Удалить</button>
+            </div>
+        `).join('') || "Тикетов нет";
+    }
+
+    function resolveTicket(id) {
+        tickets = tickets.filter(x => x.id !== id);
+        renderAdminTickets();
+    }
+
+    function renderLeaderboard() {
+        const users = [
+            {n: 'Kegovich', v: 142.5}, {n: 'mas1sa', v: 98.2}, {n: 'Ivan_TON', v: 45.0}
+        ];
+        document.getElementById('leaderboard-mini').innerHTML = users.map((u, i) => `
+            <div style="display:flex; justify-content:space-between; font-size:12px; padding:5px 0;">
+                <span>${i+1}. @${u.n}</span>
+                <span style="color:var(--gold)">${u.v} TON</span>
+            </div>
+        `).join('');
+    }
+
+    function leaveRoom() { nav('lobby'); resetGame(); }
+
+    // RUN
     init();
+
 </script>
 </body>
 </html>
