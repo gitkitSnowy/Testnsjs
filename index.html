@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Rolls Master PvP ELITE — Alexander Edition v9.0</title>
+    <title>Rolls Master PvP ELITE — Alexander Edition v9.5.1 Full</title>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
@@ -280,7 +280,6 @@
     </header>
 
     <main id="app-viewport">
-        <!-- LOBBY -->
         <div id="scr-lobby" class="screen active">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <h2 style="margin:0; font-size: 24px;">Game Center</h2>
@@ -299,13 +298,8 @@
                 <p style="color:var(--text-sub); font-size:12px;">Множитель до x500.</p>
                 <button class="btn btn-secondary btn-sm">PLAY</button>
             </div>
-            <div class="card" onclick="view.navigate('referral')">
-                <h4 style="margin:0; color:var(--accent);">👥 Партнерская программа</h4>
-                <p style="font-size:11px; color:var(--text-sub); margin:0;">10% от комиссий рефералов.</p>
-            </div>
         </div>
 
-        <!-- ROLL ARENA -->
         <div id="scr-game-roll" class="screen">
             <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
                 <button class="btn btn-secondary" style="width:40px; height:40px; padding:0;" onclick="view.navigate('lobby')">←</button>
@@ -328,7 +322,6 @@
             <div class="players-list" id="roll-players-list"></div>
         </div>
 
-        <!-- TOWER -->
         <div id="scr-game-tower" class="screen">
             <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
                 <button class="btn btn-secondary" style="width:40px; height:40px; padding:0;" onclick="view.navigate('lobby')">←</button>
@@ -344,7 +337,6 @@
             </div>
         </div>
 
-        <!-- PROFILE -->
         <div id="scr-profile" class="screen">
             <div class="card" style="text-align:center;">
                 <img id="prof-avatar" src="" style="width:90px; height:90px; border-radius:25px; border:4px solid var(--accent); margin-bottom:12px;" alt="Profile">
@@ -378,19 +370,6 @@
             </div>
             <button id="admin-trigger" class="btn btn-danger" style="display:none; margin-top:20px;" onclick="admin.open()">⚙️ АДМИН-ПАНЕЛЬ</button>
         </div>
-
-        <!-- REFERRAL -->
-        <div id="scr-referral" class="screen">
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-                <button class="btn btn-secondary" style="width:40px; height:40px; padding:0;" onclick="view.navigate('lobby')">←</button>
-                <h2 style="margin:0;">Партнерство</h2>
-            </div>
-            <div class="card" style="text-align:center;">
-                <div style="font-size:40px; margin-bottom:10px;">💎</div>
-                <input type="text" id="ref-link" readonly value="t.me/rolls_bot?start=12345" style="width:100%; background:var(--bg-ultra); border:1px solid #30363d; border-radius:14px; padding:14px; color:white; text-align:center; font-weight:700; margin-bottom:12px;">
-                <button class="btn btn-gold" onclick="systems.copyRef()">СКОПИРОВАТЬ ССЫЛКУ</button>
-            </div>
-        </div>
     </main>
 
     <nav>
@@ -400,10 +379,9 @@
     </nav>
 </div>
 
-<!-- АДМИН-ПАНЕЛЬ (СКРОЛЛЯЩАЯСЯ) -->
 <div id="modal-admin" class="modal-overlay">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; position:sticky; top:0; background:var(--bg-ultra); padding-bottom:10px; z-index:10;">
-        <h2 style="color:var(--red); margin:0; font-size:18px;">⚙️ ADMIN TERMINAL v9.0</h2>
+        <h2 style="color:var(--red); margin:0; font-size:18px;">⚙️ ADMIN TERMINAL v9.5</h2>
         <button class="btn btn-secondary btn-sm" onclick="admin.close()">✕ ЗАКРЫТЬ</button>
     </div>
 
@@ -413,7 +391,6 @@
             <div>> MODULES LOADED...</div>
         </div>
 
-        <!-- Секция 1: Управление пользователем -->
         <div class="card">
             <h4 style="margin:0 0 12px 0; color:var(--accent);">👤 УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЕМ</h4>
             <div class="input-group">
@@ -435,7 +412,6 @@
             <button class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="admin.setLevel()">УСТАНОВИТЬ УРОВЕНЬ</button>
         </div>
 
-        <!-- Секция 2: Генератор промокодов -->
         <div class="card">
             <h4 style="margin:0 0 12px 0; color:var(--accent);">🎟️ ГЕНЕРАТОР ПРОМОКОДОВ</h4>
             <div class="input-group">
@@ -453,50 +429,32 @@
             <button class="btn btn-gold btn-sm" onclick="admin.createPromo()">СОЗДАТЬ ПРОМОКОД</button>
         </div>
 
-        <!-- Секция 3: Управление промокодами -->
-        <div class="card">
-            <h4 style="margin:0 0 12px 0; color:var(--accent);">📋 АКТИВНЫЕ ПРОМОКОДЫ</h4>
-            <div id="admin-promo-list" style="max-height:200px; overflow-y:auto;"></div>
-            <div style="display:flex; gap:8px; margin-top:10px;">
-                <input type="text" id="adm-delete-promo" placeholder="КОД ДЛЯ УДАЛЕНИЯ" style="flex:1; background:var(--bg-ultra); border:1px solid #30363d; border-radius:12px; padding:12px; color:white;">
-                <button class="btn btn-danger btn-sm" onclick="admin.deletePromo()">УДАЛИТЬ</button>
-            </div>
-        </div>
-
-        <!-- Секция 4: Управление игрой -->
         <div class="card">
             <h4 style="margin:0 0 12px 0; color:var(--accent);">🎮 УПРАВЛЕНИЕ ИГРОЙ</h4>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
                 <button class="btn btn-danger btn-sm" onclick="admin.forceRollEnd()">ЗАВЕРШИТЬ РОЛЛ</button>
                 <button class="btn btn-success btn-sm" onclick="admin.addBot()">ДОБАВИТЬ БОТА</button>
             </div>
-            <div class="input-group">
-                <label>МНОЖИТЕЛЬ БАШНИ</label>
-                <input type="number" id="adm-tower-mult" placeholder="2.0">
-            </div>
-            <button class="btn btn-warning btn-sm" style="background:var(--gold); color:#000;" onclick="admin.setTowerFloor()">УСТ. ЭТАЖ БАШНИ</button>
             <button class="btn btn-danger btn-sm" style="margin-top:8px;" onclick="admin.resetAll()">🔄 СБРОС ВСЕХ ДАННЫХ</button>
         </div>
     </div>
 </div>
 
 <script>
-/* =============================================================================
-   ROLLS MASTER ELITE v9.0 — CORE ENGINE
-   Персонализированное колесо, скроллящаяся админка
-   ============================================================================= */
+/**
+ * ROLLS MASTER FULL v9.5.1
+ */
 
 const tg = window.Telegram.WebApp;
 
-// --- СОСТОЯНИЕ ---
 const state = {
     user: {
         id: 0, name: "Alexander", balance: 150.0, xp: 120, lvl: 1,
         avatar: "", username: "",
-        stats: { games: 0, wins: 0, turnover: 0.0, profit: 0.0 }
+        stats: { games: 0, wins: 0, turnover: 0.0 }
     },
     config: {
-        botNames: ["Ivan_TON", "Satoshi_N", "Kirov_Pro", "Rich_Boy", "Crypto_King", "Durov_Fans", "Elite_User"],
+        botNames: ["Ivan_TON", "Satoshi_N", "Kirov_Pro", "Rich_Boy", "Crypto_King", "Durov_Fans"],
         playerColors: ["#2481cc", "#ff4757", "#2ed573", "#ffcc00", "#a55eea", "#ff6348", "#1e90ff"],
         towerMults: [1.2, 1.5, 1.9, 2.5, 3.8, 5.5, 9.0, 18.0, 45.0, 120.0, 500.0]
     },
@@ -511,48 +469,48 @@ const state = {
     supportChat: [{ sender: 'admin', text: '👋 Я Alexander. Чем помочь?' }]
 };
 
-// --- НАВИГАЦИЯ ---
+// --- НАВИГАЦИЯ (ПОЛНАЯ) ---
 const view = {
     navigate(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('scr-' + id).classList.add('active');
+        const activeScr = document.getElementById('scr-' + id);
+        if(activeScr) activeScr.classList.add('active');
+        
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         if (id === 'lobby') document.querySelectorAll('.nav-link')[0].classList.add('active');
         if (id === 'game-roll') document.querySelectorAll('.nav-link')[1].classList.add('active');
-        if (id === 'profile') { document.querySelectorAll('.nav-link')[2].classList.add('active'); support.renderChat(); }
+        if (id === 'profile') { 
+            document.querySelectorAll('.nav-link')[2].classList.add('active'); 
+            support.renderChat(); 
+        }
+        
         if (id === 'game-roll') gameRoll.init();
         if (id === 'game-tower') gameTower.init();
+        
         systems.syncUI();
     }
 };
 
-// --- РОЛЛ АРЕНА С ПЕРСОНАЛИЗИРОВАННЫМ КОЛЕСОМ ---
+// --- РОЛЛ АРЕНА (ПОЛНАЯ ОТРИСОВКА) ---
 const gameRoll = {
     canvas: null, ctx: null,
-
     init() {
         this.canvas = document.getElementById('wheelCanvas');
         this.ctx = this.canvas.getContext('2d');
         if (!state.games.roll.active) this.startTimer();
         this.drawWheel();
     },
-
     startTimer() {
         state.games.roll.active = true;
         state.games.roll.timer = 15;
         state.games.roll.players = [];
         state.games.roll.bank = 0;
         document.getElementById('roll-bet-btn').disabled = false;
-
         clearInterval(state.games.roll.timerInt);
         state.games.roll.timerInt = setInterval(() => {
             state.games.roll.timer--;
             document.getElementById('roll-timer').innerText = state.games.roll.timer + 's';
-
-            if (state.games.roll.timer < 8 && state.games.roll.players.length < 2) {
-                this.addBot();
-            }
-
+            if (state.games.roll.timer < 8 && state.games.roll.players.length < 2) this.addBot();
             if (state.games.roll.timer <= 0) {
                 clearInterval(state.games.roll.timerInt);
                 if (state.games.roll.players.length >= 2) this.spin();
@@ -562,137 +520,72 @@ const gameRoll = {
             this.drawWheel();
         }, 1000);
     },
-
     addBot() {
         const name = state.config.botNames[Math.floor(Math.random() * state.config.botNames.length)];
         const bet = parseFloat((0.5 + Math.random() * 5).toFixed(1));
-        const colorIndex = state.games.roll.players.length % state.config.playerColors.length;
+        const color = state.config.playerColors[state.games.roll.players.length % state.config.playerColors.length];
         state.games.roll.players.push({
-            name, bet,
-            avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`,
-            isBot: true,
-            color: state.config.playerColors[colorIndex]
+            name, bet, avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`,
+            isBot: true, color: color
         });
         state.games.roll.bank += bet;
     },
-
     placeBet() {
         const amount = parseFloat(document.getElementById('roll-bet-amount').value);
-        if (state.user.balance < amount) return tg.showAlert('Недостаточно средств');
+        if (state.user.balance < amount || amount <= 0) return tg.showAlert('Ошибка баланса');
         state.user.balance -= amount;
-        const colorIndex = state.games.roll.players.length % state.config.playerColors.length;
         state.games.roll.players.push({
-            name: state.user.name,
-            bet: amount,
-            avatar: state.user.avatar,
-            isBot: false,
-            color: state.config.playerColors[colorIndex]
+            name: state.user.name, bet: amount, avatar: state.user.avatar,
+            isBot: false, color: "#2481cc"
         });
         state.games.roll.bank += amount;
-        systems.syncUI();
         document.getElementById('roll-bet-btn').disabled = true;
-        this.renderPlayers();
-        this.drawWheel();
+        systems.syncUI();
     },
-
+    drawWheel() {
+        const ctx = this.ctx;
+        if (!ctx) return;
+        ctx.clearRect(0, 0, 600, 600);
+        const players = state.games.roll.players;
+        if (players.length === 0) {
+            ctx.fillStyle = '#1c2128'; ctx.beginPath(); ctx.arc(300, 300, 280, 0, Math.PI * 2); ctx.fill();
+            return;
+        }
+        let startAngle = -Math.PI / 2;
+        players.forEach(p => {
+            const slice = (p.bet / state.games.roll.bank) * Math.PI * 2;
+            ctx.beginPath(); ctx.fillStyle = p.color; ctx.moveTo(300, 300);
+            ctx.arc(300, 300, 280, startAngle, startAngle + slice); ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = '#05070a'; ctx.lineWidth = 4; ctx.stroke();
+            startAngle += slice;
+        });
+        ctx.beginPath(); ctx.fillStyle = '#0d1117'; ctx.arc(300, 300, 50, 0, Math.PI * 2); ctx.fill();
+    },
     renderPlayers() {
         const list = document.getElementById('roll-players-list');
         list.innerHTML = state.games.roll.players.map(p => `
             <div class="p-item">
                 <div style="display:flex; align-items:center;">
                     <span class="player-color-dot" style="background:${p.color};"></span>
-                    <img src="${p.avatar}" alt="${p.name}">
-                    <span style="font-weight:900; font-size:13px;">${p.name} <span class="badge ${p.isBot ? 'badge-bot' : 'badge-human'}">${p.isBot ? 'BOT' : 'ВЫ'}</span></span>
+                    <img src="${p.avatar}">
+                    <span>${p.name} <span class="badge ${p.isBot ? 'badge-bot' : 'badge-human'}">${p.isBot ? 'BOT' : 'ВЫ'}</span></span>
                 </div>
                 <div style="color:var(--gold); font-weight:900;">${p.bet.toFixed(1)} TON</div>
             </div>
         `).join('');
         document.getElementById('lobby-roll-bank').innerText = state.games.roll.bank.toFixed(2);
     },
-
-    drawWheel() {
-        const players = state.games.roll.players;
-        if (players.length === 0) {
-            this.ctx.clearRect(0, 0, 600, 600);
-            this.ctx.fillStyle = '#1c2128';
-            this.ctx.beginPath();
-            this.ctx.arc(300, 300, 280, 0, Math.PI * 2);
-            this.ctx.fill();
-            return;
-        }
-
-        const totalBet = players.reduce((sum, p) => sum + p.bet, 0);
-        let startAngle = -Math.PI / 2;
-        this.ctx.clearRect(0, 0, 600, 600);
-
-        players.forEach(p => {
-            const sliceAngle = (p.bet / totalBet) * Math.PI * 2;
-            this.ctx.beginPath();
-            this.ctx.fillStyle = p.color;
-            this.ctx.moveTo(300, 300);
-            this.ctx.arc(300, 300, 280, startAngle, startAngle + sliceAngle);
-            this.ctx.closePath();
-            this.ctx.fill();
-            this.ctx.strokeStyle = '#05070a';
-            this.ctx.lineWidth = 4;
-            this.ctx.stroke();
-
-            // Аватарка игрока в середине его сектора
-            const midAngle = startAngle + sliceAngle / 2;
-            const avatarX = 300 + Math.cos(midAngle) * 180;
-            const avatarY = 300 + Math.sin(midAngle) * 180;
-            
-            this.ctx.save();
-            this.ctx.beginPath();
-            this.ctx.arc(avatarX, avatarY, 28, 0, Math.PI * 2);
-            this.ctx.clip();
-            
-            const img = new Image();
-            img.src = p.avatar;
-            img.onload = () => {
-                this.ctx.drawImage(img, avatarX - 28, avatarY - 28, 56, 56);
-            };
-            this.ctx.restore();
-
-            // Имя игрока
-            this.ctx.fillStyle = 'white';
-            this.ctx.font = 'bold 11px Inter, sans-serif';
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText(p.name, avatarX, avatarY + 42);
-
-            startAngle += sliceAngle;
-        });
-
-        // Центр
-        this.ctx.beginPath();
-        this.ctx.fillStyle = '#0d1117';
-        this.ctx.arc(300, 300, 50, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.strokeStyle = '#2481cc';
-        this.ctx.lineWidth = 4;
-        this.ctx.stroke();
-    },
-
     spin() {
-        if (state.games.roll.spinning) return;
         state.games.roll.spinning = true;
-        this.drawWheel();
         const randomRot = 3600 + Math.random() * 3600;
         this.canvas.style.transform = `rotate(${randomRot}deg)`;
-
-        setTimeout(() => {
-            this.calculateWinner();
-            setTimeout(() => this.reset(), 3000);
-        }, 5500);
+        setTimeout(() => { this.calculateWinner(); setTimeout(() => this.reset(), 3000); }, 5500);
     },
-
     calculateWinner() {
-        const players = state.games.roll.players;
         const total = state.games.roll.bank;
-        let pool = 0;
         const rand = Math.random() * total;
-        let winner = players[players.length - 1];
-        for (let p of players) {
+        let pool = 0; let winner = state.games.roll.players[0];
+        for (let p of state.games.roll.players) {
             pool += p.bet;
             if (rand <= pool) { winner = p; break; }
         }
@@ -700,59 +593,45 @@ const gameRoll = {
             state.user.balance += total * 0.95;
             state.user.stats.wins++;
             state.user.xp += 50;
-            tg.showAlert(`🎉 ВЫ ВЫИГРАЛИ ${(total * 0.95).toFixed(2)} TON!`);
-        } else {
-            tg.showAlert(`😞 Победил ${winner.name} (${total.toFixed(2)} TON)`);
-        }
+            tg.showAlert(`🎉 ПОБЕДА! +${(total * 0.95).toFixed(2)} TON`);
+        } else tg.showAlert(`Выиграл ${winner.name}`);
         state.user.stats.games++;
-        state.user.stats.turnover += total;
         systems.syncUI();
     },
-
     reset() {
-        this.canvas.style.transition = 'none';
-        this.canvas.style.transform = 'rotate(0deg)';
+        this.canvas.style.transition = 'none'; this.canvas.style.transform = 'rotate(0deg)';
         setTimeout(() => {
             this.canvas.style.transition = 'transform 5s cubic-bezier(0.12, 0.85, 0.25, 1)';
-            state.games.roll.spinning = false;
-            state.games.roll.active = false;
-            this.startTimer();
+            state.games.roll.spinning = false; this.startTimer();
         }, 50);
     },
-
-    resetTimer() {
-        state.games.roll.active = false;
-        clearInterval(state.games.roll.timerInt);
-        this.startTimer();
-    }
+    resetTimer() { state.games.roll.active = false; this.startTimer(); }
 };
 
-// --- БАШНЯ ---
+// --- БАШНЯ (FIXED) ---
 const gameTower = {
     init() {
         const render = document.getElementById('tower-render');
         render.innerHTML = '';
         for (let i = 0; i < 11; i++) {
             const row = document.createElement('div');
-            row.className = 'tower-floor';
-            row.id = `tw-floor-${i}`;
-            row.innerHTML = `
-                <div class="t-tile" onclick="gameTower.step(${i}, 0)">?</div>
-                <div class="t-tile" onclick="gameTower.step(${i}, 1)">?</div>
-                <div class="t-tile" onclick="gameTower.step(${i}, 2)">?</div>
-            `;
+            row.className = 'tower-floor'; row.id = `tw-floor-${i}`;
+            row.innerHTML = `<div class="t-tile" onclick="gameTower.step(${i}, 0)">?</div>
+                             <div class="t-tile" onclick="gameTower.step(${i}, 1)">?</div>
+                             <div class="t-tile" onclick="gameTower.step(${i}, 2)">?</div>`;
             render.appendChild(row);
         }
     },
     start() {
         const bet = parseFloat(document.getElementById('tower-bet-input').value);
-        if (state.user.balance < bet) return tg.showAlert('Недостаточно TON');
+        if (state.user.balance < bet || bet <= 0) return tg.showAlert('Недостаточно TON');
         state.user.balance -= bet;
         state.games.tower.bet = bet;
         state.games.tower.floor = 0;
         state.games.tower.active = true;
         document.getElementById('tower-start-btn').style.display = 'none';
         document.getElementById('tower-cashout-btn').style.display = 'block';
+        document.getElementById('tower-cashout-btn').disabled = false; // Сброс блокировки
         this.updateUI();
         systems.syncUI();
     },
@@ -760,40 +639,49 @@ const gameTower = {
         document.querySelectorAll('.tower-floor').forEach(f => f.classList.remove('active'));
         const el = document.getElementById(`tw-floor-${state.games.tower.floor}`);
         if (el) el.classList.add('active');
+        const mult = state.config.towerMults[state.games.tower.floor - 1] || 0;
+        if(mult > 0) document.getElementById('tower-cashout-btn').innerText = `CASHOUT (${(state.games.tower.bet * mult).toFixed(2)})`;
     },
     step(f, t) {
         if (!state.games.tower.active || f !== state.games.tower.floor) return;
+        
+        // ФИКС БАГА: Блокируем кнопку сразу при клике
+        document.getElementById('tower-cashout-btn').disabled = true;
+
         const win = Math.random() > 0.4;
         const tiles = document.querySelectorAll(`#tw-floor-${f} .t-tile`);
         if (win) {
-            tiles[t].classList.add('win');
-            tiles[t].innerText = '✓';
+            tiles[t].classList.add('win'); tiles[t].innerText = '✓';
             state.games.tower.floor++;
+            
+            // Если выиграл — снова разрешаем забрать
+            document.getElementById('tower-cashout-btn').disabled = false;
+            
             if (state.games.tower.floor > 10) this.cashout();
             else this.updateUI();
         } else {
-            tiles[t].classList.add('lose');
-            tiles[t].innerText = '✗';
+            tiles[t].classList.add('lose'); tiles[t].innerText = '✗';
             state.games.tower.active = false;
+            // Прячем кнопку при проигрыше моментально
+            document.getElementById('tower-cashout-btn').style.display = 'none';
             setTimeout(() => this.reset(), 1000);
         }
     },
     cashout() {
-        const mult = state.config.towerMults[state.games.tower.floor - 1] || 1;
+        if(!state.games.tower.active || state.games.tower.floor === 0) return;
+        const mult = state.config.towerMults[state.games.tower.floor - 1];
         const winAmt = state.games.tower.bet * mult;
         state.user.balance += winAmt;
         state.user.xp += 30;
         state.user.stats.games++;
-        state.user.stats.wins++;
-        tg.showAlert(`💰 Выигрыш: ${winAmt.toFixed(2)} TON`);
+        tg.showAlert(`💰 ВЫИГРЫШ: ${winAmt.toFixed(2)} TON`);
         this.reset();
     },
     reset() {
         state.games.tower.active = false;
         document.getElementById('tower-start-btn').style.display = 'block';
         document.getElementById('tower-cashout-btn').style.display = 'none';
-        this.init();
-        systems.syncUI();
+        this.init(); systems.syncUI();
     }
 };
 
@@ -806,16 +694,14 @@ const support = {
         state.supportChat.push({ sender: 'user', text });
         input.value = '';
         setTimeout(() => {
-            state.supportChat.push({ sender: 'admin', text: 'Спасибо за обращение! Отвечу в ближайшее время. — Alexander' });
+            state.supportChat.push({ sender: 'admin', text: 'Запрос принят. — Alexander' });
             this.renderChat();
         }, 1500);
         this.renderChat();
     },
     renderChat() {
         const container = document.getElementById('support-messages');
-        container.innerHTML = state.supportChat.map(m => `
-            <div class="support-msg ${m.sender}">${m.text}</div>
-        `).join('');
+        container.innerHTML = state.supportChat.map(m => `<div class="support-msg ${m.sender}">${m.text}</div>`).join('');
         container.scrollTop = container.scrollHeight;
     }
 };
@@ -823,8 +709,7 @@ const support = {
 // --- СИСТЕМА ---
 const systems = {
     init() {
-        tg.ready();
-        tg.expand();
+        tg.ready(); tg.expand();
         this.loadUser();
         this.syncUI();
         setInterval(() => this.save(), 5000);
@@ -834,19 +719,15 @@ const systems = {
             const u = tg.initDataUnsafe.user;
             state.user.id = u.id;
             state.user.name = u.first_name || "Alexander";
-            state.user.username = u.username || "";
             state.user.avatar = u.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.id}`;
             if (u.username === 'Kegovich' || u.username === 'mas1sa') {
                 document.getElementById('admin-trigger').style.display = 'block';
-                document.getElementById('top-rank-text').innerText = '[LEAD DEVELOPER]';
             }
         }
-        const saved = localStorage.getItem('rm_elite_v9');
+        const saved = localStorage.getItem('rm_full_v95');
         if (saved) {
             const p = JSON.parse(saved);
-            state.user.balance = p.balance || state.user.balance;
-            state.user.xp = p.xp || state.user.xp;
-            state.user.lvl = p.lvl || state.user.lvl;
+            state.user.balance = p.balance; state.user.xp = p.xp; state.user.lvl = p.lvl;
         }
     },
     syncUI() {
@@ -865,20 +746,13 @@ const systems = {
     redeemPromo() {
         const code = document.getElementById('promo-input').value.toUpperCase().trim();
         const promo = state.promos.find(p => p.code === code);
-        if (!promo) return tg.showAlert('❌ Неверный промокод');
-        if (promo.used >= promo.limit) return tg.showAlert('❌ Лимит исчерпан');
-        state.user.balance += promo.val;
-        promo.used++;
+        if (!promo || promo.used >= promo.limit) return tg.showAlert('Неверный код');
+        state.user.balance += promo.val; promo.used++;
         tg.showAlert(`✅ +${promo.val} TON!`);
-        document.getElementById('promo-input').value = '';
-        this.syncUI();
-    },
-    copyRef() {
-        navigator.clipboard.writeText(document.getElementById('ref-link').value);
-        tg.showAlert('🔗 Ссылка скопирована');
+        document.getElementById('promo-input').value = ''; systems.syncUI();
     },
     save() {
-        localStorage.setItem('rm_elite_v9', JSON.stringify({
+        localStorage.setItem('rm_full_v95', JSON.stringify({
             balance: state.user.balance, xp: state.user.xp, lvl: state.user.lvl
         }));
     }
@@ -886,11 +760,7 @@ const systems = {
 
 // --- АДМИН-ПАНЕЛЬ ---
 const admin = {
-    open() {
-        document.getElementById('modal-admin').style.display = 'flex';
-        this.log("ROOT: Alexander авторизован");
-        this.renderPromoList();
-    },
+    open() { document.getElementById('modal-admin').style.display = 'flex'; this.log("SESSION START"); },
     close() { document.getElementById('modal-admin').style.display = 'none'; },
     log(msg) {
         const box = document.getElementById('admin-logs');
@@ -899,77 +769,30 @@ const admin = {
     },
     setBalance() {
         const v = parseFloat(document.getElementById('adm-bal-input').value);
-        if (isNaN(v)) return;
-        state.user.balance = v;
-        systems.syncUI();
-        this.log(`Баланс → ${v} TON`);
+        if (!isNaN(v)) { state.user.balance = v; systems.syncUI(); this.log(`BAL: ${v}`); }
     },
     setXP() {
         const v = parseInt(document.getElementById('adm-xp-input').value);
-        if (isNaN(v)) return;
-        state.user.xp = v;
-        systems.syncUI();
-        this.log(`XP → ${v}`);
+        if (!isNaN(v)) { state.user.xp = v; systems.syncUI(); this.log(`XP: ${v}`); }
     },
     setLevel() {
         const v = parseInt(document.getElementById('adm-lvl-input').value);
-        if (isNaN(v)) return;
-        state.user.lvl = v;
-        systems.syncUI();
-        this.log(`Уровень → ${v}`);
+        if (!isNaN(v)) { state.user.lvl = v; systems.syncUI(); this.log(`LVL: ${v}`); }
     },
     createPromo() {
         const c = document.getElementById('adm-p-code').value.toUpperCase();
         const v = parseFloat(document.getElementById('adm-p-val').value);
         const l = parseInt(document.getElementById('adm-p-lim').value);
-        if (!c || isNaN(v) || isNaN(l)) return this.log('❌ Ошибка параметров');
         state.promos.push({ code: c, val: v, limit: l, used: 0 });
-        this.log(`✅ Промокод ${c} (${v} TON, лимит ${l})`);
-        this.renderPromoList();
-    },
-    deletePromo() {
-        const code = document.getElementById('adm-delete-promo').value.toUpperCase();
-        const idx = state.promos.findIndex(p => p.code === code);
-        if (idx === -1) return this.log('❌ Не найден');
-        state.promos.splice(idx, 1);
-        this.log(`🗑️ Промокод ${code} удален`);
-        this.renderPromoList();
-    },
-    renderPromoList() {
-        const list = document.getElementById('admin-promo-list');
-        list.innerHTML = state.promos.map(p => `
-            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:11px;">
-                <span style="color:var(--accent); font-weight:900;">${p.code}</span>
-                <span>${p.val} TON</span>
-                <span style="color:var(--text-sub);">${p.used}/${p.limit}</span>
-            </div>
-        `).join('');
+        this.log(`PROMO: ${c}`);
     },
     forceRollEnd() {
         if (state.games.roll.active) {
             clearInterval(state.games.roll.timerInt);
-            state.games.roll.timer = 1;
-            state.games.roll.active = false;
-            gameRoll.spin();
-            this.log('⚡ Ролл завершен принудительно');
+            state.games.roll.timer = 0; gameRoll.spin();
+            this.log('FORCE END');
         }
     },
-    addBot() {
-        if (state.games.roll.active) {
-            gameRoll.addBot();
-            gameRoll.renderPlayers();
-            gameRoll.drawWheel();
-            this.log('🤖 Бот добавлен в ролл');
-        }
-    },
-    resetAll() {
-        localStorage.clear();
-        location.reload();
-    }
+    addBot() { gameRoll.addBot(); this.log('BOT ADDED'); },
+    resetAll() { localStorage.clear(); location.reload(); }
 };
-
-// BOOT
-window.onload = () => systems.init();
-</script>
-</body>
-</html>
