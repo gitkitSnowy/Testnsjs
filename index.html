@@ -3,713 +3,760 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Rolls Master PvP ELITE v16</title>
+    <title>Rolls Master PvP GODMODE v19</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
     <style>
-        /* CSS SECTION - ПРЕМИАЛЬНЫЙ ТЕМНЫЙ ДИЗАЙН 
+        /* ================================================================
+           STYLING ARCHITECTURE - "GODMODE" NEON BLACK
+           ================================================================
         */
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
-
         :root {
-            --bg-color: #000000;
-            --panel-color: #0c0c0e;
-            --accent-color: #007aff;
-            --accent-glow: rgba(0, 122, 255, 0.4);
-            --gold-color: #ffb400;
-            --red-color: #ff3b30;
-            --green-color: #34c759;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --kb-bg: #161618;
-            --key-bg: #2c2c2e;
-            --key-active: #444446;
+            --p-bg: #030303;
+            --p-panel: #0a0a0b;
+            --p-card: #121214;
+            --p-accent: #007aff;
+            --p-accent-glow: rgba(0, 122, 255, 0.4);
+            --p-gold: #ffcc00;
+            --p-gold-glow: rgba(255, 204, 0, 0.3);
+            --p-red: #ff3b30;
+            --p-green: #28cd41;
+            --p-border: rgba(255, 255, 255, 0.08);
+            --p-text: #ffffff;
+            --p-text-muted: #6e6e73;
+            --p-kb-key: #1c1c1e;
+            --p-glass: rgba(255, 255, 255, 0.03);
+            --p-font-main: 'Inter', sans-serif;
+            --p-font-logo: 'Orbitron', sans-serif;
+            --p-transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        /* RESET & BASE */
         * {
-            box-sizing: border-box;
+            margin: 0; padding: 0; box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            outline: none;
+            -webkit-user-select: none; user-select: none;
+            scrollbar-width: none;
         }
+
+        ::-webkit-scrollbar { display: none; }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: #ffffff;
-            font-family: 'Inter', sans-serif;
+            background-color: var(--p-bg);
+            color: var(--p-text);
+            font-family: var(--p-font-main);
+            height: 100vh; width: 100vw;
             overflow: hidden;
-            height: 100vh;
+            display: flex; justify-content: center;
         }
 
-        /* ОСНОВНАЯ ОБОЛОЧКА */
+        /* КАНВАС ДЛЯ ЧАСТИЦ */
+        #particle-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        /* MAIN WRAPPER */
         .app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            max-width: 500px;
-            margin: 0 auto;
-            position: relative;
-            background: radial-gradient(circle at top left, rgba(0,122,255,0.05), transparent);
+            width: 100%; max-width: 480px;
+            height: 100vh; position: relative;
+            background: radial-gradient(circle at 50% 0%, #15151a 0%, #030303 100%);
+            display: flex; flex-direction: column;
+            z-index: 2; border-left: 1px solid var(--p-border); border-right: 1px solid var(--p-border);
         }
 
-        /* ШАПКА ПРИЛОЖЕНИЯ */
-        header {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid var(--border-color);
+        /* TOP BAR */
+        .app-header {
+            padding: 25px 20px; background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(25px); border-bottom: 1px solid var(--p-border);
+            display: flex; justify-content: space-between; align-items: center;
             z-index: 1000;
         }
 
-        .user-block { display: flex; align-items: center; gap: 12px; }
-        .avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            border: 2px solid var(--accent-color);
-            object-fit: cover;
-            box-shadow: 0 0 10px var(--accent-glow);
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .u-avatar-wrap {
+            width: 54px; height: 54px; border-radius: 18px;
+            background: linear-gradient(135deg, var(--p-accent), #5e5ce6);
+            padding: 2px; position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
-        .user-meta { display: flex; flex-direction: column; }
-        .user-name { font-weight: 800; font-size: 15px; letter-spacing: -0.3px; }
-        .user-level { font-size: 10px; color: var(--accent-color); font-weight: 900; text-transform: uppercase; }
-
-        .balance-block { text-align: right; }
-        .balance-label { font-size: 8px; color: #666; letter-spacing: 1px; margin-bottom: 2px; }
-        .balance-value { font-family: 'Orbitron'; color: var(--gold-color); font-size: 20px; font-weight: 900; }
-
-        /* КОНТЕНТНАЯ ОБЛАСТЬ */
-        main {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 150px;
-            scrollbar-width: none;
-        }
-        main::-webkit-scrollbar { display: none; }
-
-        .screen { display: none; }
-        .screen.active { display: block; animation: screenSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-
-        @keyframes screenSlide {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
+        .u-avatar-wrap img { width: 100%; height: 100%; border-radius: 16px; object-fit: cover; }
+        .u-level-badge {
+            position: absolute; bottom: -5px; right: -5px;
+            background: var(--p-gold); color: #000; font-weight: 900;
+            font-size: 10px; padding: 2px 6px; border-radius: 6px;
+            border: 2px solid var(--p-bg);
         }
 
-        /* КАРТОЧКИ И ЭЛЕМЕНТЫ */
-        .card {
-            background: var(--panel-color);
-            border: 1px solid var(--border-color);
-            border-radius: 28px;
-            padding: 22px;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
+        .u-info { display: flex; flex-direction: column; }
+        .u-name { font-weight: 800; font-size: 16px; letter-spacing: -0.3px; }
+        .u-status { font-size: 10px; color: var(--p-accent); font-weight: 700; text-transform: uppercase; }
+
+        .header-right { text-align: right; }
+        .bal-container {
+            background: var(--p-card); border: 1px solid var(--p-border);
+            padding: 8px 16px; border-radius: 20px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .bal-val { font-family: var(--p-font-logo); color: var(--p-gold); font-size: 18px; font-weight: 700; }
+        .bal-sym { font-size: 10px; color: var(--p-text-muted); margin-left: 4px; }
+
+        /* SCROLLER & VIEWS */
+        .view-port {
+            flex: 1; overflow-y: auto; padding: 20px;
+            padding-bottom: 180px; position: relative;
         }
 
-        /* ЦИФРОВОЕ КОЛЕСО ROLL */
-        .roll-box {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 10px 0 25px;
-        }
-        .wheel-svg {
-            width: 90%;
-            height: 90%;
-            transform: rotate(-90deg);
-            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1);
-        }
-        .timer-display {
-            position: absolute;
-            font-family: 'Orbitron';
-            font-size: 48px;
-            font-weight: 900;
-            text-shadow: 0 0 20px var(--accent-glow);
+        .view { display: none; width: 100%; opacity: 0; transform: translateY(20px); transition: var(--p-transition); }
+        .view.active { display: block; opacity: 1; transform: translateY(0); }
+
+        /* CARDS */
+        .glass-panel {
+            background: var(--p-card); border: 1px solid var(--p-border);
+            border-radius: 32px; padding: 24px; margin-bottom: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
         }
 
-        /* TOWER GRID */
-        .tower-engine { display: grid; grid-template-rows: repeat(8, 1fr); gap: 10px; }
-        .tower-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; opacity: 0.15; transition: 0.3s; }
+        /* ------------------------------------------------------------
+           ROLL MODULE - КРУГОВАЯ РУЛЕТКА 
+           ------------------------------------------------------------
+        */
+        .roll-stage {
+            width: 100%; aspect-ratio: 1; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .svg-engine {
+            width: 100%; height: 100%; transform: rotate(-90deg);
+            filter: drop-shadow(0 0 20px rgba(0,0,0,0.9));
+        }
+
+        .pie-slice { transition: all 1s var(--p-transition); stroke-width: 16; fill: none; }
+
+        .roll-center-hub {
+            position: absolute; width: 130px; height: 130px;
+            background: radial-gradient(circle, #151518 0%, #000 100%);
+            border-radius: 50%; z-index: 10;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 2px solid var(--p-border);
+            box-shadow: 0 0 50px rgba(0,0,0,1), inset 0 0 30px var(--p-accent-glow);
+        }
+        .timer-big { font-family: var(--p-font-logo); font-size: 46px; font-weight: 900; color: #fff; line-height: 1; }
+        .timer-small { font-size: 11px; color: var(--p-accent); font-weight: 800; letter-spacing: 1px; }
+
+        /* АВАТАРКИ ВНУТРИ КРУГА */
+        .pie-markers-layer { position: absolute; inset: 0; pointer-events: none; }
+        .player-pin {
+            position: absolute; width: 38px; height: 38px; border-radius: 12px;
+            border: 2px solid #fff; background: #000; overflow: hidden;
+            transform: translate(-50%, -50%); transition: 0.8s var(--p-transition);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+        }
+        .player-pin img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* BET INTERFACE */
+        .bet-input-wrap {
+            background: #000; border: 1px solid var(--p-border);
+            border-radius: 24px; padding: 22px; text-align: center;
+            margin-bottom: 15px; position: relative;
+        }
+        .bet-val-display { font-family: var(--p-font-logo); font-size: 30px; color: var(--p-gold); }
+        .bet-label { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--p-text-muted); }
+
+        .btn-main {
+            width: 100%; padding: 24px; border-radius: 24px; border: none;
+            font-family: var(--p-font-logo); font-weight: 900; font-size: 17px;
+            text-transform: uppercase; letter-spacing: 2px; cursor: pointer;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-accent { background: var(--p-accent); color: #fff; box-shadow: 0 12px 30px var(--p-accent-glow); }
+        .btn-accent:active { transform: scale(0.96); }
+        .btn-accent:disabled { background: #1c1c1e; box-shadow: none; color: #444; }
+
+        /* ------------------------------------------------------------
+           TOWER MODULE 
+           ------------------------------------------------------------
+        */
+        .tower-grid { display: grid; grid-template-rows: repeat(8, 1fr); gap: 14px; }
+        .tower-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; opacity: 0.15; transition: 0.4s; }
         .tower-row.active { opacity: 1; }
         .tower-tile {
-            height: 52px;
-            background: #1c1c1e;
-            border-radius: 14px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
+            height: 65px; background: #18181b; border-radius: 20px;
+            border: 1px solid var(--p-border); display: flex; align-items: center; justify-content: center;
+            font-size: 28px; transition: 0.3s;
         }
-        .tower-tile.win { background: var(--green-color); color: #000; box-shadow: 0 0 20px var(--green-color); border: none; }
-        .tower-tile.lose { background: var(--red-color); opacity: 0.7; border: none; }
+        .tower-tile.win { background: var(--p-green); color: #000; border: none; box-shadow: 0 0 30px var(--p-green); }
+        .tower-tile.lose { background: var(--p-red); opacity: 0.5; border: none; }
 
-        /* ИНПУТЫ И КНОПКИ */
-        .input-display {
-            width: 100%;
-            padding: 18px;
-            background: #000;
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            color: var(--gold-color);
-            font-family: 'Orbitron';
-            text-align: center;
-            font-size: 22px;
-            margin-bottom: 15px;
-            min-height: 65px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .input-display:empty::before { content: "0.00"; color: #333; }
-
-        .btn {
-            width: 100%;
-            padding: 20px;
-            border-radius: 22px;
-            border: none;
-            font-weight: 900;
-            font-family: 'Orbitron';
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.2s;
-            cursor: pointer;
-        }
-        .btn-main { background: var(--accent-color); color: #fff; box-shadow: 0 10px 25px var(--accent-glow); }
-        .btn-gold { background: var(--gold-color); color: #000; }
-        .btn:active { transform: scale(0.95); }
-
-        /* ЧАТ */
+        /* ------------------------------------------------------------
+           CHAT & SOCIAL 
+           ------------------------------------------------------------
+        */
         .chat-container {
-            height: 300px;
-            overflow-y: auto;
-            background: #050505;
-            border-radius: 20px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
+            height: 380px; background: #050506; border-radius: 28px;
+            border: 1px solid var(--p-border); padding: 20px;
+            display: flex; flex-direction: column; gap: 16px; overflow-y: auto;
         }
-        .msg-bubble {
-            padding: 12px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            max-width: 85%;
-            line-height: 1.5;
-        }
-        .msg-mine { align-self: flex-end; background: var(--accent-color); border-bottom-right-radius: 4px; }
-        .msg-theirs { align-self: flex-start; background: #1c1c1e; border-bottom-left-radius: 4px; }
-        .msg-author { font-size: 10px; font-weight: 900; color: var(--gold-color); margin-bottom: 4px; display: block; }
+        .chat-msg { display: flex; flex-direction: column; max-width: 85%; }
+        .msg-own { align-self: flex-end; }
+        .msg-bubble { padding: 14px 18px; border-radius: 22px; font-size: 14px; line-height: 1.5; }
+        .msg-own .msg-bubble { background: var(--p-accent); color: #fff; border-bottom-right-radius: 4px; }
+        .msg-bot .msg-bubble { background: #1c1c1f; color: #d1d1d6; border-bottom-left-radius: 4px; }
+        .msg-meta { font-size: 10px; font-weight: 800; color: var(--p-gold); margin-bottom: 4px; text-transform: uppercase; }
 
-        /* КАСТОМНАЯ КЛАВИАТУРА */
-        .keyboard-engine {
-            position: fixed;
-            bottom: -100%;
-            left: 0;
-            width: 100%;
-            background: #111111;
-            border-top: 1px solid var(--border-color);
-            z-index: 9999;
-            transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            padding: 8px 6px 35px;
+        /* ------------------------------------------------------------
+           KEYBOARD OS 
+           ------------------------------------------------------------
+        */
+        .os-kb {
+            position: fixed; bottom: -100%; left: 0; width: 100%;
+            background: #080808; border-top: 1px solid var(--p-border);
+            padding: 10px 10px 45px; z-index: 10000;
+            transition: bottom 0.5s var(--p-transition);
+            box-shadow: 0 -20px 60px rgba(0,0,0,0.9);
         }
-        .keyboard-engine.visible { bottom: 0; }
-        
-        .kb-row { display: flex; justify-content: center; gap: 5px; margin-bottom: 7px; }
-        .key {
-            background: var(--key-bg);
-            border-radius: 6px;
-            height: 48px;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 500;
-            color: #fff;
-            box-shadow: 0 1px 0 rgba(0,0,0,0.5);
+        .os-kb.show { bottom: 0; }
+        .kb-row { display: flex; justify-content: center; gap: 7px; margin-bottom: 10px; }
+        .kb-key {
+            background: var(--p-kb-key); height: 56px; flex: 1;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 20px; font-weight: 500;
+            border-bottom: 4px solid #000; transition: 0.1s;
         }
-        .key:active { background: var(--key-active); transform: scale(0.9); }
-        .key.wide { flex: 1.5; background: #3a3a3c; }
-        .key.space { flex: 5; }
-        .key.func { background: #3a3a3c; font-size: 14px; }
+        .kb-key:active { transform: translateY(4px); border-bottom-width: 0; background: #333; }
+        .kb-key.func { background: #2c2c2e; font-size: 13px; font-weight: 800; flex: 1.7; }
+        .kb-key.space { flex: 5.5; }
 
-        /* НАВИГАЦИЯ */
-        nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            max-width: 500px;
-            background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(25px);
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 0 35px;
-            border-top: 1px solid var(--border-color);
-            z-index: 500;
+        /* ------------------------------------------------------------
+           NAVBAR 
+           ------------------------------------------------------------
+        */
+        .nav-bar {
+            position: fixed; bottom: 0; width: 100%; max-width: 480px;
+            background: rgba(8,8,10,0.95); backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; padding: 18px 0 38px;
+            border-top: 1px solid var(--p-border); z-index: 900;
         }
-        .nav-item { color: #555; text-align: center; font-size: 11px; font-weight: 800; }
-        .nav-item.active { color: var(--accent-color); }
-        .nav-item span { display: block; font-size: 22px; margin-bottom: 5px; }
+        .nav-btn { color: #444; text-align: center; transition: 0.3s; cursor: pointer; position: relative; }
+        .nav-btn.active { color: var(--p-accent); }
+        .nav-btn i { font-size: 26px; display: block; margin-bottom: 6px; font-style: normal; }
+        .nav-btn span { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* АДМИН ПАНЕЛЬ */
-        .admin-modal {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 10000;
-            display: none;
-            flex-direction: column;
-            padding: 25px;
-            overflow-y: auto;
+        /* ------------------------------------------------------------
+           ROOT OVERLORD CONSOLE 
+           ------------------------------------------------------------
+        */
+        .root-panel {
+            position: fixed; inset: 0; background: #000; z-index: 20000;
+            display: none; flex-direction: column; padding: 40px 25px;
         }
-        .adm-card { background: #0c0c0c; border: 1px solid var(--border-color); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
-        .adm-input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 10px; margin: 8px 0; }
+        .root-scroll { flex: 1; overflow-y: auto; }
+        .root-box { background: var(--p-card); border: 1px solid var(--p-border); border-radius: 28px; padding: 22px; margin-bottom: 22px; }
+        .root-field { width: 100%; padding: 16px; background: #000; border: 1px solid #333; border-radius: 12px; color: #fff; margin-top: 12px; font-family: var(--p-font-logo); }
+        .root-label { font-size: 11px; font-weight: 900; color: var(--p-accent); text-transform: uppercase; }
+
+        /* NOTIFICATIONS */
+        .toast {
+            position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
+            background: var(--p-accent); color: #fff; padding: 12px 24px;
+            border-radius: 15px; font-weight: 800; font-size: 13px;
+            z-index: 30000; box-shadow: 0 10px 30px var(--p-accent-glow);
+            display: none; animation: toastIn 0.3s ease;
+        }
+        @keyframes toastIn { from { transform: translate(-50%, -20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <header>
-        <div class="user-block">
-            <img id="top-avatar" class="avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Alex">
-            <div class="user-meta">
-                <span class="user-name" id="top-name">Alexander</span>
-                <span class="user-level">Premium Elite • LVL <span id="top-lvl">1</span></span>
-            </div>
-        </div>
-        <div class="balance-block">
-            <div class="balance-label">CREDITS</div>
-            <div class="balance-value"><span id="top-bal">0.00</span></div>
-        </div>
-    </header>
+    <canvas id="particle-canvas"></canvas>
 
-    <main id="view-port">
-        <div id="scr-roll" class="screen active">
-            <div class="card">
-                <div class="roll-box">
-                    <svg class="wheel-svg" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="45" fill="none" stroke="#1c1c1e" stroke-width="8" />
-                        <circle id="wheel-progress" cx="50" cy="50" r="45" fill="none" stroke="var(--accent-color)" stroke-width="8" stroke-dasharray="283" stroke-dashoffset="0" />
-                    </svg>
-                    <div class="timer-display" id="roll-time">15</div>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <div class="u-avatar-wrap">
+                    <img id="head-av" src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Alex">
+                    <div class="u-level-badge">LV.17</div>
                 </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                    <div style="text-align:left;"><small style="color:#666">БАНК</small><br><b style="color:var(--gold-color); font-size:18px;" id="roll-bank">0.00</b></div>
-                    <div style="text-align:right;"><small style="color:#666">ИГРОКИ</small><br><b style="font-size:18px;" id="roll-count">0</b></div>
-                </div>
-                <div class="input-display" id="inp-roll-bet" onclick="kboard.show('num', 'inp-roll-bet')">1.00</div>
-                <button class="btn btn-main" onclick="engine.placeBet()">СДЕЛАТЬ СТАВКУ</button>
-            </div>
-        </div>
-
-        <div id="scr-tower" class="screen">
-            <div class="card">
-                <div class="tower-engine" id="tower-grid"></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:25px;">
-                    <button class="btn btn-main" id="tw-btn-start" onclick="engine.towerStart()">СТАВКА 5.0</button>
-                    <button class="btn btn-gold" id="tw-btn-cash" style="display:none;" onclick="engine.towerCash()">CASH OUT</button>
+                <div class="u-info">
+                    <span class="u-name" id="head-name">Alexander</span>
+                    <span class="u-status" id="head-status">PROJECT OWNER</span>
                 </div>
             </div>
-        </div>
-
-        <div id="scr-profile" class="screen">
-            <div class="card" style="text-align:center;">
-                <h2 id="prof-name" style="margin: 0 0 10px 0; font-size:24px;">Alexander</h2>
-                <div style="display:flex; justify-content:center; gap:25px;">
-                    <div><small style="color:#666">XP</small><br><b id="prof-xp">0</b></div>
-                    <div><small style="color:#666">WINS</small><br><b id="prof-wins">0</b></div>
+            <div class="header-right">
+                <div class="bal-container">
+                    <span class="bal-val" id="head-bal">0.00</span>
+                    <span class="bal-sym">TON</span>
                 </div>
             </div>
+        </header>
 
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <button class="btn btn-main" style="flex:1; height:45px; padding:0; font-size:12px;" onclick="engine.setChat('global')">ГЛОБАЛ</button>
-                <button class="btn btn-main" style="flex:1; height:45px; padding:0; font-size:12px; background:#1c1c1e;" onclick="engine.setChat('support')">SUPPORT</button>
-            </div>
-
-            <div class="chat-container" id="chat-view"></div>
+        <main class="view-port">
             
-            <div style="display:flex; gap:10px;">
-                <div class="input-display" id="inp-chat-msg" style="margin:0; font-family:'Inter'; font-size:15px; text-align:left; justify-content:flex-start; padding:0 20px; flex:1;" onclick="kboard.show('alpha', 'inp-chat-msg')"></div>
-                <button class="btn btn-main" style="width:65px; padding:0;" onclick="engine.sendMessage()">></button>
+            <div id="v-roll" class="view active">
+                <div class="glass-panel" style="background: transparent; border: none; box-shadow: none; padding: 0;">
+                    <div class="roll-stage">
+                        <svg class="svg-engine" viewBox="0 0 100 100" id="pie-svg">
+                            </svg>
+                        <div class="pie-markers-layer" id="pie-pins"></div>
+                        <div class="roll-center-hub">
+                            <div class="timer-big" id="roll-timer">15</div>
+                            <div class="timer-small">WAITING</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; margin-bottom:25px; padding: 0 10px;">
+                        <div>
+                            <p style="color:var(--p-text-muted); font-size:9px; font-weight:900;">BANK POOL</p>
+                            <p style="color:var(--p-gold); font-family:var(--p-font-logo); font-size:24px;" id="roll-bank">0.00</p>
+                        </div>
+                        <div style="text-align:right;">
+                            <p style="color:var(--p-text-muted); font-size:9px; font-weight:900;">PLAYERS</p>
+                            <p style="font-family:var(--p-font-logo); font-size:24px;" id="roll-pcount">0</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel">
+                        <div class="bet-label">ENTER STAKE</div>
+                        <div class="bet-input-wrap" id="bet-field" onclick="sys.kbOpen('num', 'bet-field')">10.00</div>
+                        <button class="btn-main btn-accent" id="btn-bet" onclick="game.rollJoin()">PLACE YOUR BET</button>
+                    </div>
+                </div>
             </div>
 
-            <button id="adm-btn" class="btn" style="background:var(--red-color); margin-top:25px; display:none;" onclick="admin.open()">ADMIN PANEL</button>
+            <div id="v-tower" class="view">
+                <div class="glass-panel">
+                    <div class="tower-grid" id="tower-grid"></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:30px;">
+                        <button class="btn-main btn-accent" id="tw-btn-start" onclick="game.towerStart()">STAKE 5.0</button>
+                        <button class="btn-main btn-accent" id="tw-btn-cash" style="display:none; background:var(--p-gold); color:#000;" onclick="game.towerCash()">CASH OUT</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="v-profile" class="view">
+                <div class="glass-panel" style="margin-bottom:15px; padding:15px;">
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-main btn-accent" style="flex:1; height:45px; font-size:11px;" onclick="sys.chatMode('global')" id="chat-tab-g">GLOBAL</button>
+                        <button class="btn-main btn-accent" style="flex:1; height:45px; font-size:11px; background:#1c1c1f;" onclick="sys.chatMode('support')" id="chat-tab-s">SUPPORT</button>
+                    </div>
+                </div>
+                
+                <div class="chat-container" id="chat-box"></div>
+                
+                <div style="display:flex; gap:12px; margin-top:15px;">
+                    <div class="bet-input-wrap" id="chat-field" style="margin:0; text-align:left; font-family:'Inter'; font-size:15px; flex:1;" onclick="sys.kbOpen('alpha', 'chat-field')"></div>
+                    <button class="btn-main btn-accent" style="width:65px; padding:0;" onclick="sys.chatSend()">></button>
+                </div>
+
+                <button class="btn-main" id="root-access-btn" style="background:var(--p-red); margin-top:30px; display:none;" onclick="root.show()">ROOT CONSOLE</button>
+            </div>
+
+        </main>
+
+        <nav class="nav-bar">
+            <div class="nav-btn active" onclick="sys.nav('roll', this)"><i>⚔️</i><span>Roll</span></div>
+            <div class="nav-btn" onclick="sys.nav('tower', this)"><i>🏰</i><span>Tower</span></div>
+            <div class="nav-btn" onclick="sys.nav('profile', this)"><i>👤</i><span>Profile</span></div>
+        </nav>
+
+        <div class="os-kb" id="kb-engine">
+            <div style="display:flex; justify-content:space-between; padding:5px 15px 15px; align-items:center;">
+                <span id="kb-id-tag" style="font-weight:900; color:var(--p-accent); font-size:11px; opacity:0.6;">V19_SYSTEM_IO</span>
+                <div onclick="sys.kbClose()" style="color:var(--p-accent); font-weight:900; background:var(--p-accent-glow); padding:8px 18px; border-radius:12px;">CLOSE</div>
+            </div>
+            <div id="kb-render-zone"></div>
         </div>
-    </main>
-
-    <nav>
-        <div class="nav-item active" id="nav-roll" onclick="engine.navigate('roll')"><span>⚔️</span>ROLL</div>
-        <div class="nav-item" id="nav-tower" onclick="engine.navigate('tower')"><span>🏰</span>TOWER</div>
-        <div class="nav-item" id="nav-profile" onclick="engine.navigate('profile')"><span>👤</span>PROFILE</div>
-    </nav>
-</div>
-
-<div class="keyboard-engine" id="kb-wrapper">
-    <div style="display:flex; justify-content:space-between; padding:0 15px 10px; align-items:center;">
-        <span id="kb-status" style="font-size:11px; font-weight:800; color:var(--accent-color);">РУССКАЯ РАСКЛАДКА</span>
-        <div onclick="kboard.hide()" style="padding:5px 10px; color:var(--accent-color); font-weight:900;">ГОТОВО</div>
-    </div>
-    <div id="kb-content"></div>
-</div>
-
-<div id="admin-panel" class="admin-modal">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-        <h2 style="color:var(--red-color); font-family:'Orbitron'; margin:0;">SYSTEM ROOT</h2>
-        <button onclick="admin.close()" class="key" style="width:45px; flex:none;">X</button>
     </div>
 
-    <div class="adm-card">
-        <h3>МОДИФИКАЦИЯ АККАУНТА</h3>
-        <label>БАЛАНС</label><input type="number" id="adm-set-bal" class="adm-input">
-        <label>УРОВЕНЬ</label><input type="number" id="adm-set-lvl" class="adm-input">
-        <button class="btn btn-main" onclick="admin.saveUser()">СОХРАНИТЬ</button>
-    </div>
+    <div class="toast" id="toast"></div>
 
-    <div class="adm-card">
-        <h3>УПРАВЛЕНИЕ ГЕЙМПЛЕЕМ</h3>
-        <label>RTP TOWER (Шанс %): <b id="rtp-val">45</b></label>
-        <input type="range" id="adm-rtp" min="0" max="100" value="45" style="width:100%; margin:15px 0;">
+    <div class="root-panel" id="root-ui">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+            <h1 style="color:var(--p-red); font-family:var(--p-font-logo);">ROOT ACCESS</h1>
+            <button onclick="root.hide()" class="kb-key" style="width:50px; flex:none; background:var(--p-red);">X</button>
+        </div>
+        <div class="root-scroll">
+            <div class="root-box">
+                <p class="root-label">Account Balance</p>
+                <input type="number" id="adm-set-bal" class="root-field">
+                <button class="btn-main btn-accent" style="margin-top:20px;" onclick="root.apply()">PATCH MEMORY</button>
+            </div>
+            <div class="root-box">
+                <p class="root-label">Tower Win Rate (%)</p>
+                <input type="range" id="adm-rtp-range" min="0" max="100" style="width:100%; margin:20px 0;">
+                <div id="rtp-preview" style="text-align:center; font-family:var(--p-font-logo); font-size:28px;">45%</div>
+            </div>
+            <div class="root-box">
+                <p class="root-label">System Logs</p>
+                <div id="root-logs" style="font-size:10px; font-family:monospace; color:#34c759; margin-top:10px; max-height:100px; overflow:y:auto;">
+                    > SYSTEM BOOTED V19.0.4...<br>
+                    > AUTHENTICATED: ALEXANDER...
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="adm-card">
-        <h3>АКТИВНЫЕ ИГРОКИ (DB)</h3>
-        <div id="adm-player-list"></div>
-    </div>
-</div>
 
 <script>
-/* JAVASCRIPT SECTION - ЛОГИКА ПРИЛОЖЕНИЯ 
+/* ================================================================
+   GODMODE ENGINE CORE - V19.0.4 "TITAN"
+   ================================================================
 */
+
 const tg = window.Telegram.WebApp;
 
-// СОСТОЯНИЕ ПРИЛОЖЕНИЯ
-const state = {
-    u: { name: "Alexander", bal: 500.0, lvl: 1, xp: 0, wins: 0, id: 6418873752, user: "Kegovich", av: "" },
-    game: {
-        roll: { timer: 15, bank: 0, players: 0, active: true },
-        tower: { active: false, floor: 0, rtp: 45 }
-    },
-    chat: { mode: 'global', global: [], support: [] },
-    kb: { target: null, lang: 'ru', isCaps: false, type: 'alpha' }
+// DATA STORE
+const APP = {
+    u: { name: "Alexander", id: "6418873752", bal: 5000.0, av: "", status: "DEVELOPER" },
+    roll: { timer: 15, bank: 0, players: [], myBet: 0, active: true },
+    tower: { active: false, floor: 0, rtp: 45 },
+    chat: { mode: 'global', g: [], s: [] },
+    kb: { target: null, lang: 'ru', caps: false, mode: 'alpha' },
+    particles: []
 };
 
-// СЛОВАРЬ МАТА
-const badWords = ["хуй", "пизд", "ебал", "сука", "бля", "мудак", "гандон", "член", "залуп"];
-
-// КОНФИГУРАЦИЯ КЛАВИАТУРЫ
-const layouts = {
+const CHARSETS = {
     ru: [
         ["й","ц","у","к","е","н","г","ш","щ","з","х"],
         ["ф","ы","в","а","п","р","о","л","д","ж","э"],
         ["⇧","я","ч","с","м","и","т","ь","б","ю","⌫"],
-        ["🌐",",", " ", ".", "↩"]
+        ["🌐",","," ",".","↩"]
     ],
     en: [
         ["q","w","e","r","t","y","u","i","o","p"],
         ["a","s","d","f","g","h","j","k","l"],
         ["⇧","z","x","c","v","b","n","m","⌫"],
-        ["🌐",",", " ", ".", "↩"]
+        ["🌐",","," ",".","↩"]
     ],
-    num: [
-        ["1","2","3"],
-        ["4","5","6"],
-        ["7","8","9"],
-        [".","0","⌫"]
-    ]
+    num: [["1","2","3"],["4","5","6"],["7","8","9"],[".","0","⌫"]]
 };
 
-// МОДУЛЬ КЛАВИАТУРЫ
-const kboard = {
-    show(type, targetId) {
-        state.kb.type = type;
-        state.kb.target = document.getElementById(targetId);
-        document.getElementById('kb-wrapper').classList.add('visible');
-        this.render();
+const sys = {
+    // НАВИГАЦИЯ
+    nav(v, el) {
+        document.querySelectorAll('.view').forEach(s => s.classList.remove('active'));
+        document.getElementById('v-'+v).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+        if(v === 'tower') game.towerInit();
+        this.sync();
+        tg.HapticFeedback.impactOccurred('medium');
     },
-    hide() {
-        document.getElementById('kb-wrapper').classList.remove('visible');
-    },
-    render() {
-        const cont = document.getElementById('kb-content');
-        const layout = state.kb.type === 'num' ? layouts.num : layouts[state.kb.lang];
-        
-        document.getElementById('kb-status').innerText = 
-            state.kb.type === 'num' ? "ЦИФРОВАЯ ПАНЕЛЬ" : 
-            (state.kb.lang === 'ru' ? "РУССКАЯ РАСКЛАДКА" : "ENGLISH LAYOUT");
 
-        cont.innerHTML = layout.map(row => `
+    // ОБНОВЛЕНИЕ ДАННЫХ
+    sync() {
+        document.getElementById('head-bal').innerText = APP.u.bal.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('head-name').innerText = APP.u.name;
+        if(APP.u.av) document.getElementById('head-av').src = APP.u.av;
+    },
+
+    // КЛАВИАТУРА
+    kbOpen(mode, target) {
+        APP.kb.mode = mode; APP.kb.target = document.getElementById(target);
+        document.getElementById('kb-engine').classList.add('show');
+        this.kbRender();
+    },
+    kbClose() { document.getElementById('kb-engine').classList.remove('show'); },
+    kbRender() {
+        const zone = document.getElementById('kb-render-zone');
+        const layout = APP.kb.mode === 'num' ? CHARSETS.num : CHARSETS[APP.kb.lang];
+        zone.innerHTML = layout.map(row => `
             <div class="kb-row">
                 ${row.map(k => {
-                    let cls = "key";
-                    let label = k;
-                    let action = `kboard.press('${k}')`;
-
-                    if(k === "⇧") { cls += " func"; action = "kboard.toggleCaps()"; }
-                    if(k === "⌫") { cls += " func"; label = "BACK"; action = "kboard.back()"; }
-                    if(k === "🌐") { cls += " func"; label = "RU/EN"; action = "kboard.toggleLang()"; }
-                    if(k === " ") { cls += " space"; label = "ПРОБЕЛ"; }
-                    if(k === "↩") { cls += " func"; label = "ВВОД"; action = "kboard.hide()"; }
-
-                    // Применение Caps Lock
-                    if(state.kb.isCaps && k.length === 1 && k !== " " && k !== "." && k !== ",") {
-                        label = k.toUpperCase();
-                    }
-
-                    return `<div class="${cls}" onclick="${action}">${label}</div>`;
+                    let cls = "kb-key", lbl = k, act = `sys.kbType('${k}')`;
+                    if(k === "⇧") { cls += " func"; act = "sys.kbCaps()"; }
+                    if(k === "⌫") { cls += " func"; lbl = "DEL"; act = "sys.kbBack()"; }
+                    if(k === "🌐") { cls += " func"; lbl = "RU/EN"; act = "sys.kbLang()"; }
+                    if(k === " ") { cls += " space"; lbl = "SPACE"; }
+                    if(k === "↩") { cls += " func"; lbl = "ENTER"; act = "sys.kbClose()"; }
+                    if(APP.kb.caps && k.length === 1 && k !== " " && k !== "." && k !== ",") lbl = k.toUpperCase();
+                    return `<div class="${cls}" onclick="${act}">${lbl}</div>`;
                 }).join('')}
             </div>
         `).join('');
     },
-    press(k) {
-        let val = state.kb.target.innerText;
-        if(k === " ") k = " ";
-        if(k === "⇧" || k === "⌫" || k === "🌐" || k === "↩") return;
-        
-        const char = state.kb.isCaps ? k.toUpperCase() : k;
-        state.kb.target.innerText = val + char;
-        tg.HapticFeedback.selectionChanged();
+    kbType(k) {
+        if(["⇧","⌫","🌐","↩"].includes(k)) return;
+        const char = APP.kb.caps ? k.toUpperCase() : k;
+        APP.kb.target.innerText += char;
+        tg.HapticFeedback.impactOccurred('light');
     },
-    back() {
-        let val = state.kb.target.innerText;
-        state.kb.target.innerText = val.slice(0, -1);
+    kbBack() { APP.kb.target.innerText = APP.kb.target.innerText.slice(0,-1); },
+    kbCaps() { APP.kb.caps = !APP.kb.caps; this.kbRender(); },
+    kbLang() { APP.kb.lang = APP.kb.lang === 'ru' ? 'en' : 'ru'; this.kbRender(); },
+
+    // ЧАТ
+    chatMode(m) {
+        APP.chat.mode = m;
+        document.getElementById('chat-tab-g').style.background = m === 'global' ? 'var(--p-accent)' : '#1c1c1f';
+        document.getElementById('chat-tab-s').style.background = m === 'support' ? 'var(--p-accent)' : '#1c1c1f';
+        this.chatRender();
     },
-    toggleCaps() {
-        state.kb.isCaps = !state.kb.isCaps;
-        this.render();
+    chatSend() {
+        const inp = document.getElementById('chat-field');
+        if(!inp.innerText.trim()) return;
+        const msg = { name: APP.u.name, txt: inp.innerText, own: true };
+        if(APP.chat.mode === 'global') APP.chat.g.push(msg); else APP.chat.s.push(msg);
+        inp.innerText = ''; this.chatRender();
+        tg.HapticFeedback.notificationOccurred('success');
     },
-    toggleLang() {
-        state.kb.lang = state.kb.lang === 'ru' ? 'en' : 'ru';
-        this.render();
+    chatRender() {
+        const box = document.getElementById('chat-box');
+        const data = APP.chat.mode === 'global' ? APP.chat.g : APP.chat.s;
+        box.innerHTML = data.map(m => `
+            <div class="chat-msg ${m.own ? 'msg-own' : 'msg-bot'}">
+                <span class="msg-meta">${m.name}</span>
+                <div class="msg-bubble">${m.txt}</div>
+            </div>
+        `).join('');
+        box.scrollTop = box.scrollHeight;
+    },
+
+    toast(txt) {
+        const t = document.getElementById('toast');
+        t.innerText = txt; t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 3000);
     }
 };
 
-// МОДУЛЬ ЛОГИКИ ИГРЫ
-const engine = {
-    navigate(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('scr-'+id).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById('nav-'+id).classList.add('active');
-        if(id === 'tower') this.towerInit();
-        this.sync();
-    },
-    sync() {
-        document.getElementById('top-bal').innerText = state.u.bal.toFixed(2);
-        document.getElementById('top-lvl').innerText = state.u.lvl;
-        document.getElementById('top-name').innerText = state.u.name;
-        document.getElementById('prof-name').innerText = state.u.name;
-        document.getElementById('prof-xp').innerText = state.u.xp;
-        document.getElementById('prof-wins').innerText = state.u.wins;
-        if(state.u.av) document.getElementById('top-avatar').src = state.u.av;
-    },
+const game = {
     // ROLL LOGIC
-    rollTimer() {
+    rollInit() {
         setInterval(() => {
-            if(!state.game.roll.active) return;
-            state.game.roll.timer--;
+            if(!APP.roll.active) return;
+            APP.roll.timer--;
             
-            // Анимация прогресс-бара
-            const circle = document.getElementById('wheel-progress');
-            const offset = (state.game.roll.timer / 15) * 283;
-            circle.style.strokeDashoffset = 283 - offset;
+            // Имитация захода игроков
+            if(APP.roll.timer > 3 && Math.random() > 0.75) this.botEntry();
 
-            if(state.game.roll.timer <= 0) {
-                this.rollFinish();
-                state.game.roll.timer = 15;
+            if(APP.roll.timer <= 0) {
+                this.rollResolve();
+                APP.roll.timer = 15;
+                APP.roll.myBet = 0;
+                APP.roll.players = [];
+                APP.roll.bank = 0;
+                document.getElementById('btn-bet').disabled = false;
             }
-            document.getElementById('roll-time').innerText = state.game.roll.timer;
-            document.getElementById('roll-bank').innerText = state.game.roll.bank.toFixed(2);
-            document.getElementById('roll-count').innerText = state.game.roll.players;
+            
+            document.getElementById('roll-timer').innerText = APP.roll.timer;
+            document.getElementById('roll-bank').innerText = APP.roll.bank.toFixed(2);
+            document.getElementById('roll-pcount').innerText = APP.roll.players.length;
+            this.rollDraw();
         }, 1000);
     },
-    placeBet() {
-        const amount = parseFloat(document.getElementById('inp-roll-bet').innerText);
-        if(isNaN(amount) || amount <= 0) return tg.showAlert("Некорректная сумма");
-        if(state.u.bal >= amount) {
-            state.u.bal -= amount;
-            state.game.roll.bank += amount;
-            state.game.roll.players++;
-            this.sync();
+
+    botEntry() {
+        const bots = ["KitsaKega", "TonWhale", "CryptoKing", "Mamba_Dev", "DarkAmbient", "Shadow"];
+        const bid = Math.floor(Math.random()*8999)+1000;
+        const bamt = Math.floor(Math.random()*100)+5;
+        APP.roll.players.push({
+            name: bots[Math.floor(Math.random()*bots.length)],
+            id: bid, bet: bamt, 
+            av: `https://api.dicebear.com/7.x/identicon/svg?seed=${bid}`,
+            me: false
+        });
+        APP.roll.bank += bamt;
+    },
+
+    rollJoin() {
+        const amt = parseFloat(document.getElementById('bet-field').innerText);
+        if(amt > 0 && APP.u.bal >= amt && APP.roll.myBet === 0) {
+            APP.u.bal -= amt;
+            APP.roll.myBet = amt;
+            APP.roll.bank += amt;
+            APP.roll.players.push({
+                name: APP.u.name, id: APP.u.id, bet: amt, av: APP.u.av, me: true
+            });
+            document.getElementById('btn-bet').disabled = true;
+            sys.sync();
             tg.HapticFeedback.notificationOccurred('success');
-        } else {
-            tg.showAlert("Недостаточно TON");
+            sys.toast("BET PLACED!");
         }
     },
-    rollFinish() {
-        if(state.game.roll.bank > 0) {
-            const win = state.game.roll.bank * 0.95;
-            state.u.bal += win;
-            state.u.wins++;
-            tg.showAlert(`Раунд окончен! Вы забираете банк: ${win.toFixed(2)} TON`);
-            state.game.roll.bank = 0;
-            state.game.roll.players = 0;
-            this.sync();
+
+    rollDraw() {
+        const svg = document.getElementById('pie-svg');
+        const pins = document.getElementById('pie-pins');
+        svg.innerHTML = ''; pins.innerHTML = '';
+        
+        if(APP.roll.players.length === 0) {
+            svg.innerHTML = `<circle cx="50" cy="50" r="40" stroke="#1c1c1e" stroke-width="16" fill="none" />`;
+            return;
         }
+
+        let currentAngle = 0;
+        const palette = ["#007aff", "#5e5ce6", "#ffcc00", "#ff3b30", "#28cd41", "#af52de", "#ff9500"];
+
+        APP.roll.players.forEach((p, idx) => {
+            const ratio = p.bet / APP.roll.bank;
+            const angle = ratio * 360;
+            const dash = `${ratio * 251.2} 251.2`;
+            const offset = -(currentAngle / 360) * 251.2;
+
+            const slice = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            slice.setAttribute("cx", "50");
+            slice.setAttribute("cy", "50");
+            slice.setAttribute("r", "40");
+            slice.classList.add("pie-slice");
+            slice.style.stroke = p.me ? "var(--p-accent)" : palette[idx % palette.length];
+            slice.style.strokeDasharray = dash;
+            slice.style.strokeDashoffset = offset;
+            if(p.me) slice.style.filter = "drop-shadow(0 0 5px var(--p-accent))";
+            svg.appendChild(slice);
+
+            // МАРКЕРЫ (АВАТАРКИ)
+            const midAngle = (currentAngle + angle / 2) * (Math.PI / 180);
+            const radius = 40;
+            const px = 50 + radius * Math.cos(midAngle - Math.PI/2);
+            const py = 50 + radius * Math.sin(midAngle - Math.PI/2);
+
+            const pin = document.createElement('div');
+            pin.className = 'player-pin';
+            if(p.me) { pin.style.borderColor = 'var(--p-gold)'; pin.style.zIndex = '100'; }
+            pin.style.left = px + '%';
+            pin.style.top = py + '%';
+            pin.innerHTML = `<img src="${p.av}">`;
+            pins.appendChild(pin);
+
+            currentAngle += angle;
+        });
     },
-    // TOWER LOGIC
+
+    rollResolve() {
+        if(APP.roll.myBet > 0) {
+            const winRatio = APP.roll.myBet / APP.roll.bank;
+            if(Math.random() < winRatio) {
+                const total = APP.roll.bank * 0.95;
+                APP.u.bal += total;
+                sys.toast(`WINNER! +${total.toFixed(2)} TON`);
+                fx.spawnExplosion();
+            }
+        }
+        sys.sync();
+    },
+
+    // TOWER
     towerInit() {
-        const grid = document.getElementById('tower-grid');
-        grid.innerHTML = '';
+        const g = document.getElementById('tower-grid'); g.innerHTML = '';
         for(let i=7; i>=0; i--) {
-            grid.innerHTML += `
-                <div class="tower-row" id="row-${i}">
-                    <div class="tower-tile" onclick="engine.towerStep(${i},0)">?</div>
-                    <div class="tower-tile" onclick="engine.towerStep(${i},1)">?</div>
-                    <div class="tower-tile" onclick="engine.towerStep(${i},2)">?</div>
-                </div>
-            `;
+            g.innerHTML += `<div class="tower-row" id="tw-row-${i}">
+                <div class="tower-tile" onclick="game.towerStep(${i},0)">?</div>
+                <div class="tower-tile" onclick="game.towerStep(${i},1)">?</div>
+                <div class="tower-tile" onclick="game.towerStep(${i},2)">?</div>
+            </div>`;
         }
     },
     towerStart() {
-        if(state.u.bal < 5) return tg.showAlert("Минимум 5 TON");
-        state.u.bal -= 5;
-        state.game.tower.active = true;
-        state.game.tower.floor = 0;
+        if(APP.u.bal < 5) return;
+        APP.u.bal -= 5; APP.tower.active = true; APP.tower.floor = 0;
         document.getElementById('tw-btn-start').style.display = 'none';
         document.getElementById('tw-btn-cash').style.display = 'block';
-        this.towerUpdate();
-        this.sync();
+        this.towerUpdate(); sys.sync();
     },
     towerUpdate() {
         document.querySelectorAll('.tower-row').forEach(r => r.classList.remove('active'));
-        document.getElementById('row-'+state.game.tower.floor).classList.add('active');
+        document.getElementById('tw-row-'+APP.tower.floor).classList.add('active');
     },
     towerStep(f, t) {
-        if(!state.game.tower.active || f !== state.game.tower.floor) return;
-        
-        const isWin = (Math.random() * 100) < state.game.tower.rtp;
-        const row = document.getElementById('row-'+f).children;
-        
-        if(isWin) {
-            row[t].classList.add('win');
-            state.game.tower.floor++;
-            state.u.xp += 25;
-            if(state.game.tower.floor > 7) this.towerCash();
-            else this.towerUpdate();
+        if(!APP.tower.active || f !== APP.tower.floor) return;
+        const win = (Math.random() * 100) < APP.tower.rtp;
+        const tiles = document.getElementById('tw-row-'+f).children;
+        if(win) {
+            tiles[t].classList.add('win');
+            APP.tower.floor++;
+            tg.HapticFeedback.impactOccurred('light');
+            if(APP.tower.floor > 7) this.towerCash(); else this.towerUpdate();
         } else {
-            row[t].classList.add('lose');
-            state.game.tower.active = false;
+            tiles[t].classList.add('lose');
+            APP.tower.active = false;
             tg.HapticFeedback.notificationOccurred('error');
-            setTimeout(() => this.towerReset(), 800);
+            setTimeout(() => this.towerInit(), 1000);
         }
-        this.sync();
     },
     towerCash() {
-        const multipliers = [1.2, 2.5, 6, 12, 28, 60, 140, 350];
-        const prize = 5 * multipliers[state.game.tower.floor-1];
-        state.u.bal += prize;
-        state.u.wins++;
-        tg.showAlert(`ПОБЕДА! Зачислено ${prize} TON`);
-        this.towerReset();
-    },
-    towerReset() {
-        state.game.tower.active = false;
+        const multipliers = [1.45, 2.9, 6.2, 14, 35, 90, 210, 500];
+        const prize = 5 * multipliers[APP.tower.floor-1];
+        APP.u.bal += prize;
+        sys.toast(`CASHED: ${prize} TON`);
+        APP.tower.active = false;
         document.getElementById('tw-btn-start').style.display = 'block';
         document.getElementById('tw-btn-cash').style.display = 'none';
-        this.towerInit();
-    },
-    // CHAT LOGIC
-    setChat(m) { state.chat.mode = m; this.chatRender(); },
-    sendMessage() {
-        const inp = document.getElementById('inp-chat-msg');
-        let text = inp.innerText.trim();
-        if(!text) return;
+        this.towerInit(); sys.sync();
+        fx.spawnExplosion();
+    }
+};
 
-        // Фильтр мата
-        badWords.forEach(w => {
-            const reg = new RegExp(w, 'gi');
-            text = text.replace(reg, "***");
+const fx = {
+    canvas: null, ctx: null,
+    init() {
+        this.canvas = document.getElementById('particle-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        window.onresize = () => {
+            this.canvas.width = window.innerWidth;
+            this.canvas.height = window.innerHeight;
+        };
+        window.onresize();
+        this.loop();
+    },
+    spawnExplosion() {
+        for(let i=0; i<50; i++) {
+            APP.particles.push({
+                x: window.innerWidth/2, y: window.innerHeight/2,
+                vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10,
+                life: 1, color: Math.random() > 0.5 ? '#ffcc00' : '#007aff',
+                size: Math.random()*4+2
+            });
+        }
+    },
+    loop() {
+        this.ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
+        APP.particles.forEach((p, idx) => {
+            p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.life -= 0.02;
+            this.ctx.globalAlpha = p.life;
+            this.ctx.fillStyle = p.color;
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+            this.ctx.fill();
+            if(p.life <= 0) APP.particles.splice(idx, 1);
         });
-
-        const msg = { u: state.u.name, t: text, mine: true };
-        if(state.chat.mode === 'global') state.chat.global.push(msg);
-        else state.chat.support.push(msg);
-        
-        inp.innerText = '';
-        this.chatRender();
-    },
-    chatRender() {
-        const view = document.getElementById('chat-view');
-        const data = state.chat.mode === 'global' ? state.chat.global : state.chat.support;
-        view.innerHTML = data.map(m => `
-            <div class="msg-bubble ${m.mine ? 'msg-mine' : 'msg-theirs'}">
-                <span class="msg-author">${m.u}</span>${m.t}
-            </div>
-        `).join('');
-        view.scrollTop = view.scrollHeight;
+        requestAnimationFrame(() => this.loop());
     }
 };
 
-// МОДУЛЬ АДМИНКИ
-const admin = {
-    open() {
-        document.getElementById('admin-panel').style.display = 'flex';
-        document.getElementById('adm-set-bal').value = state.u.bal;
-        document.getElementById('adm-set-lvl').value = state.u.lvl;
-        this.renderPlayers();
+const root = {
+    show() {
+        document.getElementById('root-ui').style.display = 'flex';
+        document.getElementById('adm-set-bal').value = APP.u.bal;
     },
-    close() { document.getElementById('admin-panel').style.display = 'none'; },
-    saveUser() {
-        state.u.bal = parseFloat(document.getElementById('adm-set-bal').value);
-        state.u.lvl = parseInt(document.getElementById('adm-set-lvl').value);
-        engine.sync();
-        tg.showAlert("Данные обновлены");
-    },
-    renderPlayers() {
-        const list = document.getElementById('adm-player-list');
-        const mock = [
-            { name: state.u.name, bal: state.u.bal, user: state.u.user },
-            { name: "Kirov_User", bal: 15.0, user: "kirov43" },
-            { name: "Test_Player", bal: 0.5, user: "tester" }
-        ];
-        list.innerHTML = mock.map(p => `
-            <div class="adm-card" style="display:flex; justify-content:space-between; align-items:center; background:#111;">
-                <div><b>${p.name}</b><br><small>${p.bal} TON</small></div>
-                <button class="btn btn-main" style="width:auto; padding:8px 15px; font-size:10px;" onclick="window.open('tg://resolve?domain=${p.user}')">В ЛС</button>
-            </div>
-        `).join('');
+    hide() { document.getElementById('root-ui').style.display = 'none'; },
+    apply() {
+        APP.u.bal = parseFloat(document.getElementById('adm-set-bal').value);
+        sys.sync(); sys.toast("MEMORY PATCHED");
+        this.hide();
     }
 };
 
-// ИНИЦИАЛИЗАЦИЯ
-document.getElementById('adm-rtp').oninput = function() {
-    state.game.tower.rtp = this.value;
-    document.getElementById('rtp-val').innerText = this.value;
+document.getElementById('adm-rtp-range').oninput = function() {
+    APP.tower.rtp = this.value;
+    document.getElementById('rtp-preview').innerText = this.value + '%';
 };
 
+// INITIALIZATION
 window.onload = () => {
-    tg.ready();
-    tg.expand();
-    
-    // Получение данных из Telegram
+    tg.ready(); tg.expand();
     if(tg.initDataUnsafe?.user) {
         const user = tg.initDataUnsafe.user;
-        state.u.name = user.first_name;
-        state.u.id = user.id;
-        state.u.user = user.username || "user";
-        state.u.av = user.photo_url || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.id}`;
-        
-        // Проверка прав админа
+        APP.u.name = user.first_name;
+        APP.u.id = String(user.id);
+        APP.u.av = user.photo_url || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.id}`;
         if(user.id === 6418873752 || user.username === 'Kegovich') {
-            document.getElementById('adm-btn').style.display = 'block';
+            document.getElementById('root-access-btn').style.display = 'block';
         }
     }
-
-    engine.sync();
-    engine.rollTimer();
-    engine.towerInit();
+    sys.sync(); game.rollInit(); game.towerInit(); fx.init();
 };
 </script>
-
 </body>
 </html>
