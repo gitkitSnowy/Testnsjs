@@ -3,311 +3,497 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Rolls Master PvP ELITE v14</title>
+    <title>Rolls Master PvP ELITE v15</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;600;800&display=swap');
 
         :root {
             --bg: #000000;
-            --card: #0a0a0c;
+            --panel: #0d0d0f;
             --accent: #007aff;
-            --accent-glow: rgba(0, 122, 255, 0.5);
             --gold: #ffb400;
             --red: #ff3b30;
+            --green: #34c759;
             --border: rgba(255, 255, 255, 0.08);
+            --key-bg: #2c2c2e;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { 
-            margin: 0; background: var(--bg); color: #fff; 
-            font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        .app-shell { display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; position: relative; z-index: 10; }
+        .app-shell { display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; position: relative; }
 
+        /* HEADER */
         header {
             padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--border); z-index: 100;
         }
-        .u-av { width: 45px; height: 45px; border-radius: 12px; border: 1px solid var(--accent); }
+        .u-info { display: flex; align-items: center; gap: 12px; }
+        .u-av { width: 42px; height: 42px; border-radius: 12px; border: 1.5px solid var(--accent); }
+        .u-name-box { display: flex; flex-direction: column; }
+        .u-name { font-weight: 800; font-size: 14px; }
+        .u-lvl { font-size: 10px; color: var(--accent); font-weight: 900; }
 
-        main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 120px; }
-        .screen { display: none; animation: fadeIn 0.3s ease; }
-        .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .bal-box { text-align: right; }
+        .bal-val { font-family: 'Orbitron'; color: var(--gold); font-size: 18px; font-weight: 900; }
 
+        /* MAIN CONTENT */
+        main { flex: 1; overflow-y: auto; padding: 15px 15px 150px; }
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CARDS */
         .card {
-            background: var(--card); border: 1px solid var(--border); border-radius: 24px;
-            padding: 20px; margin-bottom: 15px; position: relative;
+            background: var(--panel); border: 1px solid var(--border); border-radius: 24px;
+            padding: 20px; margin-bottom: 15px;
         }
 
-        /* INPUTS & BUTTONS */
-        .game-input {
-            width: 100%; padding: 16px; background: #000; border: 1px solid var(--border);
-            color: var(--gold); border-radius: 16px; font-family: 'Orbitron'; text-align: center;
-            font-size: 18px; margin-bottom: 10px;
-        }
-        .btn {
-            width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 900;
-            text-transform: uppercase; cursor: pointer; font-family: 'Orbitron';
-            background: var(--accent); color: #fff;
-        }
-        .btn:active { transform: scale(0.96); opacity: 0.9; }
-
-        /* CHAT SYSTEM */
-        .chat-box { height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; padding: 5px; }
-        .msg { padding: 10px 14px; border-radius: 15px; font-size: 13px; max-width: 80%; }
-        .msg.me { align-self: flex-end; background: var(--accent); }
-        .msg.other { align-self: flex-start; background: #1c1c1e; }
-        .msg-n { font-size: 9px; font-weight: 900; color: var(--gold); display: block; }
-
-        /* TOWER */
+        /* TOWER GRID */
         .t-grid { display: grid; grid-template-rows: repeat(8, 1fr); gap: 8px; }
-        .t-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; opacity: 0.2; }
-        .t-row.active { opacity: 1; }
-        .t-tile { height: 45px; background: #161618; border-radius: 10px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
-        .t-tile.win { background: #34c759; box-shadow: 0 0 15px #34c759; }
+        .t-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; opacity: 0.2; pointer-events: none; }
+        .t-row.active { opacity: 1; pointer-events: auto; }
+        .t-tile { height: 48px; background: #1c1c1e; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; }
+        .t-tile.win { background: var(--green); color: #000; box-shadow: 0 0 15px var(--green); }
+        .t-tile.lose { background: var(--red); opacity: 0.8; }
+
+        /* ROLL WHEEL */
+        .roll-container { position: relative; width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+        .wheel { width: 85%; height: 85%; border-radius: 50%; border: 8px solid #1c1c1e; position: relative; transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1); }
+        .wheel-center { position: absolute; font-family: 'Orbitron'; font-size: 42px; font-weight: 900; z-index: 5; }
+        .pointer { position: absolute; top: 0; width: 4px; height: 30px; background: var(--accent); z-index: 10; border-radius: 2px; }
+
+        /* CUSTOM INPUTS */
+        .fake-input {
+            width: 100%; padding: 18px; background: #000; border: 1px solid var(--border);
+            border-radius: 18px; color: var(--gold); font-family: 'Orbitron'; text-align: center;
+            font-size: 20px; margin-bottom: 15px; cursor: pointer;
+        }
+        .fake-input:empty::before { content: attr(placeholder); color: #444; }
+
+        /* CUSTOM KEYBOARDS */
+        .kb-overlay {
+            position: fixed; bottom: -100%; left: 0; width: 100%; background: #161618;
+            border-top: 1px solid var(--border); z-index: 2000; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 10px 5px 30px;
+        }
+        .kb-overlay.open { bottom: 0; }
+        .kb-grid { display: grid; gap: 6px; }
+        .num-grid { grid-template-columns: repeat(3, 1fr); }
+        .text-row { display: flex; justify-content: center; gap: 4px; margin-bottom: 6px; }
+        .key {
+            background: var(--key-bg); border-radius: 6px; height: 45px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 18px; cursor: pointer; flex: 1;
+        }
+        .key:active { background: #48484a; }
+        .key.special { background: #3a3a3c; font-size: 14px; flex: 1.5; }
+        .key.space { flex: 4; }
+
+        /* CHAT */
+        .chat-wrap { height: 280px; overflow-y: auto; background: #050505; border-radius: 15px; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border); }
+        .message { margin-bottom: 10px; max-width: 85%; padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.4; }
+        .msg-me { align-self: flex-end; background: var(--accent); margin-left: auto; }
+        .msg-other { align-self: flex-start; background: #1c1c1e; }
+        .msg-user { font-size: 10px; font-weight: 900; color: var(--gold); margin-bottom: 2px; display: block; }
 
         /* NAV */
         nav {
             position: fixed; bottom: 0; width: 100%; max-width: 500px;
-            background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; 
-            padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 100;
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; padding: 15px 0 35px;
+            border-top: 1px solid var(--border); z-index: 150;
         }
-        .n-item { color: #555; text-align: center; font-size: 10px; font-weight: 900; cursor: pointer; }
-        .n-item.active { color: var(--accent); }
+        .nav-btn { color: #444; font-size: 10px; font-weight: 900; text-align: center; }
+        .nav-btn.active { color: var(--accent); }
+        .nav-btn i { font-size: 24px; display: block; margin-bottom: 4px; font-style: normal; }
 
-        /* ADMIN PANEL */
-        .adm-modal { position: fixed; inset: 0; background: #000; z-index: 2000; padding: 25px; display: none; flex-direction: column; overflow-y: auto; }
+        /* ADMIN */
+        .adm-screen { position: fixed; inset: 0; background: #000; z-index: 3000; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
+        .adm-user-item { background: #0d0d0f; border: 1px solid var(--border); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+
+        .btn {
+            width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 900;
+            text-transform: uppercase; font-family: 'Orbitron'; cursor: pointer; transition: 0.2s;
+        }
+        .btn-blue { background: var(--accent); color: white; }
+        .btn-gold { background: var(--gold); color: black; }
     </style>
 </head>
 <body>
 
 <div class="app-shell">
     <header>
-        <div style="display:flex; align-items:center; gap:10px;">
-            <img id="h-av" class="u-av" src="">
-            <div>
-                <div id="h-name" style="font-weight:800;">Player</div>
-                <div style="font-size:10px; color:var(--accent);">LVL <span id="h-lvl">1</span></div>
+        <div class="u-info">
+            <img id="head-av" class="u-av" src="">
+            <div class="u-name-box">
+                <span class="u-name" id="head-name">Alexander</span>
+                <span class="u-lvl">LVL <span id="head-lvl">1</span></span>
             </div>
         </div>
-        <div style="text-align:right;">
-            <div id="h-bal" style="font-family:'Orbitron'; color:var(--gold); font-size:18px;">0.00</div>
-            <div style="font-size:8px; letter-spacing:1px;">TON</div>
+        <div class="bal-box">
+            <div class="bal-val"><span id="head-bal">0.00</span> <small style="font-size:10px">TON</small></div>
         </div>
     </header>
 
-    <main>
-        <div id="scr-lobby" class="screen active">
-            <div class="card" onclick="ui.nav('roll')">
-                <h2>⚔️ PvP ROLL</h2>
-                <p style="font-size:12px; color:#666;">Ставки в реальном времени. Банк: <span id="l-bank" style="color:var(--gold);">0.00</span></p>
-                <button class="btn" style="margin-top:10px;">ВОЙТИ</button>
-            </div>
-            <div class="card" onclick="ui.nav('tower')">
-                <h2>🏰 TOWER</h2>
-                <p style="font-size:12px; color:#666;">Поднимайся и умножай ставку до x150.</p>
-                <button class="btn" style="background:#1c1c1e; margin-top:10px;">ИГРАТЬ</button>
-            </div>
-        </div>
-
-        <div id="scr-roll" class="screen">
+    <main id="scroll-area">
+        <div id="scr-roll" class="screen active">
             <div class="card" style="text-align:center;">
-                <h1 id="r-timer" style="font-family:'Orbitron'; font-size:48px;">15</h1>
-                <p>БАНК: <span id="r-bank" style="color:var(--gold);">0.00</span> TON</p>
-                <input type="number" id="bet-roll" class="game-input" value="1.0" inputmode="decimal">
-                <button id="btn-roll-bet" class="btn">ПОСТАВИТЬ</button>
+                <div class="roll-container">
+                    <div class="pointer"></div>
+                    <div class="wheel" id="main-wheel"></div>
+                    <div class="wheel-center" id="roll-timer">15</div>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:800; font-size:14px;">
+                    <span>БАНК: <b style="color:var(--gold)" id="roll-bank">0.00</b></span>
+                    <span>ИГРОКОВ: <b id="roll-players">0</b></span>
+                </div>
+                <div class="fake-input" id="inp-bet-roll" onclick="kb.open('num', 'inp-bet-roll')">1.0</div>
+                <button class="btn btn-blue" onclick="game.rollBet()">ПОСТАВИТЬ</button>
             </div>
         </div>
 
         <div id="scr-tower" class="screen">
             <div class="card">
-                <div class="t-grid" id="t-grid"></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
-                    <button id="btn-t-start" class="btn">ИГРАТЬ (5)</button>
-                    <button id="btn-t-cash" class="btn" style="background:var(--gold); color:#000; display:none;">CASH</button>
+                <div class="t-grid" id="tower-grid"></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
+                    <button class="btn btn-blue" id="tw-start-btn" onclick="game.towerStart()">СТАВКА 5</button>
+                    <button class="btn btn-gold" id="tw-cash-btn" style="display:none;" onclick="game.towerCashout()">CASH OUT</button>
                 </div>
             </div>
         </div>
 
         <div id="scr-profile" class="screen">
             <div class="card" style="text-align:center;">
-                <h2 id="p-name">Player</h2>
-                <div style="display:flex; justify-content:center; gap:20px; font-size:11px;">
-                    <span>XP: <b id="p-xp">0</b></span>
-                    <span>WINS: <b id="p-wins">0</b></span>
+                <h2 id="prof-name">Alexander</h2>
+                <div style="display:flex; justify-content:center; gap:30px; font-size:12px;">
+                    <span>XP: <b id="prof-xp">0</b></span>
+                    <span>WINS: <b id="prof-wins">0</b></span>
                 </div>
             </div>
 
-            <div style="display:flex; gap:10px; margin-bottom:10px;">
-                <button class="btn" style="flex:1; font-size:10px; background:#1c1c1e;" onclick="chat.set('global')" id="tab-g">ЧАТ</button>
-                <button class="btn" style="flex:1; font-size:10px; background:#1c1c1e;" onclick="chat.set('support')" id="tab-s">ПОДДЕРЖКА</button>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button class="btn btn-blue" style="flex:1; font-size:10px;" onclick="chat.switch('global')">ГЛОБАЛ</button>
+                <button class="btn btn-blue" style="flex:1; font-size:10px; background:#1c1c1e;" onclick="chat.switch('support')">ПОДДЕРЖКА</button>
             </div>
 
-            <div class="card">
-                <div class="chat-box" id="chat-render"></div>
-                <div style="display:flex; gap:8px;">
-                    <input type="text" id="chat-in" class="game-input" style="font-family:'Inter'; font-size:14px; margin:0;" placeholder="Сообщение...">
-                    <button class="btn" style="width:60px;" onclick="chat.send()">></button>
-                </div>
+            <div class="chat-wrap" id="chat-render"></div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <div class="fake-input" id="inp-chat" style="margin:0; font-family:'Inter'; font-size:14px; text-align:left;" placeholder="Сообщение..." onclick="kb.open('text', 'inp-chat')"></div>
+                <button class="btn btn-blue" style="width:60px; padding:15px 0;" onclick="chat.send()">></button>
             </div>
 
-            <button id="adm-trigger" class="btn" style="background:var(--red); margin-top:15px; display:none;" onclick="admin.open()">ADMIN CP</button>
+            <button class="btn" style="background:var(--red); margin-top:20px; display:none;" id="adm-trigger" onclick="adm.open()">ADMIN PANEL</button>
         </div>
     </main>
 
     <nav>
-        <div class="n-item active" onclick="ui.nav('lobby')"><i>🏠</i>ГЛАВНАЯ</div>
-        <div class="n-item" onclick="ui.nav('tower')"><i>🏰</i>БАШНЯ</div>
-        <div class="n-item" onclick="ui.nav('profile')"><i>👤</i>ПРОФИЛЬ</div>
+        <div class="nav-btn active" id="nav-roll" onclick="ui.nav('roll')"><i>⚔️</i>ROLL</div>
+        <div class="nav-btn" id="nav-tower" onclick="ui.nav('tower')"><i>🏰</i>TOWER</div>
+        <div class="nav-btn" id="nav-profile" onclick="ui.nav('profile')"><i>👤</i>PROFILE</div>
     </nav>
 </div>
 
-<div id="adm-modal" class="adm-modal">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="color:var(--red);">ADMIN</h2>
-        <button class="btn" style="width:auto; padding:10px;" onclick="admin.close()">X</button>
+<div class="kb-overlay" id="kb-num">
+    <div style="display:flex; justify-content:space-between; padding:0 15px 10px;">
+        <span style="color:var(--gold); font-weight:900;">СУММА СТАВКИ</span>
+        <span onclick="kb.close()" style="color:var(--accent);">ГОТОВО</span>
     </div>
-    <div class="card" style="margin-top:20px;">
-        <label>БАЛАНС</label><input type="number" id="adm-bal" class="game-input">
-        <label>LVL</label><input type="number" id="adm-lvl" class="adm-input" style="width:100%; padding:10px; background:#000; color:#fff; border:1px solid #333;">
-        <button class="btn" style="margin-top:10px;" onclick="admin.save()">ОБНОВИТЬ</button>
+    <div class="kb-grid num-grid">
+        <div class="key" onclick="kb.type('1')">1</div><div class="key" onclick="kb.type('2')">2</div><div class="key" onclick="kb.type('3')">3</div>
+        <div class="key" onclick="kb.type('4')">4</div><div class="key" onclick="kb.type('5')">5</div><div class="key" onclick="kb.type('6')">6</div>
+        <div class="key" onclick="kb.type('7')">7</div><div class="key" onclick="kb.type('8')">8</div><div class="key" onclick="kb.type('9')">9</div>
+        <div class="key" onclick="kb.type('.')">.</div><div class="key" onclick="kb.type('0')">0</div><div class="key special" onclick="kb.back()">⌫</div>
     </div>
+</div>
+
+<div class="kb-overlay" id="kb-text">
+    <div style="display:flex; justify-content:space-between; padding:0 15px 10px;">
+        <span id="kb-lang-label" style="font-weight:900; color:var(--accent);">РУССКИЙ</span>
+        <span onclick="kb.close()" style="color:var(--accent);">ЗАКРЫТЬ</span>
+    </div>
+    <div id="kb-text-container"></div>
+</div>
+
+<div class="adm-screen" id="adm-screen">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h1 style="color:var(--red); font-family:'Orbitron';">ELITE CONTROL</h1>
+        <button onclick="adm.close()" class="key" style="width:40px; height:40px;">X</button>
+    </div>
+    
     <div class="card">
-        <label>ПОДКРУТКА TOWER (%): <b id="adm-v">45</b></label>
-        <input type="range" id="adm-range" min="0" max="100" value="45" style="width:100%;">
+        <h3>ГЛОБАЛЬНЫЕ НАСТРОЙКИ</h3>
+        <label>ПОДКРУТКА TOWER (%): <b id="adm-rtp-val">45</b></label>
+        <input type="range" id="adm-rtp" min="0" max="100" value="45" style="width:100%; margin:10px 0;">
     </div>
+
+    <div id="adm-user-list"></div>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
-    const db = {
-        u: { bal: 100, lvl: 1, xp: 0, wins: 0, name: "Player" },
-        roll: { timer: 15, bank: 0 },
+    const state = {
+        u: { name: "Player", bal: 500, lvl: 1, xp: 0, wins: 0, av: "", id: 0 },
+        roll: { bank: 0, players: 0, timer: 15, active: false },
         tower: { active: false, floor: 0, rtp: 45 },
-        chat: { mode: 'global', g: [], s: [] }
+        chat: { mode: 'global', g: [], s: [] },
+        kb: { currentInp: null, lang: 'ru', isCaps: false }
     };
+
+    const mats = ["хуй", "пизд", "ебал", "сука", "бля", "гандон", "мудак", "член"];
 
     const ui = {
         nav(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('scr-'+id).classList.add('active');
-            if(id === 'tower') tower.init();
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('nav-'+id).classList.add('active');
+            if(id === 'tower') game.towerInit();
             this.sync();
         },
         sync() {
-            document.getElementById('h-bal').innerText = db.u.bal.toFixed(2);
-            document.getElementById('h-lvl').innerText = db.u.lvl;
-            document.getElementById('h-name').innerText = db.u.name;
-            document.getElementById('p-name').innerText = db.u.name;
-            document.getElementById('p-xp').innerText = db.u.xp;
-            document.getElementById('p-wins').innerText = db.u.wins;
+            document.getElementById('head-bal').innerText = state.u.bal.toFixed(2);
+            document.getElementById('head-name').innerText = state.u.name;
+            document.getElementById('head-lvl').innerText = state.u.lvl;
+            document.getElementById('prof-name').innerText = state.u.name;
+            document.getElementById('prof-xp').innerText = state.u.xp;
+            document.getElementById('prof-wins').innerText = state.u.wins;
+            if(state.u.av) document.getElementById('head-av').src = state.u.av;
         }
     };
 
-    const roll = {
-        init() {
-            setInterval(() => {
-                db.roll.timer--;
-                if(db.roll.timer < 0) {
-                    db.roll.timer = 15;
-                    db.roll.bank = 0;
-                    tg.showAlert("Раунд завершен!");
-                }
-                document.getElementById('r-timer').innerText = db.roll.timer;
-                document.getElementById('r-bank').innerText = db.roll.bank.toFixed(2);
-                document.getElementById('l-bank').innerText = db.roll.bank.toFixed(2);
-            }, 1000);
-        }
-    };
-
-    const tower = {
-        init() {
-            const g = document.getElementById('t-grid'); g.innerHTML = '';
-            for(let i=7; i>=0; i--) {
-                g.innerHTML += `<div class="t-row" id="tr-${i}"><div class="t-tile" onclick="tower.step(${i},0)">?</div><div class="t-tile" onclick="tower.step(${i},1)">?</div><div class="t-tile" onclick="tower.step(${i},2)">?</div></div>`;
-            }
+    const kb = {
+        layout: {
+            ru: [
+                ["Й","Ц","У","К","Е","Н","Г","Ш","Щ","З","Х","Ъ"],
+                ["Ф","Ы","В","А","П","Р","О","Л","Д","Ж","Э"],
+                ["⇧","Я","Ч","С","М","И","Т","Ь","Б","Ю","⌫"],
+                ["🌐"," ",".","!","?"]
+            ],
+            en: [
+                ["Q","W","E","R","T","Y","U","I","O","P"],
+                ["A","S","D","F","G","H","J","K","L"],
+                ["⇧","Z","X","C","V","B","N","M","⌫"],
+                ["🌐"," ",".","!","?"]
+            ]
         },
-        start() {
-            if(db.u.bal < 5) return;
-            db.u.bal -= 5; db.tower.active = true; db.tower.floor = 0;
-            document.getElementById('btn-t-start').style.display = 'none';
-            document.getElementById('btn-t-cash').style.display = 'block';
-            this.draw(); ui.sync();
+        open(type, targetId) {
+            state.kb.currentInp = document.getElementById(targetId);
+            document.querySelectorAll('.kb-overlay').forEach(k => k.classList.remove('open'));
+            document.getElementById('kb-' + type).classList.add('open');
+            if(type === 'text') this.renderText();
         },
-        draw() {
-            document.querySelectorAll('.t-row').forEach(r => r.classList.remove('active'));
-            document.getElementById('tr-'+db.tower.floor).classList.add('active');
+        close() {
+            document.querySelectorAll('.kb-overlay').forEach(k => k.classList.remove('open'));
         },
-        step(f, t) {
-            if(!db.tower.active || f !== db.tower.floor) return;
-            const win = (Math.random() * 100) < db.tower.rtp;
-            if(win) {
-                document.getElementById('tr-'+f).children[t].classList.add('win');
-                db.tower.floor++; db.u.xp += 20;
-                if(db.tower.floor > 7) this.cashout(); else this.draw();
-            } else { tg.showAlert("Lose!"); this.reset(); }
-            ui.sync();
+        type(char) {
+            const current = state.kb.currentInp.innerText;
+            state.kb.currentInp.innerText = current + (state.kb.isCaps ? char.toUpperCase() : char.toLowerCase());
         },
-        cashout() {
-            const p = [10, 25, 50, 100, 250, 500, 1000, 2500][db.tower.floor-1] || 10;
-            db.u.bal += p; db.u.wins++; this.reset(); tg.showAlert("Win: " + p);
+        back() {
+            const current = state.kb.currentInp.innerText;
+            state.kb.currentInp.innerText = current.slice(0, -1);
         },
-        reset() {
-            db.tower.active = false; document.getElementById('btn-t-start').style.display = 'block';
-            document.getElementById('btn-t-cash').style.display = 'none'; this.init(); ui.sync();
+        renderText() {
+            const container = document.getElementById('kb-text-container');
+            const keys = this.layout[state.kb.lang];
+            container.innerHTML = keys.map(row => `
+                <div class="text-row">
+                    ${row.map(key => {
+                        let cls = "key";
+                        let act = `kb.type('${key}')`;
+                        if(key === "⌫") { cls += " special"; act = "kb.back()"; }
+                        if(key === "⇧") { cls += " special"; act = "kb.toggleCaps()"; }
+                        if(key === "🌐") { cls += " special"; act = "kb.toggleLang()"; }
+                        if(key === " ") { cls += " space"; act = "kb.type(' ')"; }
+                        return `<div class="${cls}" onclick="${act}">${key}</div>`;
+                    }).join('')}
+                </div>
+            `).join('');
+        },
+        toggleCaps() { state.kb.isCaps = !state.kb.isCaps; this.renderText(); },
+        toggleLang() { 
+            state.kb.lang = state.kb.lang === 'ru' ? 'en' : 'ru'; 
+            document.getElementById('kb-lang-label').innerText = state.kb.lang === 'ru' ? 'РУССКИЙ' : 'ENGLISH';
+            this.renderText(); 
         }
     };
 
     const chat = {
-        set(m) { db.chat.mode = m; this.render(); },
+        switch(m) { state.chat.mode = m; this.render(); },
         send() {
-            const inp = document.getElementById('chat-in');
-            if(!inp.value) return;
-            const m = { u: db.u.name, t: inp.value };
-            if(db.chat.mode === 'global') db.chat.g.push(m); else db.chat.s.push(m);
-            inp.value = ''; this.render();
+            const inp = document.getElementById('inp-chat');
+            let text = inp.innerText.trim();
+            if(!text) return;
+            
+            // Anti-mat
+            mats.forEach(word => {
+                const reg = new RegExp(word, 'gi');
+                text = text.replace(reg, "***");
+            });
+
+            const msg = { u: state.u.name, t: text, me: true };
+            if(state.chat.mode === 'global') state.chat.g.push(msg); else state.chat.s.push(msg);
+            inp.innerText = '';
+            this.render();
         },
         render() {
-            const r = document.getElementById('chat-render');
-            const data = db.chat.mode === 'global' ? db.chat.g : db.chat.s;
-            r.innerHTML = data.map(m => `<div class="msg ${m.u === db.u.name ? 'me' : 'other'}"><span class="msg-n">${m.u}</span>${m.t}</div>`).join('');
-            r.scrollTop = r.scrollHeight;
+            const cont = document.getElementById('chat-render');
+            const data = state.chat.mode === 'global' ? state.chat.g : state.chat.s;
+            cont.innerHTML = data.map(m => `
+                <div class="message ${m.me ? 'msg-me' : 'msg-other'}">
+                    <span class="msg-user">${m.u}</span>${m.t}
+                </div>
+            `).join('');
+            cont.scrollTop = cont.scrollHeight;
         }
     };
 
-    const admin = {
-        open() { document.getElementById('adm-modal').style.display = 'flex'; },
-        close() { document.getElementById('adm-modal').style.display = 'none'; },
-        save() {
-            db.u.bal = parseFloat(document.getElementById('adm-bal').value);
-            db.u.lvl = parseInt(document.getElementById('adm-lvl').value);
-            ui.sync(); this.close();
+    const game = {
+        rollInit() {
+            setInterval(() => {
+                state.roll.timer--;
+                if(state.roll.timer <= 0) {
+                    this.rollSpin();
+                    state.roll.timer = 15;
+                }
+                document.getElementById('roll-timer').innerText = state.roll.timer;
+                document.getElementById('roll-bank').innerText = state.roll.bank.toFixed(2);
+                document.getElementById('roll-players').innerText = state.roll.players;
+            }, 1000);
+        },
+        rollBet() {
+            const bet = parseFloat(document.getElementById('inp-bet-roll').innerText);
+            if(state.u.bal >= bet) {
+                state.u.bal -= bet;
+                state.roll.bank += bet;
+                state.roll.players++;
+                ui.sync();
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        },
+        rollSpin() {
+            const wheel = document.getElementById('main-wheel');
+            const deg = 1800 + Math.random() * 1800;
+            wheel.style.transform = `rotate(${deg}deg)`;
+            setTimeout(() => {
+                if(state.roll.bank > 0) {
+                    const win = state.roll.bank * 0.95;
+                    state.u.bal += win;
+                    tg.showAlert(`Поздравляем! Вы выиграли ${win.toFixed(2)} TON`);
+                }
+                wheel.style.transition = "none";
+                wheel.style.transform = `rotate(0deg)`;
+                setTimeout(() => wheel.style.transition = "transform 4s cubic-bezier(0.1, 0, 0.1, 1)", 50);
+                state.roll.bank = 0; state.roll.players = 0;
+            }, 4500);
+        },
+        towerInit() {
+            const g = document.getElementById('tower-grid'); g.innerHTML = '';
+            for(let i=7; i>=0; i--) {
+                g.innerHTML += `<div class="t-row" id="tw-r-${i}">
+                    <div class="t-tile" onclick="game.towerStep(${i},0)">?</div>
+                    <div class="t-tile" onclick="game.towerStep(${i},1)">?</div>
+                    <div class="t-tile" onclick="game.towerStep(${i},2)">?</div>
+                </div>`;
+            }
+        },
+        towerStart() {
+            if(state.u.bal < 5) return;
+            state.u.bal -= 5; state.tower.active = true; state.tower.floor = 0;
+            document.getElementById('tw-start-btn').style.display = 'none';
+            document.getElementById('tw-cash-btn').style.display = 'block';
+            this.towerDraw(); ui.sync();
+        },
+        towerDraw() {
+            document.querySelectorAll('.t-row').forEach(r => r.classList.remove('active'));
+            document.getElementById('tw-r-' + state.tower.floor).classList.add('active');
+        },
+        towerStep(f, t) {
+            if(!state.tower.active || f !== state.tower.floor) return;
+            const win = (Math.random() * 100) < state.tower.rtp;
+            const tiles = document.getElementById('tw-r-'+f).children;
+            if(win) {
+                tiles[t].classList.add('win');
+                state.tower.floor++;
+                state.u.xp += 30;
+                if(state.tower.floor > 7) this.towerCashout(); else this.towerDraw();
+            } else {
+                tiles[t].classList.add('lose');
+                state.tower.active = false;
+                tg.HapticFeedback.notificationOccurred('error');
+                setTimeout(() => this.towerReset(), 1000);
+            }
+            ui.sync();
+        },
+        towerCashout() {
+            const mults = [1.5, 3, 7, 15, 35, 75, 150, 400];
+            const win = 5 * mults[state.tower.floor-1];
+            state.u.bal += win; state.u.wins++;
+            tg.showAlert(`CASH OUT: ${win} TON!`);
+            this.towerReset();
+        },
+        towerReset() {
+            state.tower.active = false;
+            document.getElementById('tw-start-btn').style.display = 'block';
+            document.getElementById('tw-cash-btn').style.display = 'none';
+            this.towerInit(); ui.sync();
         }
     };
 
-    document.getElementById('adm-range').oninput = function() {
-        db.tower.rtp = this.value; document.getElementById('adm-v').innerText = this.value;
+    const adm = {
+        open() { 
+            document.getElementById('adm-screen').style.display = 'flex'; 
+            this.renderUsers();
+        },
+        close() { document.getElementById('adm-screen').style.display = 'none'; },
+        renderUsers() {
+            const list = document.getElementById('adm-user-list');
+            // Тестовые данные игроков для админки
+            const players = [
+                { name: state.u.name, bal: state.u.bal, id: "6418873752", user: "Kegovich" },
+                { name: "Ivan_Kirov", bal: 12.5, id: "123456", user: "vanya" },
+                { name: "Admin_Test", bal: 999, id: "007", user: "test" }
+            ];
+            list.innerHTML = players.map(p => `
+                <div class="adm-user-item">
+                    <div>
+                        <b>${p.name}</b><br>
+                        <small style="color:var(--gold)">${p.bal} TON</small>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="key" style="font-size:10px; width:60px;" onclick="adm.edit('${p.name}')">EDIT</button>
+                        <button class="key" style="font-size:10px; width:60px; background:var(--accent);" onclick="window.open('tg://resolve?domain=${p.user}')">В ЛС</button>
+                    </div>
+                </div>
+            `).join('');
+        },
+        edit(name) {
+            const val = prompt("Введите новый баланс для " + name);
+            if(name === state.u.name) { state.u.bal = parseFloat(val); ui.sync(); }
+        }
     };
 
-    document.getElementById('btn-roll-bet').onclick = () => {
-        const v = parseFloat(document.getElementById('bet-roll').value);
-        if(db.u.bal >= v) { db.u.bal -= v; db.roll.bank += v; ui.sync(); }
+    document.getElementById('adm-rtp').oninput = function() {
+        state.tower.rtp = this.value;
+        document.getElementById('adm-rtp-val').innerText = this.value;
     };
-    document.getElementById('btn-t-start').onclick = () => tower.start();
-    document.getElementById('btn-t-cash').onclick = () => tower.cashout();
 
     window.onload = () => {
         tg.ready(); tg.expand();
         if(tg.initDataUnsafe?.user) {
-            db.u.name = tg.initDataUnsafe.user.first_name;
-            if(tg.initDataUnsafe.user.username === 'Kegovich' || tg.initDataUnsafe.user.id === 6418873752) {
+            const user = tg.initDataUnsafe.user;
+            state.u.name = user.first_name;
+            state.u.id = user.id;
+            state.u.av = user.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`;
+            if(user.id === 6418873752 || user.username === 'Kegovich') {
                 document.getElementById('adm-trigger').style.display = 'block';
             }
         }
-        ui.sync(); roll.init();
+        ui.sync();
+        game.rollInit();
+        game.towerInit();
     };
 </script>
 </body>
