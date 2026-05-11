@@ -3,498 +3,713 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Rolls Master PvP ELITE v15</title>
+    <title>Rolls Master PvP ELITE v16</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;600;800&display=swap');
+        /* CSS SECTION - ПРЕМИАЛЬНЫЙ ТЕМНЫЙ ДИЗАЙН 
+        */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
         :root {
-            --bg: #000000;
-            --panel: #0d0d0f;
-            --accent: #007aff;
-            --gold: #ffb400;
-            --red: #ff3b30;
-            --green: #34c759;
-            --border: rgba(255, 255, 255, 0.08);
+            --bg-color: #000000;
+            --panel-color: #0c0c0e;
+            --accent-color: #007aff;
+            --accent-glow: rgba(0, 122, 255, 0.4);
+            --gold-color: #ffb400;
+            --red-color: #ff3b30;
+            --green-color: #34c759;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --kb-bg: #161618;
             --key-bg: #2c2c2e;
+            --key-active: #444446;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            outline: none;
+        }
 
-        .app-shell { display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; position: relative; }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
 
-        /* HEADER */
+        /* ОСНОВНАЯ ОБОЛОЧКА */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            background: radial-gradient(circle at top left, rgba(0,122,255,0.05), transparent);
+        }
+
+        /* ШАПКА ПРИЛОЖЕНИЯ */
         header {
-            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--border); z-index: 100;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
         }
-        .u-info { display: flex; align-items: center; gap: 12px; }
-        .u-av { width: 42px; height: 42px; border-radius: 12px; border: 1.5px solid var(--accent); }
-        .u-name-box { display: flex; flex-direction: column; }
-        .u-name { font-weight: 800; font-size: 14px; }
-        .u-lvl { font-size: 10px; color: var(--accent); font-weight: 900; }
 
-        .bal-box { text-align: right; }
-        .bal-val { font-family: 'Orbitron'; color: var(--gold); font-size: 18px; font-weight: 900; }
+        .user-block { display: flex; align-items: center; gap: 12px; }
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 2px solid var(--accent-color);
+            object-fit: cover;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .user-meta { display: flex; flex-direction: column; }
+        .user-name { font-weight: 800; font-size: 15px; letter-spacing: -0.3px; }
+        .user-level { font-size: 10px; color: var(--accent-color); font-weight: 900; text-transform: uppercase; }
 
-        /* MAIN CONTENT */
-        main { flex: 1; overflow-y: auto; padding: 15px 15px 150px; }
+        .balance-block { text-align: right; }
+        .balance-label { font-size: 8px; color: #666; letter-spacing: 1px; margin-bottom: 2px; }
+        .balance-value { font-family: 'Orbitron'; color: var(--gold-color); font-size: 20px; font-weight: 900; }
+
+        /* КОНТЕНТНАЯ ОБЛАСТЬ */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 150px;
+            scrollbar-width: none;
+        }
+        main::-webkit-scrollbar { display: none; }
+
         .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .screen.active { display: block; animation: screenSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 
-        /* CARDS */
+        @keyframes screenSlide {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* КАРТОЧКИ И ЭЛЕМЕНТЫ */
         .card {
-            background: var(--panel); border: 1px solid var(--border); border-radius: 24px;
-            padding: 20px; margin-bottom: 15px;
+            background: var(--panel-color);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            padding: 22px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ЦИФРОВОЕ КОЛЕСО ROLL */
+        .roll-box {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0 25px;
+        }
+        .wheel-svg {
+            width: 90%;
+            height: 90%;
+            transform: rotate(-90deg);
+            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1);
+        }
+        .timer-display {
+            position: absolute;
+            font-family: 'Orbitron';
+            font-size: 48px;
+            font-weight: 900;
+            text-shadow: 0 0 20px var(--accent-glow);
         }
 
         /* TOWER GRID */
-        .t-grid { display: grid; grid-template-rows: repeat(8, 1fr); gap: 8px; }
-        .t-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; opacity: 0.2; pointer-events: none; }
-        .t-row.active { opacity: 1; pointer-events: auto; }
-        .t-tile { height: 48px; background: #1c1c1e; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; }
-        .t-tile.win { background: var(--green); color: #000; box-shadow: 0 0 15px var(--green); }
-        .t-tile.lose { background: var(--red); opacity: 0.8; }
-
-        /* ROLL WHEEL */
-        .roll-container { position: relative; width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
-        .wheel { width: 85%; height: 85%; border-radius: 50%; border: 8px solid #1c1c1e; position: relative; transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1); }
-        .wheel-center { position: absolute; font-family: 'Orbitron'; font-size: 42px; font-weight: 900; z-index: 5; }
-        .pointer { position: absolute; top: 0; width: 4px; height: 30px; background: var(--accent); z-index: 10; border-radius: 2px; }
-
-        /* CUSTOM INPUTS */
-        .fake-input {
-            width: 100%; padding: 18px; background: #000; border: 1px solid var(--border);
-            border-radius: 18px; color: var(--gold); font-family: 'Orbitron'; text-align: center;
-            font-size: 20px; margin-bottom: 15px; cursor: pointer;
+        .tower-engine { display: grid; grid-template-rows: repeat(8, 1fr); gap: 10px; }
+        .tower-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; opacity: 0.15; transition: 0.3s; }
+        .tower-row.active { opacity: 1; }
+        .tower-tile {
+            height: 52px;
+            background: #1c1c1e;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
         }
-        .fake-input:empty::before { content: attr(placeholder); color: #444; }
+        .tower-tile.win { background: var(--green-color); color: #000; box-shadow: 0 0 20px var(--green-color); border: none; }
+        .tower-tile.lose { background: var(--red-color); opacity: 0.7; border: none; }
 
-        /* CUSTOM KEYBOARDS */
-        .kb-overlay {
-            position: fixed; bottom: -100%; left: 0; width: 100%; background: #161618;
-            border-top: 1px solid var(--border); z-index: 2000; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 10px 5px 30px;
+        /* ИНПУТЫ И КНОПКИ */
+        .input-display {
+            width: 100%;
+            padding: 18px;
+            background: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--gold-color);
+            font-family: 'Orbitron';
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 15px;
+            min-height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .kb-overlay.open { bottom: 0; }
-        .kb-grid { display: grid; gap: 6px; }
-        .num-grid { grid-template-columns: repeat(3, 1fr); }
-        .text-row { display: flex; justify-content: center; gap: 4px; margin-bottom: 6px; }
-        .key {
-            background: var(--key-bg); border-radius: 6px; height: 45px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 18px; cursor: pointer; flex: 1;
-        }
-        .key:active { background: #48484a; }
-        .key.special { background: #3a3a3c; font-size: 14px; flex: 1.5; }
-        .key.space { flex: 4; }
-
-        /* CHAT */
-        .chat-wrap { height: 280px; overflow-y: auto; background: #050505; border-radius: 15px; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border); }
-        .message { margin-bottom: 10px; max-width: 85%; padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.4; }
-        .msg-me { align-self: flex-end; background: var(--accent); margin-left: auto; }
-        .msg-other { align-self: flex-start; background: #1c1c1e; }
-        .msg-user { font-size: 10px; font-weight: 900; color: var(--gold); margin-bottom: 2px; display: block; }
-
-        /* NAV */
-        nav {
-            position: fixed; bottom: 0; width: 100%; max-width: 500px;
-            background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);
-            display: flex; justify-content: space-around; padding: 15px 0 35px;
-            border-top: 1px solid var(--border); z-index: 150;
-        }
-        .nav-btn { color: #444; font-size: 10px; font-weight: 900; text-align: center; }
-        .nav-btn.active { color: var(--accent); }
-        .nav-btn i { font-size: 24px; display: block; margin-bottom: 4px; font-style: normal; }
-
-        /* ADMIN */
-        .adm-screen { position: fixed; inset: 0; background: #000; z-index: 3000; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
-        .adm-user-item { background: #0d0d0f; border: 1px solid var(--border); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .input-display:empty::before { content: "0.00"; color: #333; }
 
         .btn {
-            width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 900;
-            text-transform: uppercase; font-family: 'Orbitron'; cursor: pointer; transition: 0.2s;
+            width: 100%;
+            padding: 20px;
+            border-radius: 22px;
+            border: none;
+            font-weight: 900;
+            font-family: 'Orbitron';
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.2s;
+            cursor: pointer;
         }
-        .btn-blue { background: var(--accent); color: white; }
-        .btn-gold { background: var(--gold); color: black; }
+        .btn-main { background: var(--accent-color); color: #fff; box-shadow: 0 10px 25px var(--accent-glow); }
+        .btn-gold { background: var(--gold-color); color: #000; }
+        .btn:active { transform: scale(0.95); }
+
+        /* ЧАТ */
+        .chat-container {
+            height: 300px;
+            overflow-y: auto;
+            background: #050505;
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+        .msg-bubble {
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            max-width: 85%;
+            line-height: 1.5;
+        }
+        .msg-mine { align-self: flex-end; background: var(--accent-color); border-bottom-right-radius: 4px; }
+        .msg-theirs { align-self: flex-start; background: #1c1c1e; border-bottom-left-radius: 4px; }
+        .msg-author { font-size: 10px; font-weight: 900; color: var(--gold-color); margin-bottom: 4px; display: block; }
+
+        /* КАСТОМНАЯ КЛАВИАТУРА */
+        .keyboard-engine {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            background: #111111;
+            border-top: 1px solid var(--border-color);
+            z-index: 9999;
+            transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 8px 6px 35px;
+        }
+        .keyboard-engine.visible { bottom: 0; }
+        
+        .kb-row { display: flex; justify-content: center; gap: 5px; margin-bottom: 7px; }
+        .key {
+            background: var(--key-bg);
+            border-radius: 6px;
+            height: 48px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 500;
+            color: #fff;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.5);
+        }
+        .key:active { background: var(--key-active); transform: scale(0.9); }
+        .key.wide { flex: 1.5; background: #3a3a3c; }
+        .key.space { flex: 5; }
+        .key.func { background: #3a3a3c; font-size: 14px; }
+
+        /* НАВИГАЦИЯ */
+        nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 500px;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(25px);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0 35px;
+            border-top: 1px solid var(--border-color);
+            z-index: 500;
+        }
+        .nav-item { color: #555; text-align: center; font-size: 11px; font-weight: 800; }
+        .nav-item.active { color: var(--accent-color); }
+        .nav-item span { display: block; font-size: 22px; margin-bottom: 5px; }
+
+        /* АДМИН ПАНЕЛЬ */
+        .admin-modal {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+            padding: 25px;
+            overflow-y: auto;
+        }
+        .adm-card { background: #0c0c0c; border: 1px solid var(--border-color); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
+        .adm-input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 10px; margin: 8px 0; }
     </style>
 </head>
 <body>
 
-<div class="app-shell">
+<div class="app-container">
     <header>
-        <div class="u-info">
-            <img id="head-av" class="u-av" src="">
-            <div class="u-name-box">
-                <span class="u-name" id="head-name">Alexander</span>
-                <span class="u-lvl">LVL <span id="head-lvl">1</span></span>
+        <div class="user-block">
+            <img id="top-avatar" class="avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Alex">
+            <div class="user-meta">
+                <span class="user-name" id="top-name">Alexander</span>
+                <span class="user-level">Premium Elite • LVL <span id="top-lvl">1</span></span>
             </div>
         </div>
-        <div class="bal-box">
-            <div class="bal-val"><span id="head-bal">0.00</span> <small style="font-size:10px">TON</small></div>
+        <div class="balance-block">
+            <div class="balance-label">CREDITS</div>
+            <div class="balance-value"><span id="top-bal">0.00</span></div>
         </div>
     </header>
 
-    <main id="scroll-area">
+    <main id="view-port">
         <div id="scr-roll" class="screen active">
-            <div class="card" style="text-align:center;">
-                <div class="roll-container">
-                    <div class="pointer"></div>
-                    <div class="wheel" id="main-wheel"></div>
-                    <div class="wheel-center" id="roll-timer">15</div>
+            <div class="card">
+                <div class="roll-box">
+                    <svg class="wheel-svg" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="#1c1c1e" stroke-width="8" />
+                        <circle id="wheel-progress" cx="50" cy="50" r="45" fill="none" stroke="var(--accent-color)" stroke-width="8" stroke-dasharray="283" stroke-dashoffset="0" />
+                    </svg>
+                    <div class="timer-display" id="roll-time">15</div>
                 </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:800; font-size:14px;">
-                    <span>БАНК: <b style="color:var(--gold)" id="roll-bank">0.00</b></span>
-                    <span>ИГРОКОВ: <b id="roll-players">0</b></span>
+                <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                    <div style="text-align:left;"><small style="color:#666">БАНК</small><br><b style="color:var(--gold-color); font-size:18px;" id="roll-bank">0.00</b></div>
+                    <div style="text-align:right;"><small style="color:#666">ИГРОКИ</small><br><b style="font-size:18px;" id="roll-count">0</b></div>
                 </div>
-                <div class="fake-input" id="inp-bet-roll" onclick="kb.open('num', 'inp-bet-roll')">1.0</div>
-                <button class="btn btn-blue" onclick="game.rollBet()">ПОСТАВИТЬ</button>
+                <div class="input-display" id="inp-roll-bet" onclick="kboard.show('num', 'inp-roll-bet')">1.00</div>
+                <button class="btn btn-main" onclick="engine.placeBet()">СДЕЛАТЬ СТАВКУ</button>
             </div>
         </div>
 
         <div id="scr-tower" class="screen">
             <div class="card">
-                <div class="t-grid" id="tower-grid"></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
-                    <button class="btn btn-blue" id="tw-start-btn" onclick="game.towerStart()">СТАВКА 5</button>
-                    <button class="btn btn-gold" id="tw-cash-btn" style="display:none;" onclick="game.towerCashout()">CASH OUT</button>
+                <div class="tower-engine" id="tower-grid"></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:25px;">
+                    <button class="btn btn-main" id="tw-btn-start" onclick="engine.towerStart()">СТАВКА 5.0</button>
+                    <button class="btn btn-gold" id="tw-btn-cash" style="display:none;" onclick="engine.towerCash()">CASH OUT</button>
                 </div>
             </div>
         </div>
 
         <div id="scr-profile" class="screen">
             <div class="card" style="text-align:center;">
-                <h2 id="prof-name">Alexander</h2>
-                <div style="display:flex; justify-content:center; gap:30px; font-size:12px;">
-                    <span>XP: <b id="prof-xp">0</b></span>
-                    <span>WINS: <b id="prof-wins">0</b></span>
+                <h2 id="prof-name" style="margin: 0 0 10px 0; font-size:24px;">Alexander</h2>
+                <div style="display:flex; justify-content:center; gap:25px;">
+                    <div><small style="color:#666">XP</small><br><b id="prof-xp">0</b></div>
+                    <div><small style="color:#666">WINS</small><br><b id="prof-wins">0</b></div>
                 </div>
             </div>
 
             <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <button class="btn btn-blue" style="flex:1; font-size:10px;" onclick="chat.switch('global')">ГЛОБАЛ</button>
-                <button class="btn btn-blue" style="flex:1; font-size:10px; background:#1c1c1e;" onclick="chat.switch('support')">ПОДДЕРЖКА</button>
+                <button class="btn btn-main" style="flex:1; height:45px; padding:0; font-size:12px;" onclick="engine.setChat('global')">ГЛОБАЛ</button>
+                <button class="btn btn-main" style="flex:1; height:45px; padding:0; font-size:12px; background:#1c1c1e;" onclick="engine.setChat('support')">SUPPORT</button>
             </div>
 
-            <div class="chat-wrap" id="chat-render"></div>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <div class="fake-input" id="inp-chat" style="margin:0; font-family:'Inter'; font-size:14px; text-align:left;" placeholder="Сообщение..." onclick="kb.open('text', 'inp-chat')"></div>
-                <button class="btn btn-blue" style="width:60px; padding:15px 0;" onclick="chat.send()">></button>
+            <div class="chat-container" id="chat-view"></div>
+            
+            <div style="display:flex; gap:10px;">
+                <div class="input-display" id="inp-chat-msg" style="margin:0; font-family:'Inter'; font-size:15px; text-align:left; justify-content:flex-start; padding:0 20px; flex:1;" onclick="kboard.show('alpha', 'inp-chat-msg')"></div>
+                <button class="btn btn-main" style="width:65px; padding:0;" onclick="engine.sendMessage()">></button>
             </div>
 
-            <button class="btn" style="background:var(--red); margin-top:20px; display:none;" id="adm-trigger" onclick="adm.open()">ADMIN PANEL</button>
+            <button id="adm-btn" class="btn" style="background:var(--red-color); margin-top:25px; display:none;" onclick="admin.open()">ADMIN PANEL</button>
         </div>
     </main>
 
     <nav>
-        <div class="nav-btn active" id="nav-roll" onclick="ui.nav('roll')"><i>⚔️</i>ROLL</div>
-        <div class="nav-btn" id="nav-tower" onclick="ui.nav('tower')"><i>🏰</i>TOWER</div>
-        <div class="nav-btn" id="nav-profile" onclick="ui.nav('profile')"><i>👤</i>PROFILE</div>
+        <div class="nav-item active" id="nav-roll" onclick="engine.navigate('roll')"><span>⚔️</span>ROLL</div>
+        <div class="nav-item" id="nav-tower" onclick="engine.navigate('tower')"><span>🏰</span>TOWER</div>
+        <div class="nav-item" id="nav-profile" onclick="engine.navigate('profile')"><span>👤</span>PROFILE</div>
     </nav>
 </div>
 
-<div class="kb-overlay" id="kb-num">
-    <div style="display:flex; justify-content:space-between; padding:0 15px 10px;">
-        <span style="color:var(--gold); font-weight:900;">СУММА СТАВКИ</span>
-        <span onclick="kb.close()" style="color:var(--accent);">ГОТОВО</span>
+<div class="keyboard-engine" id="kb-wrapper">
+    <div style="display:flex; justify-content:space-between; padding:0 15px 10px; align-items:center;">
+        <span id="kb-status" style="font-size:11px; font-weight:800; color:var(--accent-color);">РУССКАЯ РАСКЛАДКА</span>
+        <div onclick="kboard.hide()" style="padding:5px 10px; color:var(--accent-color); font-weight:900;">ГОТОВО</div>
     </div>
-    <div class="kb-grid num-grid">
-        <div class="key" onclick="kb.type('1')">1</div><div class="key" onclick="kb.type('2')">2</div><div class="key" onclick="kb.type('3')">3</div>
-        <div class="key" onclick="kb.type('4')">4</div><div class="key" onclick="kb.type('5')">5</div><div class="key" onclick="kb.type('6')">6</div>
-        <div class="key" onclick="kb.type('7')">7</div><div class="key" onclick="kb.type('8')">8</div><div class="key" onclick="kb.type('9')">9</div>
-        <div class="key" onclick="kb.type('.')">.</div><div class="key" onclick="kb.type('0')">0</div><div class="key special" onclick="kb.back()">⌫</div>
-    </div>
+    <div id="kb-content"></div>
 </div>
 
-<div class="kb-overlay" id="kb-text">
-    <div style="display:flex; justify-content:space-between; padding:0 15px 10px;">
-        <span id="kb-lang-label" style="font-weight:900; color:var(--accent);">РУССКИЙ</span>
-        <span onclick="kb.close()" style="color:var(--accent);">ЗАКРЫТЬ</span>
-    </div>
-    <div id="kb-text-container"></div>
-</div>
-
-<div class="adm-screen" id="adm-screen">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h1 style="color:var(--red); font-family:'Orbitron';">ELITE CONTROL</h1>
-        <button onclick="adm.close()" class="key" style="width:40px; height:40px;">X</button>
-    </div>
-    
-    <div class="card">
-        <h3>ГЛОБАЛЬНЫЕ НАСТРОЙКИ</h3>
-        <label>ПОДКРУТКА TOWER (%): <b id="adm-rtp-val">45</b></label>
-        <input type="range" id="adm-rtp" min="0" max="100" value="45" style="width:100%; margin:10px 0;">
+<div id="admin-panel" class="admin-modal">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+        <h2 style="color:var(--red-color); font-family:'Orbitron'; margin:0;">SYSTEM ROOT</h2>
+        <button onclick="admin.close()" class="key" style="width:45px; flex:none;">X</button>
     </div>
 
-    <div id="adm-user-list"></div>
+    <div class="adm-card">
+        <h3>МОДИФИКАЦИЯ АККАУНТА</h3>
+        <label>БАЛАНС</label><input type="number" id="adm-set-bal" class="adm-input">
+        <label>УРОВЕНЬ</label><input type="number" id="adm-set-lvl" class="adm-input">
+        <button class="btn btn-main" onclick="admin.saveUser()">СОХРАНИТЬ</button>
+    </div>
+
+    <div class="adm-card">
+        <h3>УПРАВЛЕНИЕ ГЕЙМПЛЕЕМ</h3>
+        <label>RTP TOWER (Шанс %): <b id="rtp-val">45</b></label>
+        <input type="range" id="adm-rtp" min="0" max="100" value="45" style="width:100%; margin:15px 0;">
+    </div>
+
+    <div class="adm-card">
+        <h3>АКТИВНЫЕ ИГРОКИ (DB)</h3>
+        <div id="adm-player-list"></div>
+    </div>
 </div>
 
 <script>
-    const tg = window.Telegram.WebApp;
-    const state = {
-        u: { name: "Player", bal: 500, lvl: 1, xp: 0, wins: 0, av: "", id: 0 },
-        roll: { bank: 0, players: 0, timer: 15, active: false },
-        tower: { active: false, floor: 0, rtp: 45 },
-        chat: { mode: 'global', g: [], s: [] },
-        kb: { currentInp: null, lang: 'ru', isCaps: false }
-    };
+/* JAVASCRIPT SECTION - ЛОГИКА ПРИЛОЖЕНИЯ 
+*/
+const tg = window.Telegram.WebApp;
 
-    const mats = ["хуй", "пизд", "ебал", "сука", "бля", "гандон", "мудак", "член"];
+// СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+const state = {
+    u: { name: "Alexander", bal: 500.0, lvl: 1, xp: 0, wins: 0, id: 6418873752, user: "Kegovich", av: "" },
+    game: {
+        roll: { timer: 15, bank: 0, players: 0, active: true },
+        tower: { active: false, floor: 0, rtp: 45 }
+    },
+    chat: { mode: 'global', global: [], support: [] },
+    kb: { target: null, lang: 'ru', isCaps: false, type: 'alpha' }
+};
 
-    const ui = {
-        nav(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('scr-'+id).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('nav-'+id).classList.add('active');
-            if(id === 'tower') game.towerInit();
-            this.sync();
-        },
-        sync() {
-            document.getElementById('head-bal').innerText = state.u.bal.toFixed(2);
-            document.getElementById('head-name').innerText = state.u.name;
-            document.getElementById('head-lvl').innerText = state.u.lvl;
-            document.getElementById('prof-name').innerText = state.u.name;
-            document.getElementById('prof-xp').innerText = state.u.xp;
-            document.getElementById('prof-wins').innerText = state.u.wins;
-            if(state.u.av) document.getElementById('head-av').src = state.u.av;
-        }
-    };
+// СЛОВАРЬ МАТА
+const badWords = ["хуй", "пизд", "ебал", "сука", "бля", "мудак", "гандон", "член", "залуп"];
 
-    const kb = {
-        layout: {
-            ru: [
-                ["Й","Ц","У","К","Е","Н","Г","Ш","Щ","З","Х","Ъ"],
-                ["Ф","Ы","В","А","П","Р","О","Л","Д","Ж","Э"],
-                ["⇧","Я","Ч","С","М","И","Т","Ь","Б","Ю","⌫"],
-                ["🌐"," ",".","!","?"]
-            ],
-            en: [
-                ["Q","W","E","R","T","Y","U","I","O","P"],
-                ["A","S","D","F","G","H","J","K","L"],
-                ["⇧","Z","X","C","V","B","N","M","⌫"],
-                ["🌐"," ",".","!","?"]
-            ]
-        },
-        open(type, targetId) {
-            state.kb.currentInp = document.getElementById(targetId);
-            document.querySelectorAll('.kb-overlay').forEach(k => k.classList.remove('open'));
-            document.getElementById('kb-' + type).classList.add('open');
-            if(type === 'text') this.renderText();
-        },
-        close() {
-            document.querySelectorAll('.kb-overlay').forEach(k => k.classList.remove('open'));
-        },
-        type(char) {
-            const current = state.kb.currentInp.innerText;
-            state.kb.currentInp.innerText = current + (state.kb.isCaps ? char.toUpperCase() : char.toLowerCase());
-        },
-        back() {
-            const current = state.kb.currentInp.innerText;
-            state.kb.currentInp.innerText = current.slice(0, -1);
-        },
-        renderText() {
-            const container = document.getElementById('kb-text-container');
-            const keys = this.layout[state.kb.lang];
-            container.innerHTML = keys.map(row => `
-                <div class="text-row">
-                    ${row.map(key => {
-                        let cls = "key";
-                        let act = `kb.type('${key}')`;
-                        if(key === "⌫") { cls += " special"; act = "kb.back()"; }
-                        if(key === "⇧") { cls += " special"; act = "kb.toggleCaps()"; }
-                        if(key === "🌐") { cls += " special"; act = "kb.toggleLang()"; }
-                        if(key === " ") { cls += " space"; act = "kb.type(' ')"; }
-                        return `<div class="${cls}" onclick="${act}">${key}</div>`;
-                    }).join('')}
-                </div>
-            `).join('');
-        },
-        toggleCaps() { state.kb.isCaps = !state.kb.isCaps; this.renderText(); },
-        toggleLang() { 
-            state.kb.lang = state.kb.lang === 'ru' ? 'en' : 'ru'; 
-            document.getElementById('kb-lang-label').innerText = state.kb.lang === 'ru' ? 'РУССКИЙ' : 'ENGLISH';
-            this.renderText(); 
-        }
-    };
+// КОНФИГУРАЦИЯ КЛАВИАТУРЫ
+const layouts = {
+    ru: [
+        ["й","ц","у","к","е","н","г","ш","щ","з","х"],
+        ["ф","ы","в","а","п","р","о","л","д","ж","э"],
+        ["⇧","я","ч","с","м","и","т","ь","б","ю","⌫"],
+        ["🌐",",", " ", ".", "↩"]
+    ],
+    en: [
+        ["q","w","e","r","t","y","u","i","o","p"],
+        ["a","s","d","f","g","h","j","k","l"],
+        ["⇧","z","x","c","v","b","n","m","⌫"],
+        ["🌐",",", " ", ".", "↩"]
+    ],
+    num: [
+        ["1","2","3"],
+        ["4","5","6"],
+        ["7","8","9"],
+        [".","0","⌫"]
+    ]
+};
 
-    const chat = {
-        switch(m) { state.chat.mode = m; this.render(); },
-        send() {
-            const inp = document.getElementById('inp-chat');
-            let text = inp.innerText.trim();
-            if(!text) return;
+// МОДУЛЬ КЛАВИАТУРЫ
+const kboard = {
+    show(type, targetId) {
+        state.kb.type = type;
+        state.kb.target = document.getElementById(targetId);
+        document.getElementById('kb-wrapper').classList.add('visible');
+        this.render();
+    },
+    hide() {
+        document.getElementById('kb-wrapper').classList.remove('visible');
+    },
+    render() {
+        const cont = document.getElementById('kb-content');
+        const layout = state.kb.type === 'num' ? layouts.num : layouts[state.kb.lang];
+        
+        document.getElementById('kb-status').innerText = 
+            state.kb.type === 'num' ? "ЦИФРОВАЯ ПАНЕЛЬ" : 
+            (state.kb.lang === 'ru' ? "РУССКАЯ РАСКЛАДКА" : "ENGLISH LAYOUT");
+
+        cont.innerHTML = layout.map(row => `
+            <div class="kb-row">
+                ${row.map(k => {
+                    let cls = "key";
+                    let label = k;
+                    let action = `kboard.press('${k}')`;
+
+                    if(k === "⇧") { cls += " func"; action = "kboard.toggleCaps()"; }
+                    if(k === "⌫") { cls += " func"; label = "BACK"; action = "kboard.back()"; }
+                    if(k === "🌐") { cls += " func"; label = "RU/EN"; action = "kboard.toggleLang()"; }
+                    if(k === " ") { cls += " space"; label = "ПРОБЕЛ"; }
+                    if(k === "↩") { cls += " func"; label = "ВВОД"; action = "kboard.hide()"; }
+
+                    // Применение Caps Lock
+                    if(state.kb.isCaps && k.length === 1 && k !== " " && k !== "." && k !== ",") {
+                        label = k.toUpperCase();
+                    }
+
+                    return `<div class="${cls}" onclick="${action}">${label}</div>`;
+                }).join('')}
+            </div>
+        `).join('');
+    },
+    press(k) {
+        let val = state.kb.target.innerText;
+        if(k === " ") k = " ";
+        if(k === "⇧" || k === "⌫" || k === "🌐" || k === "↩") return;
+        
+        const char = state.kb.isCaps ? k.toUpperCase() : k;
+        state.kb.target.innerText = val + char;
+        tg.HapticFeedback.selectionChanged();
+    },
+    back() {
+        let val = state.kb.target.innerText;
+        state.kb.target.innerText = val.slice(0, -1);
+    },
+    toggleCaps() {
+        state.kb.isCaps = !state.kb.isCaps;
+        this.render();
+    },
+    toggleLang() {
+        state.kb.lang = state.kb.lang === 'ru' ? 'en' : 'ru';
+        this.render();
+    }
+};
+
+// МОДУЛЬ ЛОГИКИ ИГРЫ
+const engine = {
+    navigate(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('scr-'+id).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('nav-'+id).classList.add('active');
+        if(id === 'tower') this.towerInit();
+        this.sync();
+    },
+    sync() {
+        document.getElementById('top-bal').innerText = state.u.bal.toFixed(2);
+        document.getElementById('top-lvl').innerText = state.u.lvl;
+        document.getElementById('top-name').innerText = state.u.name;
+        document.getElementById('prof-name').innerText = state.u.name;
+        document.getElementById('prof-xp').innerText = state.u.xp;
+        document.getElementById('prof-wins').innerText = state.u.wins;
+        if(state.u.av) document.getElementById('top-avatar').src = state.u.av;
+    },
+    // ROLL LOGIC
+    rollTimer() {
+        setInterval(() => {
+            if(!state.game.roll.active) return;
+            state.game.roll.timer--;
             
-            // Anti-mat
-            mats.forEach(word => {
-                const reg = new RegExp(word, 'gi');
-                text = text.replace(reg, "***");
-            });
+            // Анимация прогресс-бара
+            const circle = document.getElementById('wheel-progress');
+            const offset = (state.game.roll.timer / 15) * 283;
+            circle.style.strokeDashoffset = 283 - offset;
 
-            const msg = { u: state.u.name, t: text, me: true };
-            if(state.chat.mode === 'global') state.chat.g.push(msg); else state.chat.s.push(msg);
-            inp.innerText = '';
-            this.render();
-        },
-        render() {
-            const cont = document.getElementById('chat-render');
-            const data = state.chat.mode === 'global' ? state.chat.g : state.chat.s;
-            cont.innerHTML = data.map(m => `
-                <div class="message ${m.me ? 'msg-me' : 'msg-other'}">
-                    <span class="msg-user">${m.u}</span>${m.t}
+            if(state.game.roll.timer <= 0) {
+                this.rollFinish();
+                state.game.roll.timer = 15;
+            }
+            document.getElementById('roll-time').innerText = state.game.roll.timer;
+            document.getElementById('roll-bank').innerText = state.game.roll.bank.toFixed(2);
+            document.getElementById('roll-count').innerText = state.game.roll.players;
+        }, 1000);
+    },
+    placeBet() {
+        const amount = parseFloat(document.getElementById('inp-roll-bet').innerText);
+        if(isNaN(amount) || amount <= 0) return tg.showAlert("Некорректная сумма");
+        if(state.u.bal >= amount) {
+            state.u.bal -= amount;
+            state.game.roll.bank += amount;
+            state.game.roll.players++;
+            this.sync();
+            tg.HapticFeedback.notificationOccurred('success');
+        } else {
+            tg.showAlert("Недостаточно TON");
+        }
+    },
+    rollFinish() {
+        if(state.game.roll.bank > 0) {
+            const win = state.game.roll.bank * 0.95;
+            state.u.bal += win;
+            state.u.wins++;
+            tg.showAlert(`Раунд окончен! Вы забираете банк: ${win.toFixed(2)} TON`);
+            state.game.roll.bank = 0;
+            state.game.roll.players = 0;
+            this.sync();
+        }
+    },
+    // TOWER LOGIC
+    towerInit() {
+        const grid = document.getElementById('tower-grid');
+        grid.innerHTML = '';
+        for(let i=7; i>=0; i--) {
+            grid.innerHTML += `
+                <div class="tower-row" id="row-${i}">
+                    <div class="tower-tile" onclick="engine.towerStep(${i},0)">?</div>
+                    <div class="tower-tile" onclick="engine.towerStep(${i},1)">?</div>
+                    <div class="tower-tile" onclick="engine.towerStep(${i},2)">?</div>
                 </div>
-            `).join('');
-            cont.scrollTop = cont.scrollHeight;
+            `;
         }
-    };
-
-    const game = {
-        rollInit() {
-            setInterval(() => {
-                state.roll.timer--;
-                if(state.roll.timer <= 0) {
-                    this.rollSpin();
-                    state.roll.timer = 15;
-                }
-                document.getElementById('roll-timer').innerText = state.roll.timer;
-                document.getElementById('roll-bank').innerText = state.roll.bank.toFixed(2);
-                document.getElementById('roll-players').innerText = state.roll.players;
-            }, 1000);
-        },
-        rollBet() {
-            const bet = parseFloat(document.getElementById('inp-bet-roll').innerText);
-            if(state.u.bal >= bet) {
-                state.u.bal -= bet;
-                state.roll.bank += bet;
-                state.roll.players++;
-                ui.sync();
-                tg.HapticFeedback.notificationOccurred('success');
-            }
-        },
-        rollSpin() {
-            const wheel = document.getElementById('main-wheel');
-            const deg = 1800 + Math.random() * 1800;
-            wheel.style.transform = `rotate(${deg}deg)`;
-            setTimeout(() => {
-                if(state.roll.bank > 0) {
-                    const win = state.roll.bank * 0.95;
-                    state.u.bal += win;
-                    tg.showAlert(`Поздравляем! Вы выиграли ${win.toFixed(2)} TON`);
-                }
-                wheel.style.transition = "none";
-                wheel.style.transform = `rotate(0deg)`;
-                setTimeout(() => wheel.style.transition = "transform 4s cubic-bezier(0.1, 0, 0.1, 1)", 50);
-                state.roll.bank = 0; state.roll.players = 0;
-            }, 4500);
-        },
-        towerInit() {
-            const g = document.getElementById('tower-grid'); g.innerHTML = '';
-            for(let i=7; i>=0; i--) {
-                g.innerHTML += `<div class="t-row" id="tw-r-${i}">
-                    <div class="t-tile" onclick="game.towerStep(${i},0)">?</div>
-                    <div class="t-tile" onclick="game.towerStep(${i},1)">?</div>
-                    <div class="t-tile" onclick="game.towerStep(${i},2)">?</div>
-                </div>`;
-            }
-        },
-        towerStart() {
-            if(state.u.bal < 5) return;
-            state.u.bal -= 5; state.tower.active = true; state.tower.floor = 0;
-            document.getElementById('tw-start-btn').style.display = 'none';
-            document.getElementById('tw-cash-btn').style.display = 'block';
-            this.towerDraw(); ui.sync();
-        },
-        towerDraw() {
-            document.querySelectorAll('.t-row').forEach(r => r.classList.remove('active'));
-            document.getElementById('tw-r-' + state.tower.floor).classList.add('active');
-        },
-        towerStep(f, t) {
-            if(!state.tower.active || f !== state.tower.floor) return;
-            const win = (Math.random() * 100) < state.tower.rtp;
-            const tiles = document.getElementById('tw-r-'+f).children;
-            if(win) {
-                tiles[t].classList.add('win');
-                state.tower.floor++;
-                state.u.xp += 30;
-                if(state.tower.floor > 7) this.towerCashout(); else this.towerDraw();
-            } else {
-                tiles[t].classList.add('lose');
-                state.tower.active = false;
-                tg.HapticFeedback.notificationOccurred('error');
-                setTimeout(() => this.towerReset(), 1000);
-            }
-            ui.sync();
-        },
-        towerCashout() {
-            const mults = [1.5, 3, 7, 15, 35, 75, 150, 400];
-            const win = 5 * mults[state.tower.floor-1];
-            state.u.bal += win; state.u.wins++;
-            tg.showAlert(`CASH OUT: ${win} TON!`);
-            this.towerReset();
-        },
-        towerReset() {
-            state.tower.active = false;
-            document.getElementById('tw-start-btn').style.display = 'block';
-            document.getElementById('tw-cash-btn').style.display = 'none';
-            this.towerInit(); ui.sync();
+    },
+    towerStart() {
+        if(state.u.bal < 5) return tg.showAlert("Минимум 5 TON");
+        state.u.bal -= 5;
+        state.game.tower.active = true;
+        state.game.tower.floor = 0;
+        document.getElementById('tw-btn-start').style.display = 'none';
+        document.getElementById('tw-btn-cash').style.display = 'block';
+        this.towerUpdate();
+        this.sync();
+    },
+    towerUpdate() {
+        document.querySelectorAll('.tower-row').forEach(r => r.classList.remove('active'));
+        document.getElementById('row-'+state.game.tower.floor).classList.add('active');
+    },
+    towerStep(f, t) {
+        if(!state.game.tower.active || f !== state.game.tower.floor) return;
+        
+        const isWin = (Math.random() * 100) < state.game.tower.rtp;
+        const row = document.getElementById('row-'+f).children;
+        
+        if(isWin) {
+            row[t].classList.add('win');
+            state.game.tower.floor++;
+            state.u.xp += 25;
+            if(state.game.tower.floor > 7) this.towerCash();
+            else this.towerUpdate();
+        } else {
+            row[t].classList.add('lose');
+            state.game.tower.active = false;
+            tg.HapticFeedback.notificationOccurred('error');
+            setTimeout(() => this.towerReset(), 800);
         }
-    };
+        this.sync();
+    },
+    towerCash() {
+        const multipliers = [1.2, 2.5, 6, 12, 28, 60, 140, 350];
+        const prize = 5 * multipliers[state.game.tower.floor-1];
+        state.u.bal += prize;
+        state.u.wins++;
+        tg.showAlert(`ПОБЕДА! Зачислено ${prize} TON`);
+        this.towerReset();
+    },
+    towerReset() {
+        state.game.tower.active = false;
+        document.getElementById('tw-btn-start').style.display = 'block';
+        document.getElementById('tw-btn-cash').style.display = 'none';
+        this.towerInit();
+    },
+    // CHAT LOGIC
+    setChat(m) { state.chat.mode = m; this.chatRender(); },
+    sendMessage() {
+        const inp = document.getElementById('inp-chat-msg');
+        let text = inp.innerText.trim();
+        if(!text) return;
 
-    const adm = {
-        open() { 
-            document.getElementById('adm-screen').style.display = 'flex'; 
-            this.renderUsers();
-        },
-        close() { document.getElementById('adm-screen').style.display = 'none'; },
-        renderUsers() {
-            const list = document.getElementById('adm-user-list');
-            // Тестовые данные игроков для админки
-            const players = [
-                { name: state.u.name, bal: state.u.bal, id: "6418873752", user: "Kegovich" },
-                { name: "Ivan_Kirov", bal: 12.5, id: "123456", user: "vanya" },
-                { name: "Admin_Test", bal: 999, id: "007", user: "test" }
-            ];
-            list.innerHTML = players.map(p => `
-                <div class="adm-user-item">
-                    <div>
-                        <b>${p.name}</b><br>
-                        <small style="color:var(--gold)">${p.bal} TON</small>
-                    </div>
-                    <div style="display:flex; gap:5px;">
-                        <button class="key" style="font-size:10px; width:60px;" onclick="adm.edit('${p.name}')">EDIT</button>
-                        <button class="key" style="font-size:10px; width:60px; background:var(--accent);" onclick="window.open('tg://resolve?domain=${p.user}')">В ЛС</button>
-                    </div>
-                </div>
-            `).join('');
-        },
-        edit(name) {
-            const val = prompt("Введите новый баланс для " + name);
-            if(name === state.u.name) { state.u.bal = parseFloat(val); ui.sync(); }
+        // Фильтр мата
+        badWords.forEach(w => {
+            const reg = new RegExp(w, 'gi');
+            text = text.replace(reg, "***");
+        });
+
+        const msg = { u: state.u.name, t: text, mine: true };
+        if(state.chat.mode === 'global') state.chat.global.push(msg);
+        else state.chat.support.push(msg);
+        
+        inp.innerText = '';
+        this.chatRender();
+    },
+    chatRender() {
+        const view = document.getElementById('chat-view');
+        const data = state.chat.mode === 'global' ? state.chat.global : state.chat.support;
+        view.innerHTML = data.map(m => `
+            <div class="msg-bubble ${m.mine ? 'msg-mine' : 'msg-theirs'}">
+                <span class="msg-author">${m.u}</span>${m.t}
+            </div>
+        `).join('');
+        view.scrollTop = view.scrollHeight;
+    }
+};
+
+// МОДУЛЬ АДМИНКИ
+const admin = {
+    open() {
+        document.getElementById('admin-panel').style.display = 'flex';
+        document.getElementById('adm-set-bal').value = state.u.bal;
+        document.getElementById('adm-set-lvl').value = state.u.lvl;
+        this.renderPlayers();
+    },
+    close() { document.getElementById('admin-panel').style.display = 'none'; },
+    saveUser() {
+        state.u.bal = parseFloat(document.getElementById('adm-set-bal').value);
+        state.u.lvl = parseInt(document.getElementById('adm-set-lvl').value);
+        engine.sync();
+        tg.showAlert("Данные обновлены");
+    },
+    renderPlayers() {
+        const list = document.getElementById('adm-player-list');
+        const mock = [
+            { name: state.u.name, bal: state.u.bal, user: state.u.user },
+            { name: "Kirov_User", bal: 15.0, user: "kirov43" },
+            { name: "Test_Player", bal: 0.5, user: "tester" }
+        ];
+        list.innerHTML = mock.map(p => `
+            <div class="adm-card" style="display:flex; justify-content:space-between; align-items:center; background:#111;">
+                <div><b>${p.name}</b><br><small>${p.bal} TON</small></div>
+                <button class="btn btn-main" style="width:auto; padding:8px 15px; font-size:10px;" onclick="window.open('tg://resolve?domain=${p.user}')">В ЛС</button>
+            </div>
+        `).join('');
+    }
+};
+
+// ИНИЦИАЛИЗАЦИЯ
+document.getElementById('adm-rtp').oninput = function() {
+    state.game.tower.rtp = this.value;
+    document.getElementById('rtp-val').innerText = this.value;
+};
+
+window.onload = () => {
+    tg.ready();
+    tg.expand();
+    
+    // Получение данных из Telegram
+    if(tg.initDataUnsafe?.user) {
+        const user = tg.initDataUnsafe.user;
+        state.u.name = user.first_name;
+        state.u.id = user.id;
+        state.u.user = user.username || "user";
+        state.u.av = user.photo_url || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.id}`;
+        
+        // Проверка прав админа
+        if(user.id === 6418873752 || user.username === 'Kegovich') {
+            document.getElementById('adm-btn').style.display = 'block';
         }
-    };
+    }
 
-    document.getElementById('adm-rtp').oninput = function() {
-        state.tower.rtp = this.value;
-        document.getElementById('adm-rtp-val').innerText = this.value;
-    };
-
-    window.onload = () => {
-        tg.ready(); tg.expand();
-        if(tg.initDataUnsafe?.user) {
-            const user = tg.initDataUnsafe.user;
-            state.u.name = user.first_name;
-            state.u.id = user.id;
-            state.u.av = user.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`;
-            if(user.id === 6418873752 || user.username === 'Kegovich') {
-                document.getElementById('adm-trigger').style.display = 'block';
-            }
-        }
-        ui.sync();
-        game.rollInit();
-        game.towerInit();
-    };
+    engine.sync();
+    engine.rollTimer();
+    engine.towerInit();
+};
 </script>
+
 </body>
 </html>
