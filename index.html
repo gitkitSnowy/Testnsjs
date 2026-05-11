@@ -2,1077 +2,675 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ROLLS MASTER ULTRA-MAX | Alexander Lead Dev Edition</title>
-    
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&family=Oswald:wght@700&display=swap" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Room Rolls | TON Casino</title>
+    <!-- Telegram WebApp JS -->
+    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
+    <!-- TON Connect 2.0 SDK -->
+    <script src="https://unpkg.com/@tonconnect/sdk@2.0.5/dist/tonconnect-sdk.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, get, update, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQgyNz7P5K4_dlNQsKqniO-kEALW3_OWg",
+            authDomain: "casino-213b9.firebaseapp.com",
+            databaseURL: "https://casino-213b9-default-rtdb.firebaseio.com",
+            projectId: "casino-213b9",
+            storageBucket: "casino-213b9.firebasestorage.app",
+            messagingSenderId: "104292026196",
+            appId: "1:104292026196:web:4b33abbb085143ce69eac1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        window.db = db;
+        window.ref = ref;
+        window.set = set;
+        window.get = get;
+        window.update = update;
+        window.push = push;
+        window.onValue = onValue;
+        window.remove = remove;
+    </script>
     <style>
-        /* ==========================================================================
-           INDUSTRIAL DARK THEME SYSTEM v6.0
-           Designed specifically for Alexander (Kirov Region)
-           ==========================================================================
-        */
-
-        :root {
-            /* Базовая палитра */
-            --color-bg-deep: #020406;
-            --color-bg-main: #05080a;
-            --color-panel: #0a0e14;
-            --color-panel-light: #121820;
-            
-            /* Акценты */
-            --color-accent: #2481cc;
-            --color-accent-glow: rgba(36, 129, 204, 0.4);
-            --color-accent-soft: rgba(36, 129, 204, 0.1);
-            
-            /* Статусные цвета */
-            --color-gold: #ffcc00;
-            --color-gold-glow: rgba(255, 204, 0, 0.3);
-            --color-success: #2ed573;
-            --color-error: #ff4757;
-            --color-warning: #ffa502;
-            
-            /* Текст */
-            --color-text-bright: #ffffff;
-            --color-text-main: #cbd5e0;
-            --color-text-dim: #718096;
-            --color-text-dark: #4a5568;
-
-            /* Границы и тени */
-            --border-industrial: 1px solid rgba(255, 255, 255, 0.06);
-            --border-accent: 1px solid var(--color-accent);
-            --shadow-hard: 0 10px 30px rgba(0, 0, 0, 0.7);
-            --shadow-neon: 0 0 20px var(--color-accent-glow);
-            
-            /* Геометрия */
-            --radius-sm: 8px;
-            --radius-md: 16px;
-            --radius-lg: 28px;
-            --radius-full: 9999px;
-            
-            /* Анимации */
-            --transition-fast: 0.15s ease;
-            --transition-main: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* RESET & BASE STYLES */
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            outline: none;
+            box-sizing: border-box;
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
         }
-
         body {
-            background-color: var(--color-bg-deep);
-            color: var(--color-text-main);
-            font-family: 'Inter', sans-serif;
-            line-height: 1.5;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
+            background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%);
+            font-family: 'Segoe UI', 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #fff;
+            min-height: 100vh;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        .card {
+            background: rgba(20, 28, 40, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .profile-row {
             display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffb347, #ff6b6b);
+            display: flex;
+            align-items: center;
             justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            background-size: cover;
+            background-position: center;
         }
-
-        /* MAIN WRAPPER */
-        #app {
-            width: 100%;
-            max-width: 500px;
-            height: 100vh;
-            background: radial-gradient(circle at 50% 0%, #101925 0%, #020406 100%);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            border-left: var(--border-industrial);
-            border-right: var(--border-industrial);
-        }
-
-        /* HEADER ARCHITECTURE */
-        .main-header {
-            padding: 20px;
-            background: var(--color-panel);
-            border-bottom: 2px solid rgba(36, 129, 204, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 500;
-            box-shadow: var(--shadow-hard);
-        }
-
-        .user-identity {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: var(--transition-main);
-        }
-
-        .user-identity:active {
-            transform: scale(0.97);
-            opacity: 0.8;
-        }
-
-        .avatar-container {
-            position: relative;
-            width: 56px;
-            height: 56px;
-        }
-
-        .avatar-main {
-            width: 100%;
-            height: 100%;
-            border-radius: var(--radius-full);
-            border: 2px solid var(--color-accent);
-            padding: 2px;
-            object-fit: cover;
-            box-shadow: var(--shadow-neon);
-        }
-
-        .level-tag {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            background: var(--color-accent);
-            color: white;
-            font-size: 10px;
-            font-weight: 900;
-            padding: 3px 7px;
-            border-radius: 8px;
-            border: 2px solid var(--color-panel);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .identity-text h2 {
+        .username {
             font-size: 16px;
-            font-weight: 900;
-            color: var(--color-text-bright);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            font-weight: 600;
+            background: rgba(255,255,255,0.1);
+            padding: 6px 14px;
+            border-radius: 40px;
         }
-
-        .identity-text p {
-            font-size: 9px;
-            color: var(--color-accent);
-            font-weight: 800;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
+        .balance {
+            background: rgba(0,0,0,0.5);
+            padding: 8px 16px;
+            border-radius: 32px;
+            font-weight: bold;
+            font-size: 18px;
         }
-
-        .financial-hub {
-            text-align: right;
+        .wallet-btn {
+            background: linear-gradient(90deg, #0098ea, #0088cc);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 32px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: auto;
         }
-
-        .ton-label {
-            font-size: 9px;
-            color: var(--color-text-dim);
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 2px;
-        }
-
-        .ton-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--color-gold);
-            text-shadow: 0 0 15px var(--color-gold-glow);
-        }
-
-        /* SCROLLABLE CONTENT AREA */
-        .viewport {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 120px;
-            mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
-        }
-
-        .viewport::-webkit-scrollbar {
-            width: 0; /* Hidden but functional */
-        }
-
-        /* GAME CARD STYLING */
-        .arena-card {
-            background: var(--color-panel);
-            border-radius: var(--radius-lg);
-            border: var(--border-industrial);
-            padding: 25px;
+        .tabs {
+            display: flex;
+            gap: 8px;
             margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: none;
+            padding: 10px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tab.active {
+            background: linear-gradient(90deg, #ffb347, #ff6b6b);
+            box-shadow: 0 4px 12px rgba(255,107,107,0.3);
+        }
+        .game-container {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .game-container.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .roulette-wheel {
             position: relative;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
+            width: 260px;
+            height: 260px;
+            margin: 20px auto;
+            border-radius: 50%;
+            background: #1e2a3a;
+            box-shadow: 0 0 0 8px rgba(255,255,255,0.1), 0 20px 40px rgba(0,0,0,0.5);
             overflow: hidden;
         }
-
-        .arena-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
-            opacity: 0.3;
-        }
-
-        .jackpot-display {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .jackpot-title {
-            font-size: 11px;
-            color: var(--color-text-dim);
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-        }
-
-        .jackpot-amount {
-            font-family: 'Oswald', sans-serif;
-            font-size: 48px;
-            color: var(--color-text-bright);
-            line-height: 1;
-            text-shadow: 0 0 30px var(--color-accent-glow);
-        }
-
-        /* ADVANCED WHEEL SYSTEM */
-        .wheel-module {
-            position: relative;
-            width: 320px;
-            height: 320px;
-            margin: 0 auto 35px;
-        }
-
-        canvas#gameWheel {
+        .wheel-svg {
             width: 100%;
             height: 100%;
-            border-radius: var(--radius-full);
-            filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
-            z-index: 10;
-            position: relative;
+            transform: rotate(-90deg);
         }
-
-        .wheel-indicator {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 45px;
-            background: var(--color-accent);
-            clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-            z-index: 100;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
-            border: 2px solid white;
+        .bet-input {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 40px;
+            color: white;
+            font-size: 18px;
+            width: 100%;
+            margin: 12px 0;
+            text-align: center;
         }
-
-        .wheel-center-cap {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            background: var(--color-panel);
-            border: 4px solid var(--color-accent);
-            border-radius: var(--radius-full);
-            z-index: 50;
+        .btn {
+            background: linear-gradient(90deg, #ffb347, #ff6b6b);
+            border: none;
+            padding: 14px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            width: 100%;
+            cursor: pointer;
+            transition: transform 0.1s;
+            margin-top: 8px;
+        }
+        .btn:active { transform: scale(0.97);}
+        .btn-secondary {
+            background: linear-gradient(90deg, #4a6fa5, #3a5a8a);
+        }
+        .tower-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .tower-cell {
+            background: rgba(255,215,0,0.2);
+            aspect-ratio: 1;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-        }
-
-        .cap-logo {
-            font-size: 12px;
-            font-weight: 900;
-            color: var(--color-accent);
-            letter-spacing: 1px;
-        }
-
-        /* BETTING INTERFACE */
-        .betting-engine {
-            display: grid;
-            grid-template-columns: 1fr 120px;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .bet-input-wrap {
-            position: relative;
-        }
-
-        .bet-field {
-            width: 100%;
-            background: #000;
-            border: 2px solid var(--color-panel-light);
-            border-radius: var(--radius-md);
-            padding: 18px 20px;
-            color: white;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 20px;
-            font-weight: 800;
-            transition: var(--transition-main);
-        }
-
-        .bet-field:focus {
-            border-color: var(--color-accent);
-            box-shadow: var(--shadow-neon);
-        }
-
-        .action-button {
-            background: linear-gradient(135deg, var(--color-accent) 0%, #164e7d 100%);
-            border: none;
-            border-radius: var(--radius-md);
-            color: white;
-            font-weight: 900;
-            font-size: 16px;
+            font-size: 28px;
+            font-weight: bold;
             cursor: pointer;
-            text-transform: uppercase;
-            box-shadow: 0 8px 25px rgba(36, 129, 204, 0.4);
-            transition: var(--transition-main);
+            transition: 0.1s;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-
-        .action-button:active {
-            transform: scale(0.95);
-            box-shadow: none;
-        }
-
-        /* PLAYER FEED ARCHITECTURE */
-        .feed-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .player-entry {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 14px 20px;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            animation: entrySlide 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        @keyframes entrySlide {
-            from { opacity: 0; transform: translateX(-30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .player-main {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .player-mini-ava {
-            width: 38px;
-            height: 38px;
-            border-radius: var(--radius-full);
-            border: 2px solid var(--color-accent);
-        }
-
-        .player-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--color-text-bright);
-        }
-
-        .player-stake {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 800;
-            color: var(--color-gold);
-        }
-
-        /* CHAT SYSTEM DESIGN */
-        .comms-center {
-            background: var(--color-panel);
-            border-radius: var(--radius-lg);
-            border: var(--border-industrial);
-            height: 400px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            margin-top: 20px;
-        }
-
-        .comms-header {
-            padding: 15px 25px;
-            background: rgba(255, 255, 255, 0.02);
-            border-bottom: 1px solid var(--border-industrial);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .comms-title {
-            font-size: 10px;
-            font-weight: 900;
-            color: var(--color-text-dim);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--color-success);
-            border-radius: var(--radius-full);
-            box-shadow: 0 0 10px var(--color-success);
-        }
-
-        .message-stream {
-            flex: 1;
+        .tower-cell.revealed { background: #4caf50; box-shadow: 0 0 12px #4caf50;}
+        .tower-cell.bomb { background: #f44336; }
+        .admin-panel, .support-chat {
+            max-height: 400px;
             overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
         }
-
-        .chat-bubble {
-            font-size: 13px;
-            max-width: 90%;
-            line-height: 1.5;
-        }
-
-        .chat-bubble b {
-            color: var(--color-accent);
-            margin-right: 6px;
-        }
-
-        .bubble-sys {
-            color: var(--color-text-dim);
-            font-style: italic;
-            border-left: 3px solid var(--color-accent);
-            padding-left: 12px;
-        }
-
-        .bubble-win {
-            background: rgba(255, 204, 0, 0.1);
-            border: 1px solid rgba(255, 204, 0, 0.2);
-            color: var(--color-gold);
+        .support-msg {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
             padding: 10px;
-            border-radius: var(--radius-md);
-            text-align: center;
-            font-weight: 800;
+            margin: 8px 0;
         }
-
-        .input-dock {
-            padding: 15px 20px;
-            background: #000;
-            border-top: 1px solid var(--border-industrial);
-            display: flex;
-            gap: 12px;
-        }
-
-        .chat-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 14px;
-        }
-
-        /* ADMIN CONTROL OVERLAY */
-        .admin-matrix {
-            position: fixed;
-            inset: 0;
-            background: var(--color-bg-deep);
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-            padding: 40px 25px;
-            overflow-y: auto;
-        }
-
-        .matrix-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .matrix-title {
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--color-success);
-            font-size: 16px;
-            font-weight: 800;
-        }
-
-        .matrix-terminal {
-            background: #000;
-            border-radius: var(--radius-md);
-            padding: 20px;
-            font-family: 'JetBrains Mono', monospace;
+        .badge {
+            background: gold;
+            color: black;
+            border-radius: 20px;
+            padding: 4px 12px;
             font-size: 12px;
-            color: #4ade80;
-            height: 200px;
-            overflow-y: auto;
-            border: 1px solid #1e293b;
-            margin-bottom: 25px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
-
-        .matrix-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .matrix-btn {
-            background: #1e293b;
-            border: 1px solid #334155;
+        .input-small {
+            background: rgba(0,0,0,0.6);
+            border: none;
+            padding: 10px;
+            border-radius: 30px;
             color: white;
-            padding: 18px;
-            border-radius: var(--radius-md);
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: var(--transition-fast);
-        }
-
-        .matrix-btn:active {
-            background: var(--color-accent);
-        }
-
-        .matrix-btn.danger {
-            border-color: var(--color-error);
-            color: var(--color-error);
-        }
-
-        .field-group {
-            background: var(--color-panel);
-            padding: 20px;
-            border-radius: var(--radius-md);
-            margin-bottom: 15px;
-            border: var(--border-industrial);
-        }
-
-        .field-group label {
-            display: block;
-            font-size: 10px;
-            color: var(--color-text-dim);
-            font-weight: 900;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
-        .matrix-input {
             width: 100%;
-            background: #000;
-            border: 1px solid var(--color-panel-light);
-            padding: 12px;
-            color: white;
-            border-radius: var(--radius-sm);
-            font-family: 'JetBrains Mono', monospace;
+            margin: 5px 0;
         }
-
-        /* BOTTOM NAVIGATION */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            max-width: 500px;
-            background: var(--color-panel);
-            border-top: var(--border-industrial);
+        .flex {
             display: flex;
-            padding: 15px 0 35px;
-            z-index: 400;
+            gap: 8px;
         }
-
-        .nav-tab {
-            flex: 1;
-            text-align: center;
-            color: var(--color-text-dim);
-            font-size: 10px;
-            font-weight: 900;
-            opacity: 0.4;
-            transition: var(--transition-main);
+        .ton-address {
+            font-size: 11px;
+            opacity: 0.7;
+            word-break: break-all;
         }
-
-        .nav-tab.active {
-            color: var(--color-accent);
-            opacity: 1;
+        .deposit-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 15px;
+            margin-top: 15px;
         }
-
-        .nav-icon {
-            font-size: 24px;
-            margin-bottom: 4px;
+        .withdraw-box {
+            margin-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
         }
-
     </style>
 </head>
 <body>
-
 <div id="app">
-    <header class="main-header">
-        <div class="user-identity" id="profile-trigger">
-            <div class="avatar-container">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alexander" class="avatar-main">
-                <div class="level-tag" id="ui-level">18</div>
-            </div>
-            <div class="identity-text">
-                <h2 id="ui-name">ALEXANDER</h2>
-                <p id="ui-rank">Lead Developer</p>
-            </div>
+    <div class="card">
+        <div class="profile-row">
+            <div class="avatar" id="avatarDiv">👤</div>
+            <div class="username" id="usernameDisplay">Загрузка...</div>
+            <div class="balance" id="balanceDisplay">💰 0 TON</div>
+            <button class="wallet-btn" id="walletBtn">🔌 Подключить кошелек</button>
         </div>
-        <div class="financial-hub">
-            <div class="ton-label">Vault Balance</div>
-            <div class="ton-value" id="ui-balance">1000.00</div>
-        </div>
-    </header>
-
-    <main class="viewport">
-        <section class="arena-card">
-            <div class="jackpot-display">
-                <p class="jackpot-title">Global Arena Pool</p>
-                <h1 class="jackpot-amount" id="ui-jackpot">0.00</h1>
-            </div>
-
-            <div class="wheel-module">
-                <div class="wheel-indicator"></div>
-                <div class="wheel-center-cap">
-                    <span class="cap-logo">ROLLS</span>
-                </div>
-                <canvas id="gameWheel" width="800" height="800"></canvas>
-            </div>
-
-            <div class="betting-engine">
-                <div class="bet-input-wrap">
-                    <input type="number" id="bet-field" class="bet-field" value="10.0">
-                </div>
-                <button class="action-button" onclick="Core.handleBet()">Battle</button>
-            </div>
-
-            <div class="feed-container" id="player-feed">
-                </div>
-        </section>
-
-        <section class="comms-center">
-            <div class="comms-header">
-                <span class="comms-title">System Communication</span>
-                <div class="status-dot"></div>
-            </div>
-            <div class="message-stream" id="chat-stream">
-                <div class="chat-bubble bubble-sys">System: Все модули ядра загружены. Приветствуем, Alexander.</div>
-            </div>
-            <div class="input-dock">
-                <input type="text" id="chat-field" class="chat-input" placeholder="Передача сообщения...">
-                <button onclick="Core.sendChatMessage()" style="background:var(--color-accent); border:none; color:white; width:30px; height:30px; border-radius:50%; font-weight:900;">></button>
-            </div>
-        </section>
-    </main>
-
-    <div class="admin-matrix" id="admin-matrix">
-        <div class="matrix-header">
-            <div class="matrix-title">CORE_OVERRIDE_V6.0</div>
-            <button class="matrix-btn danger" style="padding: 5px 15px;" onclick="Admin.close()">Disconnect</button>
-        </div>
-        
-        <div class="matrix-terminal" id="admin-terminal">
-            > root@alexander: mount /dev/global_database<br>
-            > Access level: GodMode<br>
-            > Regional Node: Kirov_43<br>
-            > Ready for instruction...
-        </div>
-
-        <div class="matrix-grid">
-            <button class="matrix-btn" onclick="Admin.addFunds()">+50k Credits</button>
-            <button class="matrix-btn" onclick="Core.initiateSpin()">Force Launch</button>
-            <button class="matrix-btn danger" onclick="Admin.purgeChat()">Purge Logs</button>
-            <button class="matrix-btn" onclick="Admin.spawnBot()">Inject Fake Entity</button>
-        </div>
-
-        <div class="field-group">
-            <label>RNG Manipulation (Winner Key)</label>
-            <input type="text" id="adm-force-winner" class="matrix-input" placeholder="User Identifier">
-            <button class="matrix-btn" style="width: 100%; margin-top: 10px;" onclick="Admin.lockWinner()">Lock Win Logic</button>
-        </div>
-
-        <div class="field-group">
-            <label>Global Proclamation</label>
-            <input type="text" id="adm-broadcast" class="matrix-input" placeholder="Message content...">
-            <button class="matrix-btn" style="width: 100%; margin-top: 10px;" onclick="Admin.broadcast()">Execute Proclamation</button>
-        </div>
-
-        <div class="field-group">
-            <label>Neural Link Modification (Level/Rank)</label>
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="adm-lvl" class="matrix-input" placeholder="LVL">
-                <input type="text" id="adm-rank" class="matrix-input" placeholder="RANK">
-            </div>
-            <button class="matrix-btn" style="width: 100%; margin-top: 10px;" onclick="Admin.patchProfile()">Apply Patch</button>
+        <div id="walletInfo" class="ton-address" style="text-align:center; margin-top:5px;"></div>
+        <div class="tabs">
+            <button class="tab active" data-tab="roulette">🎡 Рулетка</button>
+            <button class="tab" data-tab="tower">🗼 Tower</button>
+            <button class="tab" data-tab="profile">👤 Профиль</button>
+            <button class="tab admin-tab" data-tab="admin" style="display:none;">👑 Админ</button>
         </div>
     </div>
 
-    <nav class="bottom-nav">
-        <div class="nav-tab active">
-            <div class="nav-icon">⚔️</div>
-            ARENA
-        </div>
-        <div class="nav-tab">
-            <div class="nav-icon">📊</div>
-            ANALYTICS
-        </div>
-        <div class="nav-tab">
-            <div class="nav-icon">⚙️</div>
-            KERNEL
-        </div>
-    </nav>
-</div>
-<script>
-/**
- * ROLLS MASTER CORE ENGINE v6.0
- * LEAD DEVELOPER: ALEXANDER (KIROV 43)
- * --------------------------------------------------------------------------
- * Архитектура: Модульный Синглтон. 
- * Весь код документирован для удобства дебага в промышленной среде.
- */
-
-const tg = window.Telegram.WebApp;
-tg.expand();
-
-// ГЛОБАЛЬНОЕ СОСТОЯНИЕ СИСТЕМЫ (STATE)
-const STATE = {
-    user: {
-        id: 6418873752,
-        name: "Alexander",
-        bal: 1000.00,
-        lvl: 18,
-        rank: "Lead Developer",
-        ava: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alexander"
-    },
-    game: {
-        bank: 0,
-        players: [],
-        isSpinning: false,
-        lastWinner: null,
-        forceWinner: null, // Поле для админской подкрутки
-        rotation: 0,
-        targetRotation: 0,
-        sectors: 12,
-        colors: ['#2481cc', '#0d1117', '#1a5d93', '#161b22', '#05070a', '#1e293b']
-    },
-    ui: {
-        elements: {} // Хранилище ссылок на DOM
-    }
-};
-
-// ОСНОВНОЙ КЛАСС УПРАВЛЕНИЯ ЯДРОМ
-const Core = {
-    init() {
-        this.cacheDOM();
-        this.bindEvents();
-        this.startRenderingLoop();
-        this.syncUI();
-        
-        console.log("%c [KERNEL]: Initialized Alexander Engine v6.0 ", "color: #2ecc71; font-weight: bold;");
-    },
-
-    cacheDOM() {
-        this.canvas = document.getElementById('gameWheel');
-        this.ctx = this.canvas.getContext('2d');
-        this.ui = {
-            balance: document.getElementById('ui-balance'),
-            jackpot: document.getElementById('ui-jackpot'),
-            level: document.getElementById('ui-level'),
-            name: document.getElementById('ui-name'),
-            rank: document.getElementById('ui-rank'),
-            feed: document.getElementById('player-feed'),
-            chat: document.getElementById('chat-stream'),
-            betField: document.getElementById('bet-field')
-        };
-    },
-
-    bindEvents() {
-        // Секретный вход в админку
-        const trigger = document.getElementById('profile-trigger');
-        let timer;
-        trigger.addEventListener('touchstart', () => {
-            timer = setTimeout(() => Admin.open(), 3000);
-        });
-        trigger.addEventListener('touchend', () => clearTimeout(timer));
-
-        // Обработка клика по кнопке ставки
-        document.getElementById('chat-field').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.sendChatMessage();
-        });
-    },
-
-    // РЕНДЕРИНГ-ЦИКЛ (60 FPS)
-    startRenderingLoop() {
-        const render = () => {
-            this.drawWheel();
-            requestAnimationFrame(render);
-        };
-        render();
-    },
-
-    drawWheel() {
-        const cx = 400, cy = 400;
-        const radius = 370;
-        const sliceAngle = (Math.PI * 2) / STATE.game.sectors;
-
-        this.ctx.clearRect(0, 0, 800, 800);
-        this.ctx.save();
-        this.ctx.translate(cx, cy);
-        this.ctx.rotate(STATE.game.rotation);
-        this.ctx.translate(-cx, -cy);
-
-        for (let i = 0; i < STATE.game.sectors; i++) {
-            const startAngle = i * sliceAngle;
-            
-            // СЕКТОР
-            this.ctx.beginPath();
-            this.ctx.fillStyle = STATE.game.colors[i % STATE.game.colors.length];
-            this.ctx.moveTo(cx, cy);
-            this.ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
-            this.ctx.fill();
-
-            // ГРАНИЦЫ (Тот самый запрос Сани)
-            this.ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
-            this.ctx.lineWidth = 5;
-            this.ctx.stroke();
-
-            // АВАТАРКИ НА ГРАНИЦАХ (СЛОЖНЫЙ МОДУЛЬ)
-            if (STATE.game.players[i]) {
-                const player = STATE.game.players[i];
-                const midAngle = startAngle + (sliceAngle / 2);
-                const avaX = cx + (radius - 50) * Math.cos(midAngle);
-                const avaY = cy + (radius - 50) * Math.sin(midAngle);
-                
-                this.ctx.save();
-                this.ctx.beginPath();
-                this.ctx.arc(avaX, avaY, 25, 0, Math.PI * 2);
-                this.ctx.clip();
-                // Тут мы бы рисовали картинку, но для заглушки используем круг с инициалом
-                this.ctx.fillStyle = "#fff";
-                this.ctx.fillRect(avaX-25, avaY-25, 50, 50);
-                this.ctx.fillStyle = "#000";
-                this.ctx.font = "bold 20px Inter";
-                this.ctx.fillText(player.name.charAt(0), avaX-7, avaY+7);
-                this.ctx.restore();
-                
-                // Рамка аватарки
-                this.ctx.strokeStyle = varColor('--color-accent');
-                this.ctx.lineWidth = 3;
-                this.ctx.beginPath();
-                this.ctx.arc(avaX, avaY, 25, 0, Math.PI * 2);
-                this.ctx.stroke();
-            }
-        }
-        this.ctx.restore();
-    },
-
-    syncUI() {
-        this.ui.balance.innerText = STATE.user.bal.toFixed(2);
-        this.ui.jackpot.innerText = STATE.game.bank.toFixed(2);
-        this.ui.level.innerText = STATE.user.lvl;
-        this.ui.name.innerText = STATE.user.name.toUpperCase();
-        this.ui.rank.innerText = STATE.user.rank;
-        this.renderPlayerList();
-    },
-
-    handleBet() {
-        if (STATE.game.isSpinning) return;
-        
-        const val = parseFloat(this.ui.betField.value);
-        if (isNaN(val) || val <= 0 || val > STATE.user.bal) {
-            tg.HapticFeedback.notificationOccurred('error');
-            return;
-        }
-
-        STATE.user.bal -= val;
-        STATE.game.bank += val;
-        
-        STATE.game.players.unshift({
-            name: STATE.user.name,
-            bet: val,
-            id: STATE.user.id
-        });
-
-        this.syncUI();
-        this.postSystemMessage(`Вы внесли ${val} TON в банк!`);
-        tg.HapticFeedback.impactOccurred('heavy');
-
-        // Имитация активности других игроков
-        setTimeout(() => this.simulateCompetitors(), 1500);
-    },
-
-    simulateCompetitors() {
-        const names = ["Degen_Rich", "Vyatka_Warrior", "Crypto_Kirov", "Solana_Fan"];
-        const randomName = names[Math.floor(Math.random() * names.length)];
-        const fakeBet = Math.floor(Math.random() * 40) + 10;
-
-        STATE.game.players.push({
-            name: randomName,
-            bet: fakeBet,
-            id: Math.random()
-        });
-
-        STATE.game.bank += fakeBet;
-        this.syncUI();
-        this.postSystemMessage(`${randomName} зашел на ${fakeBet} TON!`);
-
-        if (STATE.game.players.length >= 3) {
-            setTimeout(() => this.initiateSpin(), 3000);
-        }
-    },
-
-    initiateSpin() {
-        if (STATE.game.isSpinning) return;
-        STATE.game.isSpinning = true;
-
-        const duration = 8000; 
-        const spins = 10 * Math.PI * 2;
-        const extra = Math.random() * Math.PI * 2;
-        const startTime = performance.now();
-
-        this.postSystemMessage("СТАВКИ ЗАКРЫТЫ. ЗАПУСК ЯДРА...");
-
-        const animate = (now) => {
-            const elapsed = now - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            
-            // Функция плавности (Ease Out)
-            const easeOut = 1 - Math.pow(1 - progress, 4);
-            STATE.game.rotation = (spins + extra) * easeOut;
-
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                this.finishSpin();
-            }
-        };
-        requestAnimationFrame(animate);
-    },
-
-    finishSpin() {
-        // Определение победителя
-        let winner;
-        if (STATE.game.forceWinner) {
-            winner = STATE.game.players.find(p => p.name === STATE.game.forceWinner) || STATE.game.players[0];
-            STATE.game.forceWinner = null;
-        } else {
-            winner = STATE.game.players[Math.floor(Math.random() * STATE.game.players.length)];
-        }
-
-        // Эффект победы
-        const winDiv = document.createElement('div');
-        winDiv.className = 'chat-bubble bubble-win';
-        winDiv.innerHTML = `🌟 WINNER: ${winner.name} | PRIZE: ${STATE.game.bank.toFixed(2)} TON`;
-        this.ui.chat.appendChild(winDiv);
-        this.ui.chat.scrollTop = 99999;
-
-        if (winner.name === STATE.user.name) {
-            STATE.user.bal += STATE.game.bank;
-            tg.HapticFeedback.notificationOccurred('success');
-        }
-
-        // Ресет комнаты
-        setTimeout(() => {
-            STATE.game.bank = 0;
-            STATE.game.players = [];
-            STATE.game.isSpinning = false;
-            this.syncUI();
-        }, 5000);
-    },
-
-    renderPlayerList() {
-        this.ui.feed.innerHTML = STATE.game.players.map(p => `
-            <div class="player-entry">
-                <div class="player-main">
-                    <div class="player-mini-ava" style="background:#fff; display:flex; align-items:center; justify-content:center; color:#000; font-weight:900;">${p.name[0]}</div>
-                    <span class="player-name">${p.name}</span>
-                </div>
-                <span class="player-stake">${p.bet.toFixed(1)} TON</span>
+    <!-- РУЛЕТКА -->
+    <div id="rouletteTab" class="game-container active">
+        <div class="card">
+            <h3>🎲 Room Rolls — Дуэль на ставках</h3>
+            <div class="roulette-wheel" id="wheelContainer">
+                <svg class="wheel-svg" viewBox="0 0 100 100" id="wheelSvg">
+                    <circle cx="50" cy="50" r="48" fill="#2c3e50" stroke="white" stroke-width="1"/>
+                    <circle cx="50" cy="50" r="12" fill="#f1c40f"/>
+                </svg>
             </div>
-        `).join('');
-    },
+            <div id="duelInfo" style="text-align:center; margin:10px 0;">⚔️ Нет активного дуэля</div>
+            <input type="number" id="betAmount" class="bet-input" placeholder="Ставка в TON" value="1" step="0.1">
+            <button class="btn" id="createDuelBtn">🔥 Создать дуэль</button>
+            <button class="btn btn-secondary" id="joinDuelBtn">🎯 Присоединиться к дуэли</button>
+        </div>
+    </div>
 
-    postSystemMessage(text) {
-        const msg = document.createElement('div');
-        msg.className = 'chat-bubble bubble-sys';
-        msg.innerText = `[LOG]: ${text}`;
-        this.ui.chat.appendChild(msg);
-        this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
-    },
+    <!-- TOWER -->
+    <div id="towerTab" class="game-container">
+        <div class="card">
+            <h3>🗼 Tower — Поднимись выше, забери x2.5</h3>
+            <input type="number" id="towerBet" class="bet-input" placeholder="Ставка в TON" value="0.5" step="0.1">
+            <button class="btn" id="startTowerBtn">🎮 Начать игру</button>
+            <button class="btn btn-secondary" id="cashoutTowerBtn" style="display:none;">💎 Забрать выигрыш</button>
+            <div class="tower-grid" id="towerGrid" style="display:none;"></div>
+            <div id="towerStatus" style="margin-top:12px; text-align:center;"></div>
+            <div id="towerMultiplier" style="font-size:28px; font-weight:bold; text-align:center; margin-top:10px;">x1</div>
+        </div>
+    </div>
 
-    sendChatMessage() {
-        const f = document.getElementById('chat-field');
-        if (!f.value.trim()) return;
+    <!-- ПРОФИЛЬ -->
+    <div id="profileTab" class="game-container">
+        <div class="card">
+            <h3>👤 Мой профиль</h3>
+            <div id="verifyBadge"></div>
+            <div class="deposit-box">
+                <h4>💰 Внести TON</h4>
+                <button class="btn" id="depositBtn">💎 Пополнить баланс (1 TON = 1 кредит)</button>
+                <div class="withdraw-box">
+                    <h4>💸 Вывести TON</h4>
+                    <input type="number" id="withdrawAmount" class="input-small" placeholder="Сумма в TON">
+                    <button class="btn btn-secondary" id="withdrawBtn">Вывести на кошелек</button>
+                </div>
+            </div>
+            <button class="btn" id="supportBtn" style="background:#4a6fa5; margin-top:15px;">💬 Открыть чат с поддержкой</button>
+            <div id="supportChatBox" style="display:none; margin-top:16px;">
+                <div id="supportMessages" style="max-height:200px; overflow-y:auto; margin-bottom:10px;"></div>
+                <div class="flex">
+                    <input type="text" id="supportMsgInput" class="input-small" placeholder="Сообщение...">
+                    <button id="sendSupportMsg" class="btn" style="width:auto; padding:10px 20px;">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- АДМИН ПАНЕЛЬ -->
+    <div id="adminTab" class="game-container">
+        <div class="card admin-panel">
+            <h3>👑 Админ панель</h3>
+            <button id="giveGiftBtn" class="btn" style="background:#f39c12;">🎁 Подарок всем (+5 TON)</button>
+            <button id="grantVerifyBtn" class="btn" style="background:#2ecc71;">✅ Дать галочку</button>
+            <input id="adminTargetUser" class="input-small" placeholder="Username цели">
+            <button id="makeAdminBtn" class="btn" style="background:#e67e22;">👑 Выдать админку</button>
+            <button id="makeSupportBtn" class="btn" style="background:#3498db;">🛡️ Выдать техподдержку</button>
+            <hr style="margin:15px 0;">
+            <h4>💬 Тикеты поддержки</h4>
+            <div id="ticketsList"></div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, get, update, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyDQgyNz7P5K4_dlNQsKqniO-kEALW3_OWg",
+        authDomain: "casino-213b9.firebaseapp.com",
+        databaseURL: "https://casino-213b9-default-rtdb.firebaseio.com",
+        projectId: "casino-213b9",
+        storageBucket: "casino-213b9.firebasestorage.app",
+        messagingSenderId: "104292026196",
+        appId: "1:104292026196:web:4b33abbb085143ce69eac1"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.enableClosingConfirmation();
+    
+    // TON Connect
+    let tonConnector = null;
+    let walletAddress = null;
+    
+    async function initTonConnect() {
+        if(window.TonConnect) {
+            tonConnector = new window.TonConnect.TonConnect({
+                manifestUrl: "https://raw.githubusercontent.com/ton-connect/demo-dapp/main/tonconnect-manifest.json"
+            });
+            tonConnector.onStatusChange((wallet) => {
+                if(wallet) {
+                    walletAddress = wallet.account.address;
+                    document.getElementById("walletInfo").innerHTML = `💳 ${walletAddress.slice(0,6)}...${walletAddress.slice(-4)}`;
+                    document.getElementById("walletBtn").innerHTML = "🔌 Отключить";
+                } else {
+                    walletAddress = null;
+                    document.getElementById("walletInfo").innerHTML = "";
+                    document.getElementById("walletBtn").innerHTML = "🔌 Подключить кошелек";
+                }
+            });
+        }
+    }
+    
+    document.getElementById("walletBtn").onclick = async () => {
+        if(!tonConnector) await initTonConnect();
+        if(walletAddress) {
+            await tonConnector.disconnect();
+        } else {
+            try {
+                await tonConnector.connect({
+                    bridgeUrl: "https://bridge.tonapi.io/bridge",
+                    universalLink: "https://app.tonkeeper.com/ton-connect"
+                });
+            } catch(e) { tg.showPopup({title:"Ошибка", message:"Не удалось подключить кошелек"}); }
+        }
+    };
+    
+    initTonConnect();
+    
+    let currentUser = null;
+    let userData = { balance: 5, verified: false, isAdmin: false, isSupport: false };
+    let activeDuel = null;
+    let towerGameActive = false;
+    let towerCells = [];
+    let currentMultiplier = 1;
+    let towerBetAmount = 0;
+    
+    async function initUser() {
+        const user = tg.initDataUnsafe?.user;
+        if(!user) { document.getElementById("usernameDisplay").innerText = "Guest"; return; }
+        currentUser = { id: user.id, username: user.username || user.first_name, photo: user.photo_url };
+        document.getElementById("usernameDisplay").innerText = "@" + currentUser.username;
+        if(currentUser.photo) document.getElementById("avatarDiv").style.backgroundImage = `url(${currentUser.photo})`;
+        else document.getElementById("avatarDiv").innerText = currentUser.username[0].toUpperCase();
         
-        const msg = document.createElement('div');
-        msg.className = 'chat-bubble';
-        msg.innerHTML = `<b>${STATE.user.name}:</b> ${f.value}`;
-        this.ui.chat.appendChild(msg);
-        f.value = "";
-        this.ui.chat.scrollTop = 99999;
+        const userRef = ref(db, `users/${currentUser.id}`);
+        const snap = await get(userRef);
+        if(snap.exists()) {
+            userData = snap.val();
+        } else {
+            userData = { balance: 10, verified: false, isAdmin: false, isSupport: false, username: currentUser.username };
+            await set(userRef, userData);
+        }
+        if(currentUser.username === "Kegovich") {
+            userData.isAdmin = true;
+            await update(userRef, { isAdmin: true });
+        }
+        updateUI();
+        listenForDuels();
+        loadTickets();
     }
-};
-
-// МОДУЛЬ АДМИНИСТРИРОВАНИЯ (ДОХУЯЛИОН ФУНКЦИЙ)
-const Admin = {
-    open() {
-        document.getElementById('admin-matrix').style.display = 'flex';
-        this.log("SYSTEM_OVERRIDE: Session established.");
-        tg.HapticFeedback.notificationOccurred('warning');
-    },
-    close() {
-        document.getElementById('admin-matrix').style.display = 'none';
-    },
-    log(txt) {
-        const term = document.getElementById('admin-terminal');
-        term.innerHTML += `<br>> [${new Date().toLocaleTimeString()}] ${txt}`;
-        term.scrollTop = term.scrollHeight;
-    },
-    addFunds() {
-        STATE.user.bal += 50000;
-        Core.syncUI();
-        this.log("RESOURCE_INJECTION: 50,000 Credits added.");
-    },
-    purgeChat() {
-        document.getElementById('chat-stream').innerHTML = '<div class="chat-bubble bubble-sys">System: Logs purged.</div>';
-        this.log("MEM_PURGE: Chat history deleted.");
-    },
-    spawnBot() {
-        Core.simulateCompetitors();
-        this.log("ENTITY_SPAWN: Fake competitor injected.");
-    },
-    lockWinner() {
-        const target = document.getElementById('adm-force-winner').value;
-        STATE.game.forceWinner = target;
-        this.log(`RNG_MOD: Target winner set to [${target}]`);
-    },
-    broadcast() {
-        const txt = document.getElementById('adm-broadcast').value;
-        Core.postSystemMessage(`[BROADCAST]: ${txt.toUpperCase()}`);
-        this.log("NET_SEND: Global announcement executed.");
-    },
-    patchProfile() {
-        const l = document.getElementById('adm-lvl').value;
-        const r = document.getElementById('adm-rank').value;
-        if(l) STATE.user.lvl = l;
-        if(r) STATE.user.rank = r;
-        Core.syncUI();
-        this.log("PATCH_APPLIED: Neural link updated.");
+    
+    function updateUI() {
+        document.getElementById("balanceDisplay").innerHTML = `💰 ${userData.balance.toFixed(2)} TON`;
+        if(userData.verified) document.getElementById("verifyBadge").innerHTML = '<span class="badge">✅ Верифицирован</span>';
+        if(userData.isAdmin || userData.isSupport) document.querySelector(".admin-tab").style.display = "block";
+        if(userData.isAdmin) document.getElementById("adminTab").style.display = "block";
     }
-};
-
-// Хелпер для получения цветов из CSS переменных
-function varColor(name) {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-// ИНИЦИАЛИЗАЦИЯ
-window.onload = () => Core.init();
-
+    
+    async function updateBalance(amount) {
+        const userRef = ref(db, `users/${currentUser.id}`);
+        userData.balance += amount;
+        await update(userRef, { balance: userData.balance });
+        updateUI();
+    }
+    
+    // Депозит
+    document.getElementById("depositBtn").onclick = async () => {
+        if(!walletAddress) { tg.showPopup({title:"Ошибка", message:"Сначала подключите TON кошелек!"}); return; }
+        try {
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 600,
+                messages: [{
+                    address: "EQD___demo_casino_wallet_address", // demo адрес, в реальности заменишь
+                    amount: "1000000000" // 1 TON = 10^9 nanoTON
+                }]
+            };
+            await tonConnector.sendTransaction(transaction);
+            tg.showPopup({title:"Успех", message:"Депозит 1 TON обрабатывается!"});
+            await updateBalance(1);
+        } catch(e) { tg.showPopup({title:"Ошибка", message:"Транзакция отклонена"}); }
+    };
+    
+    // Вывод
+    document.getElementById("withdrawBtn").onclick = async () => {
+        if(!walletAddress) { tg.showPopup({message:"Подключи кошелек"}); return; }
+        let amount = parseFloat(document.getElementById("withdrawAmount").value);
+        if(isNaN(amount) || amount <=0 || amount > userData.balance) { tg.showPopup({message:"Некорректная сумма"}); return; }
+        tg.showPopup({title:"Вывод", message:`Запрос на вывод ${amount} TON на ${walletAddress.slice(0,8)}... отправлен. Админ обработает.`});
+        await updateBalance(-amount);
+    };
+    
+    // РУЛЕТКА
+    document.getElementById("createDuelBtn").onclick = async () => {
+        let bet = parseFloat(document.getElementById("betAmount").value);
+        if(isNaN(bet) || bet<=0 || bet > userData.balance) { tg.showPopup({message:"Недостаточно средств!"}); return; }
+        const duelRef = ref(db, "duels/active");
+        const snap = await get(duelRef);
+        if(snap.exists() && snap.val().status === "waiting") { tg.showPopup({message:"Дуэль уже есть!"}); return; }
+        await updateBalance(-bet);
+        await set(duelRef, { creator: currentUser.id, creatorBet: bet, status: "waiting", creatorName: currentUser.username });
+        document.getElementById("duelInfo").innerHTML = `⚔️ Дуэль создана! Ставка ${bet} TON`;
+    };
+    
+    document.getElementById("joinDuelBtn").onclick = async () => {
+        const duelRef = ref(db, "duels/active");
+        const snap = await get(duelRef);
+        if(!snap.exists() || snap.val().status !== "waiting") { tg.showPopup({message:"Нет дуэли"}); return; }
+        let duel = snap.val();
+        if(duel.creator === currentUser.id) return;
+        let joinBet = duel.creatorBet;
+        if(joinBet > userData.balance) { tg.showPopup({message:`Нужно ${joinBet} TON`}); return; }
+        await updateBalance(-joinBet);
+        await update(duelRef, { opponent: currentUser.id, opponentBet: joinBet, status: "active" });
+        let winnerId = duel.creatorBet >= joinBet ? duel.creator : currentUser.id;
+        let prize = duel.creatorBet + joinBet;
+        await update(duelRef, { winner: winnerId, prize: prize, status: "finished" });
+        await update(ref(db, `users/${winnerId}`), { balance: (await get(ref(db, `users/${winnerId}`))).val().balance + prize });
+        tg.showPopup({title:"Победа!", message:`Ты выиграл ${prize} TON!`});
+        await remove(duelRef);
+        initUser();
+        drawWheel(duel.creatorBet, joinBet);
+    };
+    
+    function drawWheel(b1, b2) {
+        let total = b1+b2;
+        let angle1 = (b1/total)*360;
+        let svg = document.getElementById("wheelSvg");
+        let existing = svg.querySelectorAll("#playerSlice,#opponentSlice");
+        existing.forEach(el=>el.remove());
+        let pSlice = document.createElementNS("http://www.w3.org/2000/svg","path");
+        pSlice.setAttribute("d", `M 50 50 L 50 2 A 48 48 0 ${angle1>180?1:0} 1 ${50+48*Math.cos(angle1*Math.PI/180)} ${50+48*Math.sin(angle1*Math.PI/180)} Z`);
+        pSlice.setAttribute("fill","#ff6b6b");
+        pSlice.setAttribute("id","playerSlice");
+        svg.appendChild(pSlice);
+    }
+    
+    function listenForDuels() {
+        onValue(ref(db, "duels/active"), (snap) => {
+            if(snap.exists() && snap.val().status === "waiting") document.getElementById("duelInfo").innerHTML = `🎲 Есть дуэль! Ставка ${snap.val().creatorBet} TON`;
+            else if(!snap.exists()) document.getElementById("duelInfo").innerHTML = `⚔️ Нет активной дуэли`;
+        });
+    }
+    
+    // TOWER
+    document.getElementById("startTowerBtn").onclick = async () => {
+        let bet = parseFloat(document.getElementById("towerBet").value);
+        if(bet > userData.balance || bet <=0) { tg.showPopup({message:"Недостаточно TON"}); return; }
+        await updateBalance(-bet);
+        towerBetAmount = bet;
+        currentMultiplier = 1;
+        towerGameActive = true;
+        document.getElementById("towerMultiplier").innerHTML = "x1";
+        document.getElementById("towerStatus").innerHTML = "🏆 Нажми на безопасную плиту!";
+        document.getElementById("startTowerBtn").style.display = "none";
+        document.getElementById("cashoutTowerBtn").style.display = "block";
+        let grid = document.getElementById("towerGrid");
+        grid.style.display = "grid";
+        grid.innerHTML = "";
+        towerCells = [];
+        for(let i=0;i<9;i++) {
+            let cell = document.createElement("div");
+            cell.className = "tower-cell";
+            cell.innerText = "❓";
+            cell.dataset.index = i;
+            cell.onclick = () => towerReveal(i);
+            grid.appendChild(cell);
+            towerCells.push({revealed:false, isBomb: Math.random() < 0.2 && i>2});
+        }
+    };
+    
+    function towerReveal(idx) {
+        if(!towerGameActive) return;
+        if(towerCells[idx].revealed) return;
+        if(towerCells[idx].isBomb) {
+            document.getElementById("towerStatus").innerHTML = "💥 Ты наткнулся на бомбу! Потеряно!";
+            towerGameActive = false;
+            document.getElementById("startTowerBtn").style.display = "block";
+            document.getElementById("cashoutTowerBtn").style.display = "none";
+        } else {
+            towerCells[idx].revealed = true;
+            document.querySelectorAll(".tower-cell")[idx].classList.add("revealed");
+            document.querySelectorAll(".tower-cell")[idx].innerText = "✅";
+            currentMultiplier = 1 + (towerCells.filter(c=>c.revealed).length * 0.2);
+            document.getElementById("towerMultiplier").innerHTML = `x${currentMultiplier.toFixed(1)}`;
+            if(towerCells.filter(c=>c.revealed).length >= 7) {
+                let win = towerBetAmount * currentMultiplier;
+                updateBalance(win);
+                document.getElementById("towerStatus").innerHTML = `🎉 ПОБЕДА! +${win.toFixed(2)} TON`;
+                towerGameActive = false;
+                document.getElementById("startTowerBtn").style.display = "block";
+                document.getElementById("cashoutTowerBtn").style.display = "none";
+            }
+        }
+    }
+    
+    document.getElementById("cashoutTowerBtn").onclick = async () => {
+        if(!towerGameActive) return;
+        let win = towerBetAmount * currentMultiplier;
+        await updateBalance(win);
+        document.getElementById("towerStatus").innerHTML = `💎 Выигрыш забран! +${win.toFixed(2)} TON`;
+        towerGameActive = false;
+        document.getElementById("startTowerBtn").style.display = "block";
+        document.getElementById("cashoutTowerBtn").style.display = "none";
+    };
+    
+    // Техподдержка
+    document.getElementById("supportBtn").onclick = () => {
+        let box = document.getElementById("supportChatBox");
+        box.style.display = box.style.display === "none" ? "block" : "none";
+        loadSupportMessages();
+    };
+    
+    async function loadSupportMessages() {
+        const msgsRef = ref(db, `support/${currentUser.id}`);
+        onValue(msgsRef, (snap) => {
+            let container = document.getElementById("supportMessages");
+            container.innerHTML = "";
+            snap.forEach(child => {
+                let msg = child.val();
+                let div = document.createElement("div");
+                div.className = "support-msg";
+                div.innerHTML = `<b>${msg.from}</b>: ${msg.text}<br><small>${new Date(msg.time).toLocaleTimeString()}</small>`;
+                container.appendChild(div);
+            });
+        });
+    }
+    
+    document.getElementById("sendSupportMsg").onclick = async () => {
+        let text = document.getElementById("supportMsgInput").value;
+        if(!text) return;
+        await push(ref(db, `support/${currentUser.id}`), { from: currentUser.username, text: text, time: Date.now() });
+        document.getElementById("supportMsgInput").value = "";
+        if(userData.isAdmin || userData.isSupport) await push(ref(db, "adminTickets"), { userId: currentUser.id, msg: text });
+    };
+    
+    async function loadTickets() {
+        if(!userData.isAdmin) return;
+        onValue(ref(db, "adminTickets"), (snap) => {
+            let div = document.getElementById("ticketsList");
+            div.innerHTML = "";
+            snap.forEach(t => {
+                let ticket = t.val();
+                div.innerHTML += `<div class="support-msg">${ticket.userId}: ${ticket.msg} <button class="btn" style="width:auto; padding:5px;" onclick="replyToTicket('${ticket.userId}')">Ответить</button></div>`;
+            });
+        });
+    }
+    
+    window.replyToTicket = async (userId) => {
+        let reply = prompt("Ответ пользователю:");
+        if(reply) await push(ref(db, `support/${userId}`), { from: "Админ", text: reply, time: Date.now() });
+    };
+    
+    // Админ функции
+    document.getElementById("giveGiftBtn").onclick = async () => {
+        const users = await get(ref(db, "users"));
+        users.forEach(async (u) => {
+            await update(ref(db, `users/${u.key}`), { balance: (u.val().balance || 0) + 5 });
+        });
+        tg.showPopup({title:"Подарок", message:"+5 TON всем!"});
+    };
+    document.getElementById("grantVerifyBtn").onclick = async () => {
+        let target = document.getElementById("adminTargetUser").value;
+        const users = await get(ref(db, "users"));
+        let found = false;
+        users.forEach(async (u) => {
+            if(u.val().username === target) { await update(ref(db, `users/${u.key}`), { verified: true }); found = true; }
+        });
+        tg.showPopup({message: found ? "Галочка выдана" : "Не найден"});
+    };
+    document.getElementById("makeAdminBtn").onclick = async () => {
+        let target = document.getElementById("adminTargetUser").value;
+        const users = await get(ref(db, "users"));
+        users.forEach(async (u) => { if(u.val().username === target) await update(ref(db, `users/${u.key}`), { isAdmin: true }); });
+    };
+    document.getElementById("makeSupportBtn").onclick = async () => {
+        let target = document.getElementById("adminTargetUser").value;
+        const users = await get(ref(db, "users"));
+        users.forEach(async (u) => { if(u.val().username === target) await update(ref(db, `users/${u.key}`), { isSupport: true }); });
+    };
+    
+    // Табы
+    document.querySelectorAll(".tab").forEach(tab => {
+        tab.onclick = () => {
+            let tabName = tab.dataset.tab;
+            document.querySelectorAll(".game-container").forEach(cont => cont.classList.remove("active"));
+            document.getElementById(tabName + "Tab").classList.add("active");
+            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+        };
+    });
+    
+    initUser();
 </script>
+</body>
+</html>
