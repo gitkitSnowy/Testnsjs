@@ -3,660 +3,1076 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ROLLS MASTER ELITE | ALEXANDER EDITION</title>
+    <title>ROLLS MASTER ULTRA-MAX | Alexander Lead Dev Edition</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&family=Oswald:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* ЦВЕТОВАЯ СХЕМА: DARK INDUSTRIAL / CYBERPUNK 
-           Никакого мыла, только жесткие тени и неон.
+        /* ==========================================================================
+           INDUSTRIAL DARK THEME SYSTEM v6.0
+           Designed specifically for Alexander (Kirov Region)
+           ==========================================================================
         */
+
         :root {
-            --bg-black: #05070a;
-            --panel-dark: #0d1117;
-            --accent-blue: #2481cc;
-            --accent-glow: rgba(36, 129, 204, 0.4);
-            --gold: #ffcc00;
-            --red-alert: #ff4757;
-            --green-go: #2ed573;
-            --text-main: #ffffff;
-            --text-sub: #8b949e;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --glass: rgba(255, 255, 255, 0.02);
+            /* Базовая палитра */
+            --color-bg-deep: #020406;
+            --color-bg-main: #05080a;
+            --color-panel: #0a0e14;
+            --color-panel-light: #121820;
+            
+            /* Акценты */
+            --color-accent: #2481cc;
+            --color-accent-glow: rgba(36, 129, 204, 0.4);
+            --color-accent-soft: rgba(36, 129, 204, 0.1);
+            
+            /* Статусные цвета */
+            --color-gold: #ffcc00;
+            --color-gold-glow: rgba(255, 204, 0, 0.3);
+            --color-success: #2ed573;
+            --color-error: #ff4757;
+            --color-warning: #ffa502;
+            
+            /* Текст */
+            --color-text-bright: #ffffff;
+            --color-text-main: #cbd5e0;
+            --color-text-dim: #718096;
+            --color-text-dark: #4a5568;
+
+            /* Границы и тени */
+            --border-industrial: 1px solid rgba(255, 255, 255, 0.06);
+            --border-accent: 1px solid var(--color-accent);
+            --shadow-hard: 0 10px 30px rgba(0, 0, 0, 0.7);
+            --shadow-neon: 0 0 20px var(--color-accent-glow);
+            
+            /* Геометрия */
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 28px;
+            --radius-full: 9999px;
+            
+            /* Анимации */
+            --transition-fast: 0.15s ease;
+            --transition-main: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* ОБЩИЕ ПРАВИЛА */
-        * { 
-            box-sizing: border-box; 
-            margin: 0; padding: 0; 
+        /* RESET & BASE STYLES */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            outline: none;
             -webkit-tap-highlight-color: transparent;
-            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
-        body { 
-            background: var(--bg-black); 
-            color: var(--text-main); 
-            height: 100vh; 
-            overflow: hidden; 
-            display: flex; 
+        body {
+            background-color: var(--color-bg-deep);
+            color: var(--color-text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
             justify-content: center;
         }
 
-        .app-container {
+        /* MAIN WRAPPER */
+        #app {
             width: 100%;
             max-width: 500px;
             height: 100vh;
+            background: radial-gradient(circle at 50% 0%, #101925 0%, #020406 100%);
             display: flex;
             flex-direction: column;
-            background: radial-gradient(circle at top right, #161b22 0%, #05070a 100%);
             position: relative;
+            border-left: var(--border-industrial);
+            border-right: var(--border-industrial);
         }
 
-        /* ГЛАВНАЯ ШАПКА 
-        */
-        header {
-            padding: 15px 20px;
-            background: var(--panel-dark);
-            border-bottom: 1px solid var(--border-color);
+        /* HEADER ARCHITECTURE */
+        .main-header {
+            padding: 20px;
+            background: var(--color-panel);
+            border-bottom: 2px solid rgba(36, 129, 204, 0.2);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            z-index: 500;
+            box-shadow: var(--shadow-hard);
         }
 
-        .profile-trigger {
+        .user-identity {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
             cursor: pointer;
+            transition: var(--transition-main);
         }
 
-        .avatar-circle {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid var(--accent-blue);
-            box-shadow: 0 0 10px var(--accent-glow);
-            object-fit: cover;
+        .user-identity:active {
+            transform: scale(0.97);
+            opacity: 0.8;
         }
 
-        .user-meta h3 { font-size: 14px; font-weight: 900; }
-        .user-meta p { font-size: 10px; color: var(--accent-blue); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-
-        .balance-display { text-align: right; }
-        .bal-amount { font-size: 20px; font-weight: 900; color: var(--gold); letter-spacing: -0.5px; }
-        .bal-label { font-size: 9px; color: var(--text-sub); font-weight: 700; text-transform: uppercase; }
-
-        /* ОСНОВНОЙ КОНТЕНТ 
-        */
-        main {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 100px;
-            scrollbar-width: none;
-        }
-        main::-webkit-scrollbar { display: none; }
-
-        .screen { display: none; animation: fadeIn 0.4s ease-out; }
-        .screen.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* РУЛЕТКА - ТВОЙ ЛЮБИМЫЙ ДИЗАЙН 
-        */
-        .roulette-box {
-            background: var(--panel-dark);
-            border-radius: 28px;
-            padding: 25px;
-            border: 1px solid var(--border-color);
-            text-align: center;
+        .avatar-container {
             position: relative;
-            margin-bottom: 20px;
-            overflow: hidden;
+            width: 56px;
+            height: 56px;
         }
 
-        .jackpot-title { font-size: 11px; color: var(--text-sub); font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
-        .jackpot-value { font-size: 32px; font-weight: 900; color: var(--text-main); margin-bottom: 20px; text-shadow: 0 0 20px var(--accent-glow); }
-
-        .wheel-wrap {
-            position: relative;
-            width: 280px;
-            height: 280px;
-            margin: 0 auto 25px;
-        }
-
-        canvas#rouletteWheel {
+        .avatar-main {
             width: 100%;
             height: 100%;
-            border-radius: 50%;
-            border: 8px solid var(--bg-black);
-            transition: 6s cubic-bezier(0.1, 0, 0.1, 1);
-            filter: drop-shadow(0 0 15px rgba(0,0,0,0.8));
+            border-radius: var(--radius-full);
+            border: 2px solid var(--color-accent);
+            padding: 2px;
+            object-fit: cover;
+            box-shadow: var(--shadow-neon);
         }
 
-        .wheel-pointer {
+        .level-tag {
             position: absolute;
-            top: -15px; left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 25px solid var(--accent-blue);
-            z-index: 10;
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
-        }
-
-        .wheel-logo {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px; height: 60px;
-            background: var(--panel-dark);
-            border: 4px solid var(--accent-blue);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 10px; font-weight: 900; color: var(--accent-blue);
-            z-index: 5;
-        }
-
-        /* СТАВКИ И КНОПКИ 
-        */
-        .bet-controls { display: flex; gap: 12px; margin-bottom: 20px; }
-        .input-dark {
-            flex: 1;
-            background: var(--bg-black);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 15px;
+            bottom: -2px;
+            right: -2px;
+            background: var(--color-accent);
             color: white;
-            font-size: 18px;
-            font-weight: 900;
-            outline: none;
-            text-align: center;
-        }
-        .input-dark:focus { border-color: var(--accent-blue); }
-
-        .btn-main {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, #1a5d93 100%);
-            border: none; color: white; border-radius: 16px;
-            padding: 15px 30px; font-weight: 900; font-size: 16px;
-            cursor: pointer; transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(36, 129, 204, 0.3);
-        }
-        .btn-main:active { transform: scale(0.95); box-shadow: none; }
-
-        /* ЛОББИ ИГРОКОВ (КРУГИ) 
-        */
-        .player-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        .player-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255,255,255,0.03);
-            padding: 12px 18px;
-            border-radius: 50px;
-            border: 1px solid var(--border-color);
-        }
-
-        .p-details { display: flex; align-items: center; gap: 12px; }
-        .p-ava-small { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--accent-blue); }
-        .p-name { font-size: 13px; font-weight: 700; }
-        .p-bet { font-weight: 900; color: var(--gold); font-size: 14px; }
-
-        /* ЧАТ (ИНДУСТРИАЛЬНЫЙ) 
-        */
-        .chat-container {
-            background: var(--panel-dark);
-            border-radius: 24px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            height: 280px;
-            margin-top: 20px;
-        }
-
-        .chat-header {
-            padding: 12px 20px;
-            border-bottom: 1px solid var(--border-color);
             font-size: 10px;
             font-weight: 900;
-            color: var(--text-sub);
+            padding: 3px 7px;
+            border-radius: 8px;
+            border: 2px solid var(--color-panel);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .identity-text h2 {
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--color-text-bright);
+            letter-spacing: 0.5px;
             text-transform: uppercase;
         }
 
-        .chat-history {
+        .identity-text p {
+            font-size: 9px;
+            color: var(--color-accent);
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .financial-hub {
+            text-align: right;
+        }
+
+        .ton-label {
+            font-size: 9px;
+            color: var(--color-text-dim);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .ton-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--color-gold);
+            text-shadow: 0 0 15px var(--color-gold-glow);
+        }
+
+        /* SCROLLABLE CONTENT AREA */
+        .viewport {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: 20px;
+            padding-bottom: 120px;
+            mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
+        }
+
+        .viewport::-webkit-scrollbar {
+            width: 0; /* Hidden but functional */
+        }
+
+        /* GAME CARD STYLING */
+        .arena-card {
+            background: var(--color-panel);
+            border-radius: var(--radius-lg);
+            border: var(--border-industrial);
+            padding: 25px;
+            margin-bottom: 24px;
+            position: relative;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+
+        .arena-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+            opacity: 0.3;
+        }
+
+        .jackpot-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .jackpot-title {
+            font-size: 11px;
+            color: var(--color-text-dim);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .jackpot-amount {
+            font-family: 'Oswald', sans-serif;
+            font-size: 48px;
+            color: var(--color-text-bright);
+            line-height: 1;
+            text-shadow: 0 0 30px var(--color-accent-glow);
+        }
+
+        /* ADVANCED WHEEL SYSTEM */
+        .wheel-module {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 0 auto 35px;
+        }
+
+        canvas#gameWheel {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-full);
+            filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
+            z-index: 10;
+            position: relative;
+        }
+
+        .wheel-indicator {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 45px;
+            background: var(--color-accent);
+            clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+            z-index: 100;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+            border: 2px solid white;
+        }
+
+        .wheel-center-cap {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: var(--color-panel);
+            border: 4px solid var(--color-accent);
+            border-radius: var(--radius-full);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .cap-logo {
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--color-accent);
+            letter-spacing: 1px;
+        }
+
+        /* BETTING INTERFACE */
+        .betting-engine {
+            display: grid;
+            grid-template-columns: 1fr 120px;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .bet-input-wrap {
+            position: relative;
+        }
+
+        .bet-field {
+            width: 100%;
+            background: #000;
+            border: 2px solid var(--color-panel-light);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 800;
+            transition: var(--transition-main);
+        }
+
+        .bet-field:focus {
+            border-color: var(--color-accent);
+            box-shadow: var(--shadow-neon);
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, var(--color-accent) 0%, #164e7d 100%);
+            border: none;
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: 900;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 8px 25px rgba(36, 129, 204, 0.4);
+            transition: var(--transition-main);
+        }
+
+        .action-button:active {
+            transform: scale(0.95);
+            box-shadow: none;
+        }
+
+        /* PLAYER FEED ARCHITECTURE */
+        .feed-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .chat-msg {
-            font-size: 13px;
-            line-height: 1.4;
-            max-width: 85%;
-        }
-
-        .chat-msg b { color: var(--accent-blue); margin-right: 5px; }
-        .msg-sys { color: var(--text-sub); font-style: italic; border-left: 2px solid var(--accent-blue); padding-left: 10px; }
-
-        .chat-input-box {
-            padding: 10px;
-            border-top: 1px solid var(--border-color);
+        .player-entry {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 14px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            animation: entrySlide 0.5s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        .chat-input-box input {
+        @keyframes entrySlide {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .player-main {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .player-mini-ava {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-full);
+            border: 2px solid var(--color-accent);
+        }
+
+        .player-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-text-bright);
+        }
+
+        .player-stake {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            color: var(--color-gold);
+        }
+
+        /* CHAT SYSTEM DESIGN */
+        .comms-center {
+            background: var(--color-panel);
+            border-radius: var(--radius-lg);
+            border: var(--border-industrial);
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .comms-header {
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border-industrial);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comms-title {
+            font-size: 10px;
+            font-weight: 900;
+            color: var(--color-text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--color-success);
+            border-radius: var(--radius-full);
+            box-shadow: 0 0 10px var(--color-success);
+        }
+
+        .message-stream {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-bubble {
+            font-size: 13px;
+            max-width: 90%;
+            line-height: 1.5;
+        }
+
+        .chat-bubble b {
+            color: var(--color-accent);
+            margin-right: 6px;
+        }
+
+        .bubble-sys {
+            color: var(--color-text-dim);
+            font-style: italic;
+            border-left: 3px solid var(--color-accent);
+            padding-left: 12px;
+        }
+
+        .bubble-win {
+            background: rgba(255, 204, 0, 0.1);
+            border: 1px solid rgba(255, 204, 0, 0.2);
+            color: var(--color-gold);
+            padding: 10px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            font-weight: 800;
+        }
+
+        .input-dock {
+            padding: 15px 20px;
+            background: #000;
+            border-top: 1px solid var(--border-industrial);
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input {
             flex: 1;
             background: transparent;
             border: none;
             color: white;
-            outline: none;
             font-size: 14px;
         }
 
-        /* АДМИН ПАНЕЛЬ (COMMAND CENTER) 
-        */
-        #admin-screen {
+        /* ADMIN CONTROL OVERLAY */
+        .admin-matrix {
             position: fixed;
             inset: 0;
-            background: var(--bg-black);
-            z-index: 9999;
+            background: var(--color-bg-deep);
+            z-index: 2000;
             display: none;
             flex-direction: column;
-            padding: 40px 20px;
+            padding: 40px 25px;
+            overflow-y: auto;
         }
 
-        .admin-header {
+        .matrix-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
         }
 
-        .admin-title { font-family: 'JetBrains Mono', monospace; color: var(--green-go); font-size: 18px; }
+        .matrix-title {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--color-success);
+            font-size: 16px;
+            font-weight: 800;
+        }
 
-        .admin-grid {
+        .matrix-terminal {
+            background: #000;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #4ade80;
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #1e293b;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .matrix-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
+            margin-bottom: 30px;
         }
 
-        .console-box {
-            flex: 1;
-            background: #000;
-            border: 1px solid #1f2937;
-            border-radius: 12px;
-            padding: 15px;
-            font-family: 'JetBrains Mono', monospace;
+        .matrix-btn {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: white;
+            padding: 18px;
+            border-radius: var(--radius-md);
             font-size: 11px;
-            color: #4ade80;
-            overflow-y: auto;
-            margin-bottom: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition-fast);
         }
 
-        /* НИЖНЯЯ НАВИГАЦИЯ 
-        */
-        nav {
+        .matrix-btn:active {
+            background: var(--color-accent);
+        }
+
+        .matrix-btn.danger {
+            border-color: var(--color-error);
+            color: var(--color-error);
+        }
+
+        .field-group {
+            background: var(--color-panel);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            margin-bottom: 15px;
+            border: var(--border-industrial);
+        }
+
+        .field-group label {
+            display: block;
+            font-size: 10px;
+            color: var(--color-text-dim);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .matrix-input {
+            width: 100%;
+            background: #000;
+            border: 1px solid var(--color-panel-light);
+            padding: 12px;
+            color: white;
+            border-radius: var(--radius-sm);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* BOTTOM NAVIGATION */
+        .bottom-nav {
             position: fixed;
             bottom: 0;
             width: 100%;
             max-width: 500px;
-            background: var(--panel-dark);
-            border-top: 1px solid var(--border-color);
+            background: var(--color-panel);
+            border-top: var(--border-industrial);
             display: flex;
             padding: 15px 0 35px;
-            z-index: 1000;
+            z-index: 400;
         }
 
-        .nav-btn {
+        .nav-tab {
             flex: 1;
             text-align: center;
-            color: var(--text-sub);
+            color: var(--color-text-dim);
             font-size: 10px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: 0.3s;
-            opacity: 0.5;
+            font-weight: 900;
+            opacity: 0.4;
+            transition: var(--transition-main);
         }
 
-        .nav-btn.active { color: var(--accent-blue); opacity: 1; }
-        .nav-btn div { font-size: 20px; margin-bottom: 4px; }
+        .nav-tab.active {
+            color: var(--color-accent);
+            opacity: 1;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
 
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    
-    <header>
-        <div class="profile-trigger" id="admin-trigger">
-            <img class="avatar-circle" id="u-ava" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alexander">
-            <div class="user-meta">
-                <h3 id="u-name">Alexander</h3>
-                <p id="u-rank">Lead Developer</p>
+<div id="app">
+    <header class="main-header">
+        <div class="user-identity" id="profile-trigger">
+            <div class="avatar-container">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alexander" class="avatar-main">
+                <div class="level-tag" id="ui-level">18</div>
+            </div>
+            <div class="identity-text">
+                <h2 id="ui-name">ALEXANDER</h2>
+                <p id="ui-rank">Lead Developer</p>
             </div>
         </div>
-        <div class="balance-display">
-            <div class="bal-label">TON Balance</div>
-            <div class="bal-amount"><span id="u-bal">777.00</span></div>
+        <div class="financial-hub">
+            <div class="ton-label">Vault Balance</div>
+            <div class="ton-value" id="ui-balance">1000.00</div>
         </div>
     </header>
 
-    <main>
-        
-        <section id="scr-arena" class="screen active">
-            <div class="roulette-box">
-                <div class="jackpot-title">Global Room Bank</div>
-                <div class="jackpot-value"><span id="jackpot">0.00</span> TON</div>
-
-                <div class="wheel-wrap">
-                    <div class="wheel-pointer"></div>
-                    <div class="wheel-logo">ROLLS</div>
-                    <canvas id="rouletteWheel" width="600" height="600"></canvas>
-                </div>
-
-                <div class="bet-controls">
-                    <input type="number" id="bet-input" class="input-dark" value="10.0" step="1">
-                    <button class="btn-main" onclick="CORE.joinGame()">JOIN BATTLE</button>
-                </div>
-
-                <div class="player-list" id="player-feed">
-                    </div>
+    <main class="viewport">
+        <section class="arena-card">
+            <div class="jackpot-display">
+                <p class="jackpot-title">Global Arena Pool</p>
+                <h1 class="jackpot-amount" id="ui-jackpot">0.00</h1>
             </div>
 
-            <div class="chat-container">
-                <div class="chat-header">Live Discussion</div>
-                <div class="chat-history" id="chat-box">
-                    <div class="chat-msg msg-sys">System: Добро пожаловать, Alexander. Все системы активны.</div>
+            <div class="wheel-module">
+                <div class="wheel-indicator"></div>
+                <div class="wheel-center-cap">
+                    <span class="cap-logo">ROLLS</span>
                 </div>
-                <div class="chat-input-box">
-                    <input type="text" id="chat-input" placeholder="Введите сообщение...">
-                    <button onclick="CORE.sendMsg()" style="background:var(--accent-blue); border:none; color:white; padding:5px 15px; border-radius:10px; font-weight:900;">></button>
-                </div>
+                <canvas id="gameWheel" width="800" height="800"></canvas>
             </div>
+
+            <div class="betting-engine">
+                <div class="bet-input-wrap">
+                    <input type="number" id="bet-field" class="bet-field" value="10.0">
+                </div>
+                <button class="action-button" onclick="Core.handleBet()">Battle</button>
+            </div>
+
+            <div class="feed-container" id="player-feed">
+                </div>
         </section>
 
-        <section id="scr-dev" class="screen">
-            <div class="roulette-box" style="text-align: left;">
-                <h2 style="margin-bottom: 10px; font-weight: 900;">Новости Кировская область</h2>
-                <p style="font-size: 12px; color: var(--text-sub); line-height: 1.6;">
-                    Статус: <span style="color: var(--green-go);">Администратор</span><br>
-                    Проекты: AtomOS, Rolls Master, Milk Brand.<br>
-                    Регион: 43 (Киров).
-                </p>
-                <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div style="background: var(--bg-black); padding: 15px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 20px; font-weight: 900;">18</div>
-                        <div style="font-size: 9px; color: var(--text-sub);">LEVEL</div>
-                    </div>
-                    <div style="background: var(--bg-black); padding: 15px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 20px; font-weight: 900;">431</div>
-                        <div style="font-size: 9px; color: var(--text-sub);">WINS</div>
-                    </div>
-                </div>
+        <section class="comms-center">
+            <div class="comms-header">
+                <span class="comms-title">System Communication</span>
+                <div class="status-dot"></div>
+            </div>
+            <div class="message-stream" id="chat-stream">
+                <div class="chat-bubble bubble-sys">System: Все модули ядра загружены. Приветствуем, Alexander.</div>
+            </div>
+            <div class="input-dock">
+                <input type="text" id="chat-field" class="chat-input" placeholder="Передача сообщения...">
+                <button onclick="Core.sendChatMessage()" style="background:var(--color-accent); border:none; color:white; width:30px; height:30px; border-radius:50%; font-weight:900;">></button>
             </div>
         </section>
-
     </main>
 
-    <nav>
-        <div class="nav-btn active" onclick="UI.switch('arena', this)">
-            <div>⚔️</div>ARENA
+    <div class="admin-matrix" id="admin-matrix">
+        <div class="matrix-header">
+            <div class="matrix-title">CORE_OVERRIDE_V6.0</div>
+            <button class="matrix-btn danger" style="padding: 5px 15px;" onclick="Admin.close()">Disconnect</button>
         </div>
-        <div class="nav-btn" onclick="UI.switch('dev', this)">
-            <div>🛠️</div>DEV INFO
+        
+        <div class="matrix-terminal" id="admin-terminal">
+            > root@alexander: mount /dev/global_database<br>
+            > Access level: GodMode<br>
+            > Regional Node: Kirov_43<br>
+            > Ready for instruction...
         </div>
-    </nav>
 
-    <div id="admin-screen">
-        <div class="admin-header">
-            <div class="admin-title">SYSTEM_OVERRIDE_V4</div>
-            <button onclick="ADMIN.hide()" style="background: var(--red-alert); border:none; color:white; padding:5px 15px; border-radius:8px; font-weight:900;">EXIT</button>
+        <div class="matrix-grid">
+            <button class="matrix-btn" onclick="Admin.addFunds()">+50k Credits</button>
+            <button class="matrix-btn" onclick="Core.initiateSpin()">Force Launch</button>
+            <button class="matrix-btn danger" onclick="Admin.purgeChat()">Purge Logs</button>
+            <button class="matrix-btn" onclick="Admin.spawnBot()">Inject Fake Entity</button>
         </div>
-        <div class="console-box" id="admin-console">
-            > root@alexander: system initialized...<br>
-            > Waiting for command...
+
+        <div class="field-group">
+            <label>RNG Manipulation (Winner Key)</label>
+            <input type="text" id="adm-force-winner" class="matrix-input" placeholder="User Identifier">
+            <button class="matrix-btn" style="width: 100%; margin-top: 10px;" onclick="Admin.lockWinner()">Lock Win Logic</button>
         </div>
-        <div class="admin-grid">
-            <button class="btn-main" onclick="ADMIN.addCash()">+5000 TON</button>
-            <button class="btn-main" style="background: var(--green-go); color: black;" onclick="CORE.forceStart()">FORCE SPIN</button>
-            <button class="btn-main" onclick="ADMIN.clearChat()">CLEAR CHAT</button>
-            <button class="btn-main" style="background: var(--red-alert);" onclick="location.reload()">REBOOT</button>
+
+        <div class="field-group">
+            <label>Global Proclamation</label>
+            <input type="text" id="adm-broadcast" class="matrix-input" placeholder="Message content...">
+            <button class="matrix-btn" style="width: 100%; margin-top: 10px;" onclick="Admin.broadcast()">Execute Proclamation</button>
+        </div>
+
+        <div class="field-group">
+            <label>Neural Link Modification (Level/Rank)</label>
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="adm-lvl" class="matrix-input" placeholder="LVL">
+                <input type="text" id="adm-rank" class="matrix-input" placeholder="RANK">
+            </div>
+            <button class="matrix-btn" style="width: 100%; margin-top: 10px;" onclick="Admin.patchProfile()">Apply Patch</button>
         </div>
     </div>
 
+    <nav class="bottom-nav">
+        <div class="nav-tab active">
+            <div class="nav-icon">⚔️</div>
+            ARENA
+        </div>
+        <div class="nav-tab">
+            <div class="nav-icon">📊</div>
+            ANALYTICS
+        </div>
+        <div class="nav-tab">
+            <div class="nav-icon">⚙️</div>
+            KERNEL
+        </div>
+    </nav>
 </div>
-
 <script>
 /**
- * ROLLS MASTER ENGINE v2.0
- * Оптимизированная архитектура под Alexander (Lead Dev)
+ * ROLLS MASTER CORE ENGINE v6.0
+ * LEAD DEVELOPER: ALEXANDER (KIROV 43)
+ * --------------------------------------------------------------------------
+ * Архитектура: Модульный Синглтон. 
+ * Весь код документирован для удобства дебага в промышленной среде.
  */
 
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// Глобальное состояние
+// ГЛОБАЛЬНОЕ СОСТОЯНИЕ СИСТЕМЫ (STATE)
 const STATE = {
     user: {
-        id: 6418873752, // Твой ID
+        id: 6418873752,
         name: "Alexander",
-        bal: 777.00,
-        rank: "Lead Developer"
+        bal: 1000.00,
+        lvl: 18,
+        rank: "Lead Developer",
+        ava: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alexander"
     },
     game: {
         bank: 0,
         players: [],
         isSpinning: false,
-        colors: ['#2481cc', '#0d1117', '#161b22', '#1a5d93', '#05070a']
+        lastWinner: null,
+        forceWinner: null, // Поле для админской подкрутки
+        rotation: 0,
+        targetRotation: 0,
+        sectors: 12,
+        colors: ['#2481cc', '#0d1117', '#1a5d93', '#161b22', '#05070a', '#1e293b']
+    },
+    ui: {
+        elements: {} // Хранилище ссылок на DOM
     }
 };
 
-const UI = {
-    switch(id, btn) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('scr-'+id).classList.add('active');
-        btn.classList.add('active');
-        if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-    },
-    update() {
-        document.getElementById('u-bal').innerText = STATE.user.bal.toFixed(2);
-        document.getElementById('jackpot').innerText = STATE.game.bank.toFixed(2);
-        this.renderPlayers();
-    },
-    renderPlayers() {
-        const feed = document.getElementById('player-feed');
-        feed.innerHTML = STATE.game.players.map(p => `
-            <div class="player-card">
-                <div class="p-details">
-                    <img src="${p.ava}" class="p-ava-small">
-                    <span class="p-name">${p.name}</span>
-                </div>
-                <div class="p-bet">${p.bet.toFixed(2)} TON</div>
-            </div>
-        `).join('');
-    }
-};
-
-const CORE = {
-    joinGame() {
-        const input = document.getElementById('bet-input');
-        const amt = parseFloat(input.value);
+// ОСНОВНОЙ КЛАСС УПРАВЛЕНИЯ ЯДРОМ
+const Core = {
+    init() {
+        this.cacheDOM();
+        this.bindEvents();
+        this.startRenderingLoop();
+        this.syncUI();
         
-        if(isNaN(amt) || amt <= 0 || amt > STATE.user.bal) {
-            if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+        console.log("%c [KERNEL]: Initialized Alexander Engine v6.0 ", "color: #2ecc71; font-weight: bold;");
+    },
+
+    cacheDOM() {
+        this.canvas = document.getElementById('gameWheel');
+        this.ctx = this.canvas.getContext('2d');
+        this.ui = {
+            balance: document.getElementById('ui-balance'),
+            jackpot: document.getElementById('ui-jackpot'),
+            level: document.getElementById('ui-level'),
+            name: document.getElementById('ui-name'),
+            rank: document.getElementById('ui-rank'),
+            feed: document.getElementById('player-feed'),
+            chat: document.getElementById('chat-stream'),
+            betField: document.getElementById('bet-field')
+        };
+    },
+
+    bindEvents() {
+        // Секретный вход в админку
+        const trigger = document.getElementById('profile-trigger');
+        let timer;
+        trigger.addEventListener('touchstart', () => {
+            timer = setTimeout(() => Admin.open(), 3000);
+        });
+        trigger.addEventListener('touchend', () => clearTimeout(timer));
+
+        // Обработка клика по кнопке ставки
+        document.getElementById('chat-field').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.sendChatMessage();
+        });
+    },
+
+    // РЕНДЕРИНГ-ЦИКЛ (60 FPS)
+    startRenderingLoop() {
+        const render = () => {
+            this.drawWheel();
+            requestAnimationFrame(render);
+        };
+        render();
+    },
+
+    drawWheel() {
+        const cx = 400, cy = 400;
+        const radius = 370;
+        const sliceAngle = (Math.PI * 2) / STATE.game.sectors;
+
+        this.ctx.clearRect(0, 0, 800, 800);
+        this.ctx.save();
+        this.ctx.translate(cx, cy);
+        this.ctx.rotate(STATE.game.rotation);
+        this.ctx.translate(-cx, -cy);
+
+        for (let i = 0; i < STATE.game.sectors; i++) {
+            const startAngle = i * sliceAngle;
+            
+            // СЕКТОР
+            this.ctx.beginPath();
+            this.ctx.fillStyle = STATE.game.colors[i % STATE.game.colors.length];
+            this.ctx.moveTo(cx, cy);
+            this.ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
+            this.ctx.fill();
+
+            // ГРАНИЦЫ (Тот самый запрос Сани)
+            this.ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+            this.ctx.lineWidth = 5;
+            this.ctx.stroke();
+
+            // АВАТАРКИ НА ГРАНИЦАХ (СЛОЖНЫЙ МОДУЛЬ)
+            if (STATE.game.players[i]) {
+                const player = STATE.game.players[i];
+                const midAngle = startAngle + (sliceAngle / 2);
+                const avaX = cx + (radius - 50) * Math.cos(midAngle);
+                const avaY = cy + (radius - 50) * Math.sin(midAngle);
+                
+                this.ctx.save();
+                this.ctx.beginPath();
+                this.ctx.arc(avaX, avaY, 25, 0, Math.PI * 2);
+                this.ctx.clip();
+                // Тут мы бы рисовали картинку, но для заглушки используем круг с инициалом
+                this.ctx.fillStyle = "#fff";
+                this.ctx.fillRect(avaX-25, avaY-25, 50, 50);
+                this.ctx.fillStyle = "#000";
+                this.ctx.font = "bold 20px Inter";
+                this.ctx.fillText(player.name.charAt(0), avaX-7, avaY+7);
+                this.ctx.restore();
+                
+                // Рамка аватарки
+                this.ctx.strokeStyle = varColor('--color-accent');
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+                this.ctx.arc(avaX, avaY, 25, 0, Math.PI * 2);
+                this.ctx.stroke();
+            }
+        }
+        this.ctx.restore();
+    },
+
+    syncUI() {
+        this.ui.balance.innerText = STATE.user.bal.toFixed(2);
+        this.ui.jackpot.innerText = STATE.game.bank.toFixed(2);
+        this.ui.level.innerText = STATE.user.lvl;
+        this.ui.name.innerText = STATE.user.name.toUpperCase();
+        this.ui.rank.innerText = STATE.user.rank;
+        this.renderPlayerList();
+    },
+
+    handleBet() {
+        if (STATE.game.isSpinning) return;
+        
+        const val = parseFloat(this.ui.betField.value);
+        if (isNaN(val) || val <= 0 || val > STATE.user.bal) {
+            tg.HapticFeedback.notificationOccurred('error');
             return;
         }
 
-        STATE.user.bal -= amt;
-        STATE.game.bank += amt;
+        STATE.user.bal -= val;
+        STATE.game.bank += val;
         
         STATE.game.players.unshift({
             name: STATE.user.name,
-            bet: amt,
-            ava: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alexander"
+            bet: val,
+            id: STATE.user.id
         });
 
-        UI.update();
-        this.addChatMsg(STATE.user.name, `Сделал ставку ${amt} TON!`, false);
-        
-        if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        this.syncUI();
+        this.postSystemMessage(`Вы внесли ${val} TON в банк!`);
+        tg.HapticFeedback.impactOccurred('heavy');
 
-        // Имитация захода живых игроков (PvP режим)
-        setTimeout(() => this.mockPlayerJoin(), 1500);
+        // Имитация активности других игроков
+        setTimeout(() => this.simulateCompetitors(), 1500);
     },
 
-    mockPlayerJoin() {
-        const bots = ["WhaleTON", "Kirov_King", "CryptoDegen", "MilkLover"];
-        const name = bots[Math.floor(Math.random()*bots.length)];
-        const bet = Math.floor(Math.random() * 50) + 10;
+    simulateCompetitors() {
+        const names = ["Degen_Rich", "Vyatka_Warrior", "Crypto_Kirov", "Solana_Fan"];
+        const randomName = names[Math.floor(Math.random() * names.length)];
+        const fakeBet = Math.floor(Math.random() * 40) + 10;
 
-        STATE.game.players.unshift({
-            name: name,
-            bet: bet,
-            ava: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`
+        STATE.game.players.push({
+            name: randomName,
+            bet: fakeBet,
+            id: Math.random()
         });
-        STATE.game.bank += bet;
-        UI.update();
-        this.addChatMsg("System", `${name} ворвался в игру!`, true);
 
-        if(STATE.game.players.length >= 3 && !STATE.game.isSpinning) {
-            setTimeout(() => this.forceStart(), 2000);
+        STATE.game.bank += fakeBet;
+        this.syncUI();
+        this.postSystemMessage(`${randomName} зашел на ${fakeBet} TON!`);
+
+        if (STATE.game.players.length >= 3) {
+            setTimeout(() => this.initiateSpin(), 3000);
         }
     },
 
-    forceStart() {
-        if(STATE.game.isSpinning) return;
+    initiateSpin() {
+        if (STATE.game.isSpinning) return;
         STATE.game.isSpinning = true;
-        
-        const wheel = document.getElementById('rouletteWheel');
-        const deg = 3600 + Math.floor(Math.random() * 360);
-        wheel.style.transform = `rotate(${deg}deg)`;
-        
-        this.addChatMsg("System", "РУЛЕТКА ЗАПУЩЕНА! СТАВКИ ПРИНЯТЫ.", true);
-        
-        setTimeout(() => {
-            this.finishGame();
-        }, 6500);
+
+        const duration = 8000; 
+        const spins = 10 * Math.PI * 2;
+        const extra = Math.random() * Math.PI * 2;
+        const startTime = performance.now();
+
+        this.postSystemMessage("СТАВКИ ЗАКРЫТЫ. ЗАПУСК ЯДРА...");
+
+        const animate = (now) => {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Функция плавности (Ease Out)
+            const easeOut = 1 - Math.pow(1 - progress, 4);
+            STATE.game.rotation = (spins + extra) * easeOut;
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                this.finishSpin();
+            }
+        };
+        requestAnimationFrame(animate);
     },
 
-    finishGame() {
-        const winner = STATE.game.players[Math.floor(Math.random() * STATE.game.players.length)];
-        this.addChatMsg("WINNER", `${winner.name} забирает ${STATE.game.bank.toFixed(2)} TON!`, true);
-        
-        if(winner.name === STATE.user.name) {
-            STATE.user.bal += STATE.game.bank;
-            if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+    finishSpin() {
+        // Определение победителя
+        let winner;
+        if (STATE.game.forceWinner) {
+            winner = STATE.game.players.find(p => p.name === STATE.game.forceWinner) || STATE.game.players[0];
+            STATE.game.forceWinner = null;
+        } else {
+            winner = STATE.game.players[Math.floor(Math.random() * STATE.game.players.length)];
         }
 
-        // Сброс
+        // Эффект победы
+        const winDiv = document.createElement('div');
+        winDiv.className = 'chat-bubble bubble-win';
+        winDiv.innerHTML = `🌟 WINNER: ${winner.name} | PRIZE: ${STATE.game.bank.toFixed(2)} TON`;
+        this.ui.chat.appendChild(winDiv);
+        this.ui.chat.scrollTop = 99999;
+
+        if (winner.name === STATE.user.name) {
+            STATE.user.bal += STATE.game.bank;
+            tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        // Ресет комнаты
         setTimeout(() => {
             STATE.game.bank = 0;
             STATE.game.players = [];
             STATE.game.isSpinning = false;
-            document.getElementById('rouletteWheel').style.transition = 'none';
-            document.getElementById('rouletteWheel').style.transform = 'rotate(0deg)';
-            setTimeout(() => {
-                document.getElementById('rouletteWheel').style.transition = '6s cubic-bezier(0.1, 0, 0.1, 1)';
-            }, 100);
-            UI.update();
-        }, 3000);
+            this.syncUI();
+        }, 5000);
     },
 
-    sendMsg() {
-        const inp = document.getElementById('chat-input');
-        if(!inp.value) return;
-        this.addChatMsg(STATE.user.name, inp.value, false);
-        inp.value = '';
+    renderPlayerList() {
+        this.ui.feed.innerHTML = STATE.game.players.map(p => `
+            <div class="player-entry">
+                <div class="player-main">
+                    <div class="player-mini-ava" style="background:#fff; display:flex; align-items:center; justify-content:center; color:#000; font-weight:900;">${p.name[0]}</div>
+                    <span class="player-name">${p.name}</span>
+                </div>
+                <span class="player-stake">${p.bet.toFixed(1)} TON</span>
+            </div>
+        `).join('');
     },
 
-    addChatMsg(user, text, isSys) {
-        const box = document.getElementById('chat-box');
-        const div = document.createElement('div');
-        div.className = isSys ? 'chat-msg msg-sys' : 'chat-msg';
-        div.innerHTML = isSys ? `[SYSTEM]: ${text}` : `<b>${user}:</b> ${text}`;
-        box.appendChild(div);
-        box.scrollTop = box.scrollHeight;
+    postSystemMessage(text) {
+        const msg = document.createElement('div');
+        msg.className = 'chat-bubble bubble-sys';
+        msg.innerText = `[LOG]: ${text}`;
+        this.ui.chat.appendChild(msg);
+        this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
+    },
+
+    sendChatMessage() {
+        const f = document.getElementById('chat-field');
+        if (!f.value.trim()) return;
+        
+        const msg = document.createElement('div');
+        msg.className = 'chat-bubble';
+        msg.innerHTML = `<b>${STATE.user.name}:</b> ${f.value}`;
+        this.ui.chat.appendChild(msg);
+        f.value = "";
+        this.ui.chat.scrollTop = 99999;
     }
 };
 
-const ADMIN = {
-    init() {
-        // Секретный триггер: долгое нажатие на аватарку
-        const trigger = document.getElementById('admin-trigger');
-        let timer;
-        trigger.addEventListener('touchstart', () => {
-            timer = setTimeout(() => this.show(), 2000);
-        });
-        trigger.addEventListener('touchend', () => clearTimeout(timer));
+// МОДУЛЬ АДМИНИСТРИРОВАНИЯ (ДОХУЯЛИОН ФУНКЦИЙ)
+const Admin = {
+    open() {
+        document.getElementById('admin-matrix').style.display = 'flex';
+        this.log("SYSTEM_OVERRIDE: Session established.");
+        tg.HapticFeedback.notificationOccurred('warning');
     },
-    show() {
-        document.getElementById('admin-screen').style.display = 'flex';
-        this.log("ROOT ACCESS GRANTED. Welcome, Alex.");
+    close() {
+        document.getElementById('admin-matrix').style.display = 'none';
     },
-    hide() { document.getElementById('admin-screen').style.display = 'none'; },
-    log(msg) {
-        const console = document.getElementById('admin-console');
-        console.innerHTML += `<br>> ${msg}`;
-        console.scrollTop = console.scrollHeight;
+    log(txt) {
+        const term = document.getElementById('admin-terminal');
+        term.innerHTML += `<br>> [${new Date().toLocaleTimeString()}] ${txt}`;
+        term.scrollTop = term.scrollHeight;
     },
-    addCash() {
-        STATE.user.bal += 5000;
-        UI.update();
-        this.log("Injected 5000.00 TON to local balance.");
+    addFunds() {
+        STATE.user.bal += 50000;
+        Core.syncUI();
+        this.log("RESOURCE_INJECTION: 50,000 Credits added.");
     },
-    clearChat() {
-        document.getElementById('chat-box').innerHTML = '<div class="chat-msg msg-sys">System: Chat cleared by Administrator.</div>';
-        this.log("Global chat history purged.");
+    purgeChat() {
+        document.getElementById('chat-stream').innerHTML = '<div class="chat-bubble bubble-sys">System: Logs purged.</div>';
+        this.log("MEM_PURGE: Chat history deleted.");
+    },
+    spawnBot() {
+        Core.simulateCompetitors();
+        this.log("ENTITY_SPAWN: Fake competitor injected.");
+    },
+    lockWinner() {
+        const target = document.getElementById('adm-force-winner').value;
+        STATE.game.forceWinner = target;
+        this.log(`RNG_MOD: Target winner set to [${target}]`);
+    },
+    broadcast() {
+        const txt = document.getElementById('adm-broadcast').value;
+        Core.postSystemMessage(`[BROADCAST]: ${txt.toUpperCase()}`);
+        this.log("NET_SEND: Global announcement executed.");
+    },
+    patchProfile() {
+        const l = document.getElementById('adm-lvl').value;
+        const r = document.getElementById('adm-rank').value;
+        if(l) STATE.user.lvl = l;
+        if(r) STATE.user.rank = r;
+        Core.syncUI();
+        this.log("PATCH_APPLIED: Neural link updated.");
     }
 };
 
-// ОТРИСОВКА РУЛЕТКИ (КАНВАС)
-function drawWheel() {
-    const canvas = document.getElementById('rouletteWheel');
-    const ctx = canvas.getContext('2d');
-    const sectors = 12;
-    const angle = (Math.PI * 2) / sectors;
-
-    for (let i = 0; i < sectors; i++) {
-        ctx.beginPath();
-        ctx.fillStyle = STATE.game.colors[i % STATE.game.colors.length];
-        ctx.moveTo(300, 300);
-        ctx.arc(300, 300, 280, i * angle, (i + 1) * angle);
-        ctx.fill();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-        ctx.stroke();
-    }
+// Хелпер для получения цветов из CSS переменных
+function varColor(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-// ЗАПУСК
-window.onload = () => {
-    drawWheel();
-    UI.update();
-    ADMIN.init();
-    
-    // Приветствие в консоль (Lead Dev style)
-    console.log("%c ROLLS MASTER ELITE ", "background: #2481cc; color: white; font-weight: 900; font-size: 20px;");
-    console.log("Welcome back, Alexander. Region 43 News Admin detected.");
-};
+// ИНИЦИАЛИЗАЦИЯ
+window.onload = () => Core.init();
 
 </script>
-</body>
-</html>
