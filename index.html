@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Rolls PvP Ultra Deluxe</title>
+    <title>Rolls Master PvP</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 
     <style>
         :root {
-            --bg: #080a12;
-            --panel: #121625;
+            --bg: #070911;
+            --panel: #141828;
             --accent: #2481cc;
             --gold: #ffcc00;
             --red: #ff4757;
@@ -21,10 +21,10 @@
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100vh; background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; overflow: hidden; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100vh; background: var(--bg); color: var(--text); overflow: hidden; }
 
-        .app-wrapper { display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; }
+        .app-wrapper { display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; position: relative; }
 
         /* HEADER */
         header {
@@ -32,66 +32,54 @@
             background: var(--panel); border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 100;
         }
         .u-info { display: flex; align-items: center; gap: 10px; }
-        .u-avatar { width: 40px; height: 40px; border-radius: 12px; border: 2px solid var(--accent); object-fit: cover; }
-        .bal-box { background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 15px; border: 1px solid var(--accent); }
-
-        /* NAVIGATION */
-        nav {
-            position: fixed; bottom: 0; width: 100%; max-width: 500px;
-            background: rgba(18, 22, 37, 0.98); backdrop-filter: blur(20px);
-            display: flex; justify-content: space-around; padding: 10px 0 calc(15px + var(--safe-bottom));
-            border-top: 1px solid rgba(255,255,255,0.05); z-index: 100;
-        }
-        .nav-link { color: var(--sub); text-decoration: none; font-size: 11px; text-align: center; transition: 0.3s; }
-        .nav-link.active { color: var(--accent); transform: translateY(-3px); }
-        .nav-link i { display: block; font-size: 22px; margin-bottom: 4px; font-style: normal; }
+        .u-avatar { width: 42px; height: 42px; border-radius: 14px; border: 2px solid var(--accent); object-fit: cover; }
+        .bal-display { background: rgba(36, 129, 204, 0.1); padding: 8px 15px; border-radius: 12px; border: 1px solid var(--accent); }
 
         /* SCREENS */
-        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 120px; }
-        .screen { display: none; width: 100%; }
-        .screen.active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+        .screen { display: none; }
+        .screen.active { display: block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: scale(0.98); } }
 
-        /* ROOMS SELECTOR */
-        .rooms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .room-card { 
-            background: var(--panel); padding: 15px; border-radius: 18px; text-align: center;
-            border: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
+        /* ROOM CARDS */
+        .room-item {
+            background: var(--panel); padding: 18px; border-radius: 20px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05);
         }
-        .room-card.active { border-color: var(--accent); background: rgba(36, 129, 204, 0.1); }
-        .room-card h4 { margin: 0 0 5px 0; font-size: 14px; }
-        .room-card span { font-size: 10px; color: var(--sub); }
+        .room-meta { line-height: 1.4; }
+        .badge-lock { font-size: 10px; background: var(--red); padding: 2px 6px; border-radius: 4px; }
 
-        /* GAME ELEMENTS */
-        .wheel-container { position: relative; width: 280px; height: 280px; margin: 0 auto 30px; }
-        canvas#wheel { width: 100%; height: 100%; border-radius: 50%; transition: transform 7s cubic-bezier(0.1, 0, 0, 1); }
-        .wheel-center { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 70px; height: 70px; background: var(--bg); border-radius: 50%;
-            border: 4px solid var(--panel); display: flex; align-items: center; justify-content: center;
-            font-size: 14px; font-weight: 900; color: var(--gold);
+        /* CREATION FORM */
+        .create-form { background: var(--panel); padding: 20px; border-radius: 25px; border: 1px solid var(--accent); }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; color: var(--sub); margin-bottom: 5px; }
+        .input-fld { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 14px; border-radius: 12px; font-size: 16px; }
+
+        /* GAME AREA */
+        .game-header { text-align: center; margin-bottom: 20px; }
+        .wheel-box { position: relative; width: 280px; height: 280px; margin: 0 auto 20px; }
+        canvas#mainWheel { width: 100%; height: 100%; border-radius: 50%; transition: transform 6s cubic-bezier(0.1, 0, 0, 1); }
+        .pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 24px; z-index: 10; }
+
+        .players-container { background: var(--panel); border-radius: 20px; padding: 15px; }
+        .player-row { display: flex; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 14px; margin-bottom: 8px; }
+
+        /* NAV */
+        nav {
+            position: fixed; bottom: 0; width: 100%; max-width: 500px;
+            background: rgba(20, 24, 40, 0.95); backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; padding: 12px 0 calc(15px + var(--safe-bottom));
+            border-top: 1px solid rgba(255,255,255,0.05); z-index: 100;
         }
+        .nav-btn { color: var(--sub); text-decoration: none; font-size: 11px; text-align: center; }
+        .nav-btn.active { color: var(--accent); }
+        .nav-btn i { display: block; font-size: 20px; font-style: normal; margin-bottom: 4px; }
 
-        .players-list { background: var(--panel); border-radius: 20px; padding: 15px; }
-        .p-row { display: flex; align-items: center; padding: 10px; margin-bottom: 8px; background: rgba(255,255,255,0.02); border-radius: 12px; }
-        .p-chance { background: var(--accent); font-size: 10px; padding: 3px 7px; border-radius: 6px; margin-left: auto; }
+        .btn-action { background: var(--accent); border: none; color: white; padding: 16px; border-radius: 15px; width: 100%; font-weight: 800; font-size: 16px; margin-top: 10px; }
+        .btn-action:active { transform: scale(0.98); }
 
-        /* BUTTONS & INPUTS */
-        .btn-main { 
-            background: var(--accent); color: white; border: none; padding: 18px; 
-            border-radius: 16px; width: 100%; font-weight: 800; font-size: 16px; margin-top: 15px;
-            box-shadow: 0 5px 15px rgba(36, 129, 204, 0.3);
-        }
-        .input-main {
-            width: 100%; background: #000; border: 1px solid #333; color: white;
-            padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; font-size: 18px;
-        }
-
-        /* PROMO SECTION */
-        .promo-box { background: var(--panel); padding: 20px; border-radius: 20px; margin-top: 20px; border: 1px dashed var(--accent); }
-
-        /* MODALS */
-        .full-modal { position: fixed; inset: 0; background: var(--bg); z-index: 2000; padding: 25px; display: none; overflow-y: auto; }
+        /* MODAL */
+        .modal { position: fixed; inset: 0; background: var(--bg); z-index: 2000; padding: 25px; display: none; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -99,368 +87,369 @@
     <div class="app-wrapper">
         <header>
             <div class="u-info">
-                <img id="u-img" class="u-avatar" src="">
+                <img id="my-avatar" class="u-avatar" src="">
                 <div>
-                    <div id="u-name" style="font-weight: 800; font-size: 15px;">@Guest</div>
-                    <div id="u-tag" style="font-size: 9px; color: var(--accent); letter-spacing: 1px;">PLAYER</div>
+                    <div id="my-name" style="font-weight: 800; font-size: 15px;">@User</div>
+                    <div id="my-rank" style="font-size: 9px; color: var(--accent);">USER</div>
                 </div>
             </div>
-            <div class="bal-box">
-                <span id="u-bal" style="font-weight: 900; color: var(--gold);">0.00</span> 
-                <span style="font-size: 10px; color: var(--accent);">TON</span>
+            <div class="bal-display">
+                <span id="my-bal" style="font-weight: 900; color: var(--gold);">0.00</span> TON
             </div>
         </header>
 
         <main>
-            <div id="scr-rolls" class="screen active">
-                <div class="rooms-grid">
-                    <div class="room-card active" onclick="selectRoom(0, this)">
-                        <h4>ОБЩИЙ ЗАЛ</h4>
-                        <span>От 0.1 TON</span>
+            <div id="scr-lobby" class="screen active">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0;">Комнаты</h2>
+                    <button class="btn-action" style="width: auto; padding: 8px 15px; font-size: 12px; margin: 0;" onclick="nav('create')">+ Создать</button>
+                </div>
+                
+                <div class="room-item" style="border-left: 4px solid var(--gold);" onclick="joinRoom(0)">
+                    <div class="room-meta">
+                        <div style="font-weight: 800;">ОСНОВНОЙ ЗАЛ</div>
+                        <div style="font-size: 11px; color: var(--sub);">Публичная • Без лимита игроков</div>
                     </div>
-                    <div class="room-card" onclick="selectRoom(1, this)">
-                        <h4>VIP ПЛЮС</h4>
-                        <span>От 10 TON</span>
+                    <div style="color: var(--accent); font-weight: 900;">ИГРАТЬ</div>
+                </div>
+
+                <div id="rooms-list">
                     </div>
+            </div>
+
+            <div id="scr-create" class="screen">
+                <h2 style="margin-bottom: 25px;">Новая комната</h2>
+                <div class="create-form">
+                    <div class="input-group">
+                        <label>Макс. игроков</label>
+                        <select id="c-players" class="input-fld">
+                            <option value="1">1 Игрок (Соло/Тренировка)</option>
+                            <option value="2">2 Игрока (PvP Дуэль)</option>
+                            <option value="3">3 Игрока</option>
+                            <option value="4" selected>4 Игрока (Максимум)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Пароль (пусто — без пароля)</label>
+                        <input type="password" id="c-pass" class="input-fld" placeholder="****">
+                    </div>
+                    <div class="input-group">
+                        <label>Ставка входа (TON)</label>
+                        <input type="number" id="c-bet" class="input-fld" value="1.0" min="0.1" step="0.1">
+                    </div>
+                    <button class="btn-action" onclick="processCreateRoom()">СОЗДАТЬ ЛОББИ</button>
+                    <button class="btn-action" style="background: transparent;" onclick="nav('lobby')">ОТМЕНА</button>
+                </div>
+            </div>
+
+            <div id="scr-game" class="screen">
+                <div class="game-header">
+                    <button onclick="leaveRoom()" style="float: left; background: none; border: none; color: var(--accent); font-size: 20px;">←</button>
+                    <div id="game-title" style="font-weight: 800;">КОМНАТА #1</div>
+                    <div id="game-status" style="color: var(--gold); font-size: 11px; margin-top: 5px;">ЖДЕМ ИГРОКОВ...</div>
                 </div>
 
-                <div class="wheel-container">
-                    <div style="position:absolute; top:-15px; left:50%; transform:translateX(-50%); z-index:10; font-size:25px;">▼</div>
-                    <canvas id="wheel" width="600" height="600"></canvas>
-                    <div class="wheel-center" id="wheel-bank">0.0</div>
+                <div class="wheel-box">
+                    <div class="pointer">▼</div>
+                    <canvas id="mainWheel" width="600" height="600"></canvas>
                 </div>
 
-                <div id="game-status" style="text-align: center; font-weight: 800; color: var(--accent); margin-bottom: 15px; font-size: 13px;">
-                    ОЖИДАНИЕ ИГРОКОВ...
-                </div>
+                <div class="players-container" id="game-players">
+                    </div>
 
-                <div class="players-list" id="p-list">
-                    <div style="text-align:center; color:var(--sub); font-size:12px;">Тут пока пусто...</div>
-                </div>
-
-                <div style="margin-top: 20px;">
-                    <input type="number" id="bet-input" class="input-main" value="1.0" step="0.1">
-                    <button class="btn-main" onclick="makeBet()">ПОСТАВИТЬ В КУШ</button>
+                <div id="bet-area" style="margin-top: 20px; display: flex; gap: 10px;">
+                    <input type="number" id="play-bet" class="input-fld" style="flex: 1; text-align: center;" value="1.0">
+                    <button class="btn-action" style="flex: 2; margin-top: 0;" onclick="placeBet()">СТАВКА</button>
                 </div>
             </div>
 
             <div id="scr-profile" class="screen">
-                <div style="text-align: center;">
-                    <div style="position: relative; display: inline-block; margin-top: 20px;">
-                        <img id="p-img" class="u-avatar" style="width: 100px; height: 100px; border-radius: 30px;">
-                        <div id="v-mark" style="position: absolute; bottom: -5px; right: -5px; background: var(--accent); border-radius: 50%; width: 30px; height: 30px; display: none; border: 4px solid var(--bg); align-items: center; justify-content: center;">✓</div>
-                    </div>
-                    <h2 id="p-name" style="margin: 15px 0 5px;">@User</h2>
-                    <p id="p-status-text" style="color: var(--sub); font-size: 12px; margin-bottom: 25px;">Статус: Активен</p>
-
-                    <div id="ton-connect-btn" style="margin-bottom: 15px;"></div>
-
-                    <div class="promo-box">
-                        <h4 style="margin: 0 0 10px 0; color: var(--accent);">ПРОМОКОДЫ</h4>
-                        <input type="text" id="promo-input" class="input-main" style="font-size: 14px; padding: 12px;" placeholder="Введите код...">
-                        <button class="btn-main" style="padding: 12px; font-size: 14px;" onclick="claimPromo()">АКТИВИРОВАТЬ</button>
-                    </div>
-
-                    <button class="btn-main" style="background: #222;" onclick="openSupport()">ТЕХ. ПОДДЕРЖКА</button>
-                    <button id="adm-gate" class="btn-main" style="background: var(--gold); color: #000; display: none;" onclick="openAdmin()">АДМИН-ПАНЕЛЬ</button>
-                </div>
-            </div>
-
-            <div id="scr-support" class="screen">
-                <div style="display: flex; align-items: center; margin-bottom: 20px;">
-                    <button onclick="nav('profile')" style="background:none; border:none; color:var(--accent); font-size: 20px;">←</button>
-                    <h3 style="margin: 0 0 0 15px;">Поддержка</h3>
-                </div>
-                <div id="chat-area" style="height: 350px; overflow-y: auto; background: var(--panel); border-radius: 20px; padding: 15px; display: flex; flex-direction: column; gap: 10px;">
-                    <div style="background: #333; padding: 10px; border-radius: 12px; font-size: 13px; max-width: 85%;">
-                        Здравствуйте! Какой у вас вопрос?
-                    </div>
-                </div>
-                <div style="margin-top: 15px; display: flex; gap: 10px;">
-                    <input type="text" id="chat-input" class="input-main" style="text-align: left; font-size: 14px; flex: 1;">
-                    <button class="btn-main" style="margin: 0; width: 60px;" onclick="sendSupport()">🕊</button>
+                <div style="text-align: center; padding: 20px 0;">
+                    <img id="prof-img" class="u-avatar" style="width: 100px; height: 100px; border-radius: 30px; margin-bottom: 15px;">
+                    <h2 id="prof-name">@User</h2>
+                    <div id="ton-connect-button" style="margin-bottom: 20px;"></div>
+                    <button class="btn-action" style="background: #222;" onclick="tg.showAlert('Версия 2.0.1. Владелец: @Kegovich')">О ПРИЛОЖЕНИИ</button>
+                    <button id="adm-btn" class="btn-action" style="background: var(--gold); color: #000; display: none;" onclick="openAdmin()">АДМИН ПАНЕЛЬ</button>
                 </div>
             </div>
         </main>
 
         <nav>
-            <a href="#" class="nav-link active" onclick="nav('rolls')"><i>🎲</i>ROLLS</a>
-            <a href="#" class="nav-link" onclick="nav('profile')"><i>👤</i>PROFILE</a>
+            <a href="#" class="nav-btn active" onclick="nav('lobby')"><i>🏠</i>Лобби</a>
+            <a href="#" class="nav-btn" onclick="nav('profile')"><i>👤</i>Профиль</a>
         </nav>
     </div>
 
-    <div id="modal-admin" class="full-modal">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <h2 style="color: var(--gold);">MASTER PANEL</h2>
-            <button onclick="this.parentElement.parentElement.style.display='none'" style="background:none; border:none; color:#fff; font-size: 30px;">✕</button>
+    <div id="modal-admin" class="modal">
+        <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:30px;">
+            <h2 style="color:var(--gold); margin:0;">ADMIN CONTROL</h2>
+            <button onclick="this.parentElement.parentElement.style.display='none'" style="background:none; border:none; color:white; font-size:30px;">✕</button>
+        </div>
+        
+        <div style="background:var(--panel); padding:20px; border-radius:20px; margin-bottom:15px;">
+            <h4 style="margin-top:0;">Экстренные функции</h4>
+            <button class="btn-action" style="background:var(--red);" onclick="adminAction('reload')">ОБНОВИТЬ СЕРВЕР (ВОЗВРАТ TON)</button>
         </div>
 
-        <div style="background: var(--panel); padding: 20px; border-radius: 20px; margin-bottom: 20px;">
-            <h3>Управление</h3>
-            <input type="text" id="adm-user" class="input-main" style="font-size: 14px; text-align: left; margin-bottom: 10px;" placeholder="@username">
-            <input type="number" id="adm-sum" class="input-main" style="font-size: 14px; text-align: left; margin-bottom: 15px;" placeholder="Кол-во TON">
-            <button class="btn-main" onclick="adminAction('gift')">НАЧИСЛИТЬ TON</button>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-main" style="background: var(--green); font-size: 12px;" onclick="adminAction('v')">VERIFY</button>
-                <button class="btn-main" style="background: var(--red); font-size: 12px;" onclick="adminAction('reset')">СБРОС ИГРЫ</button>
-            </div>
-        </div>
-
-        <div style="background: var(--panel); padding: 20px; border-radius: 20px;">
-            <h3>Промокоды</h3>
-            <input type="text" id="adm-promo" class="input-main" style="font-size: 14px;" placeholder="Код (напр. GIFT50)">
-            <button class="btn-main" style="background: var(--gold); color:#000;" onclick="adminAction('promo')">СОЗДАТЬ ПРОМО</button>
+        <div style="background:var(--panel); padding:20px; border-radius:20px;">
+            <h4>Юзеры</h4>
+            <input type="text" id="adm-target" class="input-fld" placeholder="@username" style="margin-bottom:10px;">
+            <input type="number" id="adm-amt" class="input-fld" placeholder="Сумма TON">
+            <button class="btn-action" onclick="adminAction('give')">НАЧИСЛИТЬ БАЛАНС</button>
         </div>
     </div>
 
     <script>
-        // --- GLOBAL STATE ---
         const tg = window.Telegram.WebApp;
         const tonConnect = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://raw.githubusercontent.com/ton-connect/demo-dapp-with-react-ui/master/public/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect-btn'
+            buttonRootId: 'ton-connect-button'
         });
 
-        let appUser = {
-            name: "Guest",
-            bal: 10.0, // Для теста даем 10
-            role: "player",
-            isVerified: false,
-            avatar: ""
-        };
-
-        let currentRoom = 0; // 0 - Общий, 1 - VIP
-        let roomPlayers = [];
+        // СОСТОЯНИЕ
+        let user = { name: "Guest", bal: 50.0, role: "user", avatar: "" };
+        let rooms = [];
+        let currentRoomId = null;
+        let gamePlayers = [];
         let isSpinning = false;
-        let activePromos = {"KEGOVICH": 50, "START": 5};
+        let timerIv = null;
 
-        // --- INIT ---
         function init() {
             tg.ready();
             tg.expand();
+            const tgData = tg.initDataUnsafe?.user;
 
-            const data = tg.initDataUnsafe?.user;
+            user.name = tgData?.username || "Kegovich";
+            user.avatar = tgData?.photo_url || `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
             
-            // Загрузка профиля
-            appUser.name = data?.username || "Kegovich";
-            appUser.avatar = data?.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${appUser.name}`;
-            
-            document.getElementById('u-name').innerText = "@" + appUser.name;
-            document.getElementById('p-name').innerText = "@" + appUser.name;
-            document.getElementById('u-img').src = appUser.avatar;
-            document.getElementById('p-img').src = appUser.avatar;
+            document.getElementById('my-name').innerText = "@" + user.name;
+            document.getElementById('prof-name').innerText = "@" + user.name;
+            document.getElementById('my-avatar').src = user.avatar;
+            document.getElementById('prof-img').src = user.avatar;
 
-            // Настройки владельца
-            if (appUser.name === "Kegovich") {
-                appUser.role = "owner";
-                appUser.isVerified = true;
-                document.getElementById('adm-gate').style.display = 'block';
-                document.getElementById('u-tag').innerText = "ГЛАВНЫЙ РАЗРАБОТЧИК";
-                document.getElementById('v-mark').style.display = 'flex';
-                document.getElementById('p-status-text').innerText = "Статус: Владелец проекта";
+            if (user.name === "Kegovich") {
+                user.role = "owner";
+                document.getElementById('adm-btn').style.display = 'block';
+                document.getElementById('my-rank').innerText = "OWNER / DEVELOPER";
             }
 
             updateUI();
+            renderRooms();
             drawWheel();
         }
 
-        // --- NAVIGATION ---
+        // NAVIGATION
         function nav(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('scr-' + id).classList.add('active');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            if(event) event.currentTarget.classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            if(id === 'lobby' || id === 'profile') {
+                const btnIdx = id === 'lobby' ? 0 : 1;
+                document.querySelectorAll('.nav-btn')[btnIdx].classList.add('active');
+            }
         }
 
-        // --- GAME LOGIC ---
-        function selectRoom(id, el) {
-            if(isSpinning) return;
-            currentRoom = id;
-            document.querySelectorAll('.room-card').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            roomPlayers = []; // Смена комнаты очищает локальный список
-            updateRoomUI();
+        // ROOM LOGIC
+        function renderRooms() {
+            const list = document.getElementById('rooms-list');
+            list.innerHTML = rooms.map(r => `
+                <div class="room-item" onclick="joinRoom(${r.id})">
+                    <div class="room-meta">
+                        <div style="font-weight:800;">ЛОББИ #${r.id} ${r.pass ? '<span class="badge-lock">ЗАМОК</span>' : ''}</div>
+                        <div style="font-size:11px; color:var(--sub);">Игроков: ${r.players.length}/${r.max} • Вход: ${r.minBet} TON</div>
+                    </div>
+                    <div style="color:var(--accent); font-weight:900;">ЗАЙТИ</div>
+                </div>
+            `).join('');
         }
 
-        function makeBet() {
-            const val = parseFloat(document.getElementById('bet-input').value);
-            
-            // Проверки
-            if(isSpinning) return tg.showAlert("Раунд уже идет!");
-            if(appUser.bal < val) return tg.showAlert("Недостаточно TON!");
-            if(currentRoom === 1 && val < 10) return tg.showAlert("Минимум в VIP - 10 TON");
+        function processCreateRoom() {
+            const max = parseInt(document.getElementById('c-players').value);
+            const pass = document.getElementById('c-pass').value;
+            const bet = parseFloat(document.getElementById('c-bet').value);
 
-            tg.HapticFeedback.impactOccurred('heavy');
-            appUser.bal -= val;
+            if(bet < 0.1) return tg.showAlert("Минимальная ставка 0.1 TON!");
+
+            const newRoom = {
+                id: rooms.length + 1,
+                max: max,
+                pass: pass,
+                minBet: bet,
+                players: [],
+                status: "waiting"
+            };
+
+            rooms.push(newRoom);
+            renderRooms();
+            nav('lobby');
+            tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        function joinRoom(id) {
+            const room = id === 0 ? {id: 0, max: 99, minBet: 0.1, players: []} : rooms.find(r => r.id === id);
             
-            roomPlayers.push({
-                name: "@" + appUser.name,
-                bet: val,
+            if(room.pass) {
+                const input = prompt("Введите пароль от комнаты:");
+                if(input !== room.pass) return tg.showAlert("Неверный пароль!");
+            }
+
+            currentRoomId = id;
+            document.getElementById('game-title').innerText = id === 0 ? "ОСНОВНОЙ ЗАЛ" : `КОМНАТА #${id}`;
+            document.getElementById('play-bet').value = room.minBet;
+            
+            // Если входим в созданную комнату - подтягиваем существующих игроков
+            gamePlayers = (id === 0) ? [] : rooms.find(r => r.id === id).players;
+            
+            nav('game');
+            updateGameUI();
+        }
+
+        function leaveRoom() {
+            currentRoomId = null;
+            gamePlayers = [];
+            clearInterval(timerIv);
+            document.getElementById('game-status').innerText = "ЖДЕМ ИГРОКОВ...";
+            nav('lobby');
+        }
+
+        // GAMEPLAY
+        function placeBet() {
+            const betVal = parseFloat(document.getElementById('play-bet').value);
+            const room = currentRoomId === 0 ? {minBet: 0.1, max: 99} : rooms.find(r => r.id === currentRoomId);
+
+            // БАГ-ФИКСЫ
+            if(isNaN(betVal) || betVal <= 0) return tg.showAlert("Ставка должна быть больше нуля!");
+            if(betVal < room.minBet) return tg.showAlert(`Минимум для этой комнаты: ${room.minBet} TON`);
+            if(user.bal < betVal) return tg.showAlert("Недостаточно баланса!");
+            if(gamePlayers.some(p => p.name.includes(user.name))) return tg.showAlert("Вы уже в игре!");
+            if(gamePlayers.length >= room.max) return tg.showAlert("Комната переполнена!");
+
+            user.bal -= betVal;
+            gamePlayers.push({
+                name: "@" + user.name,
+                bet: betVal,
                 color: '#2481cc',
-                avatar: appUser.avatar
+                avatar: user.avatar
             });
 
+            tg.HapticFeedback.impactOccurred('medium');
             updateUI();
-            updateRoomUI();
+            updateGameUI();
 
-            if(roomPlayers.length === 2) startCountdown();
+            // ТАЙМЕР ПРИ ЗАПОЛНЕНИИ
+            if(gamePlayers.length === room.max || (currentRoomId === 0 && gamePlayers.length === 2)) {
+                startCountdown();
+            }
         }
 
         function startCountdown() {
-            let time = 10;
-            const timer = setInterval(() => {
-                time--;
-                document.getElementById('game-status').innerText = `СТАРТ ЧЕРЕЗ ${time} СЕК...`;
-                if(time <= 0) {
-                    clearInterval(timer);
-                    runSpin();
+            let sec = 10;
+            document.getElementById('game-status').style.color = var(--green);
+            timerIv = setInterval(() => {
+                document.getElementById('game-status').innerText = `СТАРТ ЧЕРЕЗ ${sec} СЕК...`;
+                if(sec <= 0) {
+                    clearInterval(timerIv);
+                    executeSpin();
                 }
+                sec--;
             }, 1000);
         }
 
-        function runSpin() {
+        function executeSpin() {
             isSpinning = true;
-            const rotate = Math.floor(Math.random() * 360) + 4000;
-            document.getElementById('wheel').style.transform = `rotate(${rotate}deg)`;
+            const rot = Math.floor(Math.random() * 360) + 3600;
+            document.getElementById('mainWheel').style.transform = `rotate(${rot}deg)`;
 
             setTimeout(() => {
-                const winner = roomPlayers[Math.floor(Math.random() * roomPlayers.length)];
-                const total = roomPlayers.reduce((s, p) => s + p.bet, 0);
+                const total = gamePlayers.reduce((s, p) => s + p.bet, 0);
+                const winner = gamePlayers[Math.floor(Math.random() * gamePlayers.length)];
                 
-                tg.showPopup({
-                    title: 'РАУНД ЗАВЕРШЕН',
-                    message: `Победитель: ${winner.name}\nВыигрыш: ${total} TON`,
-                    buttons: [{type: 'ok'}]
-                });
+                tg.showAlert(`РАУНД ОКОНЧЕН!\n\nПобедил: ${winner.name}\nВыигрыш: ${total.toFixed(2)} TON`);
+                
+                if(winner.name.includes(user.name)) {
+                    user.bal += total;
+                }
+                
+                // Очистка комнаты в списке если она не основная
+                if(currentRoomId !== 0) {
+                    rooms = rooms.filter(r => r.id !== currentRoomId);
+                }
 
-                if(winner.name.includes(appUser.name)) appUser.bal += total;
-                
                 resetGame();
-            }, 7500);
+            }, 6500);
         }
 
         function resetGame() {
-            roomPlayers = [];
             isSpinning = false;
-            document.getElementById('wheel').style.transform = 'rotate(0deg)';
-            document.getElementById('game-status').innerText = "ОЖИДАНИЕ ИГРОКОВ...";
-            updateRoomUI();
+            gamePlayers = [];
+            document.getElementById('mainWheel').style.transform = "rotate(0deg)";
+            document.getElementById('game-status').innerText = "ЖДЕМ ИГРОКОВ...";
+            document.getElementById('game-status').style.color = "var(--gold)";
+            if(currentRoomId === null) renderRooms();
+            else updateGameUI();
             updateUI();
         }
 
-        // --- DRAWING ---
-        const canvas = document.getElementById('wheel');
+        // CANVAS
+        const canvas = document.getElementById('mainWheel');
         const ctx = canvas.getContext('2d');
 
         function drawWheel() {
             ctx.clearRect(0,0,600,600);
-            const total = roomPlayers.reduce((s,p) => s+p.bet, 0);
-
-            if(roomPlayers.length === 0) {
-                ctx.beginPath(); ctx.fillStyle = "#161a26";
+            const total = gamePlayers.reduce((s,p) => s+p.bet, 0);
+            if(gamePlayers.length === 0) {
+                ctx.beginPath(); ctx.fillStyle = "#1c2130";
                 ctx.arc(300,300,280,0,7); ctx.fill();
                 return;
             }
-
             let start = 0;
-            roomPlayers.forEach(p => {
+            gamePlayers.forEach(p => {
                 const slice = (p.bet/total)*2*Math.PI;
                 ctx.beginPath(); ctx.fillStyle = p.color;
                 ctx.moveTo(300,300);
-                ctx.arc(300,300,280, start, start+slice);
+                ctx.arc(300,300,280,start,start+slice);
                 ctx.fill();
                 start += slice;
             });
         }
 
-        // --- UI UPDATES ---
-        function updateUI() {
-            document.getElementById('u-bal').innerText = appUser.bal.toFixed(2);
-        }
-
-        function updateRoomUI() {
+        function updateGameUI() {
             drawWheel();
-            const total = roomPlayers.reduce((s,p) => s+p.bet, 0);
-            document.getElementById('wheel-bank').innerText = total.toFixed(1);
-
-            const list = document.getElementById('p-list');
-            if(roomPlayers.length === 0) {
-                list.innerHTML = `<div style="text-align:center; color:var(--sub); font-size:12px;">Тут пока пусто...</div>`;
-                return;
-            }
-
-            list.innerHTML = roomPlayers.map(p => `
-                <div class="p-row">
-                    <img src="${p.avatar}" style="width:25px; height:25px; border-radius:6px; margin-right:10px;">
-                    <span style="font-size:13px; font-weight:bold;">${p.name}</span>
-                    <div class="p-chance">${((p.bet/total)*100).toFixed(0)}%</div>
-                    <span style="margin-left:15px; font-weight:900;">${p.bet} TON</span>
+            const total = gamePlayers.reduce((s,p) => s+p.bet, 0);
+            const list = document.getElementById('game-players');
+            list.innerHTML = gamePlayers.map(p => `
+                <div class="player-row">
+                    <img src="${p.avatar}" style="width:25px; height:25px; border-radius:50%; margin-right:10px;">
+                    <div style="flex:1; font-weight:bold; font-size:13px;">${p.name}</div>
+                    <div style="font-weight:900; color:var(--gold);">${p.bet} TON</div>
                 </div>
             `).join('');
         }
 
-        // --- PROMO & SUPPORT ---
-        function claimPromo() {
-            const code = document.getElementById('promo-input').value.toUpperCase();
-            if(activePromos[code]) {
-                const prize = activePromos[code];
-                appUser.bal += prize;
-                delete activePromos[code]; // Одноразовый
-                updateUI();
-                tg.showAlert(`Промокод активирован! Получено ${prize} TON`);
-            } else {
-                tg.showAlert("Неверный или использованный код");
-            }
+        function updateUI() {
+            document.getElementById('my-bal').innerText = user.bal.toFixed(2);
         }
 
-        function sendSupport() {
-            const val = document.getElementById('chat-input').value;
-            if(!val) return;
-            const area = document.getElementById('chat-area');
-            area.innerHTML += `<div style="align-self: flex-end; background: var(--accent); padding: 10px; border-radius: 12px; font-size: 13px; max-width: 85%;">${val}</div>`;
-            document.getElementById('chat-input').value = "";
-            setTimeout(() => {
-                area.innerHTML += `<div style="background: #333; padding: 10px; border-radius: 12px; font-size: 13px; max-width: 85%;">Сообщение получено. Администратор @Kegovich скоро ответит.</div>`;
-                area.scrollTop = area.scrollHeight;
-            }, 1000);
-        }
-
-        // --- ADMIN OPS ---
+        // ADMIN
         function openAdmin() { document.getElementById('modal-admin').style.display = 'block'; }
         function adminAction(type) {
-            const userRef = document.getElementById('adm-user').value;
-            const sum = parseFloat(document.getElementById('adm-sum').value);
-
-            if(type === 'gift') {
-                if(userRef.includes(appUser.name)) {
-                    appUser.bal += sum; updateUI(); tg.showConfirm("TON начислены!");
-                }
-            }
-            if(type === 'v') {
-                if(userRef.includes(appUser.name)) {
-                    document.getElementById('v-mark').style.display = 'flex';
-                }
-            }
-            if(type === 'promo') {
-                const code = document.getElementById('adm-promo').value.toUpperCase();
-                activePromos[code] = 10; // По дефолту 10 TON
-                tg.showAlert("Промокод " + code + " создан!");
-            }
-            if(type === 'reset') resetGame();
-        }
-
-        // БОТЫ (Имитация жизни)
-        setInterval(() => {
-            if(roomPlayers.length > 0 && roomPlayers.length < 3 && !isSpinning && Math.random() > 0.6) {
-                roomPlayers.push({
-                    name: "@Bot_" + Math.floor(Math.random()*100),
-                    bet: currentRoom === 0 ? Math.floor(Math.random()*3)+1 : Math.floor(Math.random()*20)+10,
-                    color: '#ff4757',
-                    avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${Math.random()}`
+            if(type === 'reload') {
+                // ВОЗВРАТ TON ПРИ ОБНОВЛЕНИИ
+                gamePlayers.forEach(p => {
+                    if(p.name.includes(user.name)) user.bal += p.bet;
                 });
-                updateRoomUI();
+                rooms = [];
+                leaveRoom();
+                tg.showAlert("Сервер обновлен. Все ставки возвращены на баланс.");
             }
-        }, 12000);
+            if(type === 'give') {
+                const target = document.getElementById('adm-target').value;
+                const amt = parseFloat(document.getElementById('adm-amt').value);
+                if(target.includes(user.name)) {
+                    user.bal += amt; updateUI(); tg.showConfirm("Начислено!");
+                }
+            }
+        }
 
         init();
     </script>
