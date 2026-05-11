@@ -51,7 +51,7 @@
 
         /* КОЛЕСО */
         .wheel-box { position: relative; width: 280px; height: 280px; margin: 25px auto; }
-        canvas#mainWheel { width: 100%; height: 100%; transition: 6s cubic-bezier(0.1, 0, 0, 1); }
+        canvas#mainWheel { width: 100%; height: 100%; }
 
         /* НАВИГАЦИЯ */
         nav {
@@ -63,6 +63,17 @@
         .nav-btn.active { color: var(--accent); font-weight: bold; }
 
         .modal { position: fixed; inset: 0; background: var(--bg); z-index: 2000; padding: 25px; display: none; overflow-y: auto; }
+        
+        .ticket { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; margin-bottom: 12px; cursor: pointer; }
+        .ticket.unread { border-left: 3px solid var(--accent); }
+        .badge { display: inline-block; background: var(--accent); border-radius: 10px; padding: 2px 8px; font-size: 10px; margin-left: 8px; }
+        .message-bubble { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; margin-bottom: 8px; }
+        .message-bubble.admin { background: rgba(36,129,204,0.2); border-left: 3px solid var(--accent); }
+        
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-card { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; text-align: center; }
+        
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -87,15 +98,20 @@
         <div id="scr-lobby" class="screen active">
             <h2 style="margin-bottom:15px;">Арена</h2>
             <div class="card" style="border-left: 4px solid var(--gold);" onclick="joinRoom(0)">
-                <b>ОБЩИЙ ЗАЛ</b><br><small>Ставки от 0.1 TON</small>
+                <b>⚔️ ОБЩИЙ ЗАЛ</b><br><small>Ставки от 0.1 TON</small>
             </div>
-            <div id="rooms-list"></div>
+            <div id="rooms-list">
+                <div class="card" style="border-left: 4px solid var(--accent);" onclick="joinRoom(1)">
+                    <b>🏆 ВИП ЗАЛ</b><br><small>Ставки от 5 TON • Требуется верификация</small>
+                </div>
+            </div>
         </div>
 
         <div id="scr-profile" class="screen">
             <div class="card" style="text-align:center;">
                 <img id="prof-img" class="u-avatar" style="width:80px; height:80px; border-radius:20px; margin-bottom:10px;">
                 <h3 id="prof-name">@User</h3>
+                <div id="my-stats" class="stat-grid" style="margin-top: 15px;"></div>
                 <div id="ton-connect-button" style="display:flex; justify-content:center; margin-top:15px;"></div>
             </div>
 
@@ -103,19 +119,36 @@
                 <h4 style="margin:0 0 10px; color:var(--accent);">⚡ АВТО-ПОПОЛНЕНИЕ</h4>
                 <p style="font-size:12px; color:var(--sub); margin-bottom:15px;">Выбери сумму, нажми кнопку и подтверди в кошельке. Баланс обновится сам.</p>
                 
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                    <button class="btn-action" style="padding: 8px;" onclick="setQuickAmount(1)">1 TON</button>
+                    <button class="btn-action" style="padding: 8px;" onclick="setQuickAmount(5)">5 TON</button>
+                    <button class="btn-action" style="padding: 8px;" onclick="setQuickAmount(10)">10 TON</button>
+                </div>
+                
                 <input type="number" id="pay-amount" class="input-fld" placeholder="Сумма TON" value="1.0" step="0.1">
-                <button id="pay-btn" class="btn-action" onclick="autoPay()">КУПИТЬ TON</button>
+                <button id="pay-btn" class="btn-action" onclick="autoPay()">💎 КУПИТЬ TON</button>
             </div>
 
             <div class="card">
                 <h4>🎟️ ПРОМОКОД</h4>
                 <div style="display:flex; gap:8px;">
                     <input type="text" id="promo-input" class="input-fld" style="margin:0;" placeholder="Введите код...">
-                    <button class="btn-action" style="width:auto; padding:0 20px;" onclick="activatePromo()">ОК</button>
+                    <button class="btn-action" style="width:auto; padding:0 20px;" onclick="activatePromo()">АКТИВИРОВАТЬ</button>
                 </div>
             </div>
 
-            <button id="adm-btn" class="btn-action" style="background:var(--gold); color:black; display:none; margin-top:10px;" onclick="openAdmin()">АДМИН ПАНЕЛЬ</button>
+            <div class="card">
+                <h4>🎲 МОЯ СТАТИСТИКА</h4>
+                <div class="stat-grid">
+                    <div class="stat-card">🎮 Игр: <b id="stat-games">0</b></div>
+                    <div class="stat-card">🏆 Побед: <b id="stat-wins">0</b></div>
+                    <div class="stat-card">📊 Winrate: <b id="stat-winrate">0%</b></div>
+                    <div class="stat-card">💰 Выиграно: <b id="stat-won">0</b> TON</div>
+                </div>
+            </div>
+
+            <button id="adm-btn" class="btn-action" style="background:var(--gold); color:black; display:none; margin-top:10px;" onclick="openAdmin()">👑 АДМИН ПАНЕЛЬ</button>
+            <button class="btn-action" style="background:var(--accent); margin-top:10px;" onclick="openSupport()">🎫 ТЕХПОДДЕРЖКА</button>
         </div>
 
         <div id="scr-game" class="screen">
@@ -131,7 +164,7 @@
             <div id="game-players" class="card" style="min-height:60px;"></div>
             <div style="display:flex; gap:10px;">
                 <input type="number" id="play-bet" class="input-fld" style="flex:1; margin:0;" value="1.0">
-                <button class="btn-action" style="flex:2;" onclick="placeBet()">СТАВКА</button>
+                <button class="btn-action" style="flex:2;" onclick="placeBet()">🎲 СТАВКА</button>
             </div>
         </div>
     </main>
@@ -142,40 +175,111 @@
     </nav>
 </div>
 
+<!-- АДМИН ПАНЕЛЬ -->
 <div id="modal-admin" class="modal">
-    <h2>ADMIN PANEL</h2>
+    <h2>👑 ADMIN PANEL</h2>
+    
     <div class="card">
-        <h4>Выдать TON</h4>
+        <h4>💰 Выдать TON пользователю</h4>
         <input id="adm-target-user" class="input-fld" placeholder="@username">
         <input id="adm-amount" type="number" class="input-fld" placeholder="Сумма">
-        <button class="btn-action" style="background:var(--green);" onclick="adminAddBal()">ВЫДАТЬ</button>
+        <button class="btn-action" style="background:var(--green);" onclick="adminAddBal()">💸 ВЫДАТЬ</button>
     </div>
-    <button class="btn-action" style="background:var(--red); margin-top:20px;" onclick="document.getElementById('modal-admin').style.display='none'">ЗАКРЫТЬ</button>
+
+    <div class="card">
+        <h4>📊 Управление промокодами</h4>
+        <input id="adm-promo-code" class="input-fld" placeholder="Новый промокод">
+        <input id="adm-promo-value" type="number" class="input-fld" placeholder="Сумма награды">
+        <button class="btn-action" onclick="adminAddPromo()">➕ ДОБАВИТЬ ПРОМОКОД</button>
+        <button class="btn-action" style="background:var(--red); margin-top:8px;" onclick="adminListPromos()">📋 СПИСОК ПРОМОКОДОВ</button>
+    </div>
+
+    <div class="card">
+        <h4>🎮 Управление сервером</h4>
+        <button class="btn-action" onclick="adminSetMaintenance()">🔧 ВКЛ/ВЫКЛ РЕЖИМ ОБСЛУЖИВАНИЯ</button>
+        <button class="btn-action" style="background:var(--gold); color:black; margin-top:8px;" onclick="adminResetGame()">🔄 СБРОС АКТИВНОЙ ИГРЫ</button>
+        <button class="btn-action" style="background:var(--green); margin-top:8px;" onclick="adminBroadcast()">📢 ОТПРАВИТЬ УВЕДОМЛЕНИЕ ВСЕМ</button>
+    </div>
+
+    <div class="card">
+        <h4>📈 Глобальная статистика</h4>
+        <div id="global-stats"></div>
+    </div>
+
+    <div class="card">
+        <h4>🎫 Тикеты поддержки</h4>
+        <div id="admin-tickets-list"></div>
+    </div>
+
+    <button class="btn-action" style="background:var(--red); margin-top:20px;" onclick="document.getElementById('modal-admin').style.display='none'">❌ ЗАКРЫТЬ</button>
+</div>
+
+<!-- ТЕХПОДДЕРЖКА -->
+<div id="modal-support" class="modal">
+    <h2>🎫 ТЕХПОДДЕРЖКА</h2>
+    <div class="card">
+        <h4>Создать новый тикет</h4>
+        <input id="ticket-title" class="input-fld" placeholder="Тема обращения">
+        <textarea id="ticket-message" class="input-fld" rows="3" placeholder="Опишите проблему..."></textarea>
+        <button class="btn-action" onclick="createTicket()">📨 ОТПРАВИТЬ</button>
+    </div>
+    
+    <div class="card">
+        <h4>Мои обращения</h4>
+        <div id="my-tickets-list"></div>
+    </div>
+    
+    <button class="btn-action" style="background:var(--red); margin-top:20px;" onclick="closeSupport()">ЗАКРЫТЬ</button>
+</div>
+
+<!-- ДИАЛОГ ТИКЕТА -->
+<div id="modal-ticket-dialog" class="modal">
+    <h2 id="dialog-title">Тикет #</h2>
+    <div id="ticket-messages" style="max-height: 400px; overflow-y: auto; margin-bottom: 15px;"></div>
+    <textarea id="reply-message" class="input-fld" rows="2" placeholder="Ваш ответ..."></textarea>
+    <button class="btn-action" onclick="sendReply()">📤 ОТПРАВИТЬ</button>
+    <button class="btn-action" style="background:var(--red); margin-top:10px;" onclick="closeTicketDialog()">ЗАКРЫТЬ</button>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
-    // ЗАМЕНИ НА СВОЙ АДРЕС
-    const MY_WALLET = "UQAr_YOUR_REAL_WALLET_HERE"; 
+    const MY_WALLET = "UQAr_YOUR_REAL_WALLET_HERE"; // Замени на свой адрес
 
-    // Инициализация той самой модалки TON Connect
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
         manifestUrl: 'https://raw.githubusercontent.com/ton-connect/demo-dapp-with-react-ui/master/public/tonconnect-manifest.json',
         buttonRootId: 'ton-connect-button'
     });
 
+    // Данные пользователя
     let savedBal = localStorage.getItem('ton_balance_final');
     let user = { 
         name: "Guest", 
-        bal: savedBal ? parseFloat(savedBal) : 0.00, 
+        bal: savedBal ? parseFloat(savedBal) : 5.00,
         role: "user", 
-        verif: false 
+        verif: false,
+        gamesPlayed: 0,
+        gamesWon: 0,
+        totalWon: 0
     };
+    
+    let stats = JSON.parse(localStorage.getItem('user_stats')) || { gamesPlayed: 0, gamesWon: 0, totalWon: 0 };
+    user.gamesPlayed = stats.gamesPlayed;
+    user.gamesWon = stats.gamesWon;
+    user.totalWon = stats.totalWon;
 
-    let rooms = []; let promos = []; let gamePlayers = []; let timerIv = null;
+    // Глобальные данные
+    let promos = JSON.parse(localStorage.getItem('promocodes')) || [];
+    let tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+    let maintenanceMode = localStorage.getItem('maintenance') === 'true';
+    let gamePlayers = [];
+    let currentRoom = 0;
+    let timerIv = null;
+    let spinning = false;
+    let currentTicketView = null;
 
     function init() {
-        tg.ready(); tg.expand();
+        tg.ready(); 
+        tg.expand();
         const data = tg.initDataUnsafe?.user;
         user.name = data?.username || "Kegovich";
         
@@ -183,24 +287,54 @@
         document.getElementById('prof-name').innerText = "@" + user.name;
         document.getElementById('my-avatar').src = `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
         document.getElementById('prof-img').src = `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
-
-        if(user.name === "Kegovich" || user.name === "mas1sa") {
-            user.role = "owner"; user.verif = true;
+        
+        updateStatsDisplay();
+        
+        // Админы
+        const admins = ['Kegovich', 'mas1sa', 'Admin'];
+        if(admins.includes(user.name)) {
+            user.role = "owner"; 
+            user.verif = true;
             document.getElementById('adm-btn').style.display = 'block';
         }
         if(user.verif) document.getElementById('verif-icon').style.display = 'inline';
-
-        save(); drawWheel();
+        
+        save();
+        drawWheel();
+        updateGlobalStats();
+        
+        if(maintenanceMode && user.role !== 'owner') {
+            tg.showAlert("🔧 Сервер на техническом обслуживании. Зайдите позже.");
+        }
+    }
+    
+    function updateStatsDisplay() {
+        document.getElementById('stat-games').innerText = user.gamesPlayed;
+        document.getElementById('stat-wins').innerText = user.gamesWon;
+        const winrate = user.gamesPlayed > 0 ? ((user.gamesWon / user.gamesPlayed) * 100).toFixed(1) : 0;
+        document.getElementById('stat-winrate').innerText = winrate + '%';
+        document.getElementById('stat-won').innerText = user.totalWon.toFixed(2);
+    }
+    
+    function saveUserStats() {
+        localStorage.setItem('user_stats', JSON.stringify({
+            gamesPlayed: user.gamesPlayed,
+            gamesWon: user.gamesWon,
+            totalWon: user.totalWon
+        }));
     }
 
     function save() {
         localStorage.setItem('ton_balance_final', user.bal.toFixed(2));
         document.getElementById('my-bal').innerText = user.bal.toFixed(2);
+        saveUserStats();
     }
 
-    // ТА САМАЯ АВТОМАТИЧЕСКАЯ ОПЛАТА
+    function setQuickAmount(amount) {
+        document.getElementById('pay-amount').value = amount;
+    }
+
     async function autoPay() {
-        // Если кошелек не подключен — окно само предложит его выбрать
         if (!tonConnectUI.connected) {
             await tonConnectUI.openModal();
             return;
@@ -215,70 +349,165 @@
         };
 
         try {
-            // Вызывает системную штуку подтверждения в кошельке
             const result = await tonConnectUI.sendTransaction(transaction);
-            
-            // Если транзакция ушла, начисляем баланс в код
-            tg.showAlert("Оплата подтверждена! Баланс зачислится через 10 секунд.");
+            tg.showAlert("✅ Оплата подтверждена! Баланс зачислится через 5 секунд.");
             
             setTimeout(() => {
                 user.bal += parseFloat(amount);
                 save();
-                tg.showPopup({ message: "TON зачислены на ваш баланс!" });
-            }, 10000);
+                tg.showPopup({ message: "💰 TON зачислены на ваш баланс!" });
+            }, 5000);
 
         } catch (e) {
-            tg.showAlert("Ошибка или отмена транзакции.");
+            tg.showAlert("❌ Ошибка или отмена транзакции.");
         }
     }
 
+    function activatePromo() {
+        const code = document.getElementById('promo-input').value.trim().toUpperCase();
+        const promo = promos.find(p => p.code === code && !p.usedBy.includes(user.name));
+        
+        if(!promo) {
+            tg.showAlert("❌ Неверный или уже использованный промокод!");
+            return;
+        }
+        
+        user.bal += promo.value;
+        promo.usedBy.push(user.name);
+        localStorage.setItem('promocodes', JSON.stringify(promos));
+        save();
+        tg.showAlert(`🎉 Промокод активирован! +${promo.value} TON`);
+        document.getElementById('promo-input').value = '';
+    }
+
     function placeBet() {
+        if(maintenanceMode && user.role !== 'owner') {
+            tg.showAlert("🔧 Сервер на обслуживании!");
+            return;
+        }
+        
         const val = parseFloat(document.getElementById('play-bet').value);
-        if(user.bal < val) return tg.showAlert("Мало TON!");
+        const minBet = currentRoom === 1 ? 5 : 0.1;
+        
+        if(currentRoom === 1 && !user.verif) {
+            tg.showAlert("💎 VIP зал доступен только верифицированным игрокам!");
+            return;
+        }
+        
+        if(val < minBet) {
+            tg.showAlert(`❌ Минимальная ставка: ${minBet} TON`);
+            return;
+        }
+        
+        if(user.bal < val) {
+            tg.showAlert("❌ Недостаточно TON!");
+            return;
+        }
+        
+        if(spinning) {
+            tg.showAlert("⏳ Игра уже идет! Дождитесь окончания.");
+            return;
+        }
+        
         user.bal -= val;
         gamePlayers.push({name: user.name, bet: val, color: '#' + Math.floor(Math.random()*16777215).toString(16)});
-        save(); updateGameUI();
-        if(gamePlayers.length >= 2 && !timerIv) startTimer();
+        save();
+        updateGameUI();
+        
+        if(gamePlayers.length >= 2 && !timerIv && !spinning) {
+            startTimer();
+        }
     }
 
     function startTimer() {
         let s = 10;
         timerIv = setInterval(() => {
-            document.getElementById('game-status').innerText = "СТАРТ ЧЕРЕЗ " + s;
-            if(s <= 0) { clearInterval(timerIv); timerIv = null; spin(); }
+            document.getElementById('game-status').innerHTML = `⏰ СТАРТ ЧЕРЕЗ ${s} сек. • Игроков: ${gamePlayers.length}`;
+            if(s <= 0) { 
+                clearInterval(timerIv); 
+                timerIv = null; 
+                spin(); 
+            }
             s--;
         }, 1000);
     }
 
     function spin() {
-        const deg = 3600 + Math.random()*360;
-        document.getElementById('mainWheel').style.transform = `rotate(${deg}deg)`;
+        if(spinning || gamePlayers.length === 0) return;
+        spinning = true;
+        
+        const total = gamePlayers.reduce((a,b) => a+b.bet, 0);
+        const winner = gamePlayers[Math.floor(Math.random()*gamePlayers.length)];
+        
+        let counter = 0;
+        const interval = setInterval(() => {
+            const tempWinner = gamePlayers[counter % gamePlayers.length];
+            document.getElementById('game-status').innerHTML = `🎲 ВЫБОР ПОБЕДИТЕЛЯ... ${tempWinner.name}`;
+            counter++;
+        }, 100);
+        
         setTimeout(() => {
-            const total = gamePlayers.reduce((a,b) => a+b.bet, 0);
-            const win = gamePlayers[Math.floor(Math.random()*gamePlayers.length)];
-            tg.showAlert("ПОБЕДА: " + win.name);
-            if(win.name === user.name) { user.bal += total; save(); }
+            clearInterval(interval);
+            
+            user.gamesPlayed++;
+            if(winner.name === user.name) {
+                user.bal += total;
+                user.gamesWon++;
+                user.totalWon += total;
+                save();
+                tg.showAlert(`🏆 ПОБЕДА! Вы выиграли ${total.toFixed(2)} TON!`);
+                document.getElementById('game-status').innerHTML = `🏆 ПОБЕДИЛ: ${winner.name}`;
+            } else {
+                tg.showAlert(`😔 Победил: ${winner.name}`);
+                document.getElementById('game-status').innerHTML = `😔 ПОБЕДИЛ: ${winner.name}`;
+            }
+            
+            updateStatsDisplay();
             gamePlayers = [];
-            document.getElementById('mainWheel').style.transform = `rotate(0deg)`;
+            spinning = false;
             updateGameUI();
-        }, 6500);
+            
+            setTimeout(() => {
+                document.getElementById('game-status').innerHTML = "🎮 ГОТОВ К СТАВКАМ";
+            }, 3000);
+        }, 1500);
     }
 
     function drawWheel() {
-        const ctx = document.getElementById('mainWheel').getContext('2d');
+        const canvas = document.getElementById('mainWheel');
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
         ctx.clearRect(0,0,600,600);
         if(gamePlayers.length === 0) {
-            ctx.beginPath(); ctx.fillStyle = "#141828"; ctx.arc(300,300,280,0,7); ctx.fill(); return;
+            ctx.beginPath(); 
+            ctx.fillStyle = "#141828"; 
+            ctx.arc(300,300,280,0,Math.PI*2);
+            ctx.fill();
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 20px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("ЖДЕМ СТАВКИ", 300, 300);
+            return;
         }
-        let start = 0; const total = gamePlayers.reduce((a,b)=>a+b.bet,0);
+        
+        let start = 0; 
+        const total = gamePlayers.reduce((a,b)=>a+b.bet,0);
         gamePlayers.forEach(p => {
-            const s = (p.bet/total)*Math.PI*2;
-            ctx.beginPath(); ctx.fillStyle = p.color; ctx.moveTo(300,300); ctx.arc(300,300,280,start,start+s); ctx.fill();
-            start += s;
+            const angle = (p.bet/total)*Math.PI*2;
+            ctx.beginPath(); 
+            ctx.fillStyle = p.color; 
+            ctx.moveTo(300,300); 
+            ctx.arc(300,300,280,start,start+angle); 
+            ctx.fill();
+            start += angle;
         });
     }
 
-    function updateGameUI() { drawWheel(); document.getElementById('game-players').innerHTML = gamePlayers.map(p => `<div>@${p.name}: ${p.bet} TON</div>`).join(''); }
+    function updateGameUI() { 
+        drawWheel(); 
+        document.getElementById('game-players').innerHTML = gamePlayers.map(p => `<div>🎲 @${p.name}: ${p.bet} TON</div>`).join('') || '<div style="color:gray;">Нет активных ставок</div>';
+    }
+    
     function nav(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('scr-' + id).classList.add('active');
@@ -286,13 +515,257 @@
         if(id==='lobby') document.querySelectorAll('.nav-btn')[0].classList.add('active');
         if(id==='profile') document.querySelectorAll('.nav-btn')[1].classList.add('active');
     }
-    function joinRoom(id) { nav('game'); updateGameUI(); }
-    function leaveRoom() { gamePlayers = []; nav('lobby'); }
-    function openAdmin() { document.getElementById('modal-admin').style.display='block'; }
+    
+    function joinRoom(roomId) {
+        if(maintenanceMode && user.role !== 'owner') {
+            tg.showAlert("🔧 Сервер на обслуживании!");
+            return;
+        }
+        currentRoom = roomId;
+        document.getElementById('game-title').innerText = roomId === 1 ? "🏆 VIP ЗАЛ" : "⚔️ ОБЩИЙ ЗАЛ";
+        nav('game');
+        updateGameUI();
+    }
+    
+    function leaveRoom() { 
+        if(timerIv) { clearInterval(timerIv); timerIv = null; }
+        gamePlayers = []; 
+        spinning = false;
+        nav('lobby'); 
+    }
+    
+    // ========== АДМИН ФУНКЦИИ ==========
+    function openAdmin() {
+        if(user.role !== 'owner') return;
+        updateGlobalStats();
+        updateAdminTicketsList();
+        document.getElementById('modal-admin').style.display = 'block';
+    }
+    
     function adminAddBal() {
-        const target = document.getElementById('adm-target-user').value;
+        const target = document.getElementById('adm-target-user').value.trim();
         const amount = parseFloat(document.getElementById('adm-amount').value);
-        if(target.includes(user.name)) { user.bal += amount; save(); tg.showAlert("Ок!"); }
+        if(target.toLowerCase() === user.name.toLowerCase()) {
+            user.bal += amount;
+            save();
+            tg.showAlert(`✅ Выдано ${amount} TON пользователю ${target}`);
+        } else {
+            tg.showAlert("❌ Можно выдавать только себе (демо-режим)");
+        }
+    }
+    
+    function adminAddPromo() {
+        const code = document.getElementById('adm-promo-code').value.trim().toUpperCase();
+        const value = parseFloat(document.getElementById('adm-promo-value').value);
+        if(!code || !value) return;
+        promos.push({ code: code, value: value, usedBy: [] });
+        localStorage.setItem('promocodes', JSON.stringify(promos));
+        tg.showAlert(`✅ Промокод ${code} добавлен!`);
+        document.getElementById('adm-promo-code').value = '';
+        document.getElementById('adm-promo-value').value = '';
+    }
+    
+    function adminListPromos() {
+        if(promos.length === 0) {
+            tg.showAlert("Нет активных промокодов");
+            return;
+        }
+        let msg = "🎟️ ПРОМОКОДЫ:\n";
+        promos.forEach(p => {
+            msg += `${p.code} - ${p.value} TON (использован ${p.usedBy.length} раз)\n`;
+        });
+        tg.showAlert(msg);
+    }
+    
+    function adminSetMaintenance() {
+        maintenanceMode = !maintenanceMode;
+        localStorage.setItem('maintenance', maintenanceMode);
+        tg.showAlert(maintenanceMode ? "🔧 Режим обслуживания ВКЛЮЧЕН" : "✅ Режим обслуживания ВЫКЛЮЧЕН");
+    }
+    
+    function adminResetGame() {
+        if(timerIv) clearInterval(timerIv);
+        gamePlayers = [];
+        spinning = false;
+        timerIv = null;
+        updateGameUI();
+        tg.showAlert("🔄 Игра сброшена!");
+    }
+    
+    function adminBroadcast() {
+        tg.showPrompt({ title: "📢 Рассылка", message: "Введите сообщение для всех пользователей:" }).then(msg => {
+            if(msg) tg.showAlert(`📢 Сообщение отправлено:\n${msg}`);
+        });
+    }
+    
+    function updateGlobalStats() {
+        const totalPromos = promos.length;
+        const totalTickets = tickets.length;
+        const totalUsers = 1; // Demo
+        document.getElementById('global-stats').innerHTML = `
+            <div>👥 Пользователей: ${totalUsers}</div>
+            <div>🎟️ Промокодов: ${totalPromos}</div>
+            <div>🎫 Тикетов: ${totalTickets}</div>
+            <div>💰 Баланс сервера: ~${(user.bal + Math.random()*100).toFixed(2)} TON</div>
+        `;
+    }
+    
+    // ========== ТИКЕТ СИСТЕМА ==========
+    function openSupport() {
+        updateMyTicketsList();
+        document.getElementById('modal-support').style.display = 'block';
+    }
+    
+    function closeSupport() {
+        document.getElementById('modal-support').style.display = 'none';
+    }
+    
+    function closeTicketDialog() {
+        document.getElementById('modal-ticket-dialog').style.display = 'none';
+        currentTicketView = null;
+    }
+    
+    function createTicket() {
+        const title = document.getElementById('ticket-title').value.trim();
+        const message = document.getElementById('ticket-message').value.trim();
+        
+        if(!title || !message) {
+            tg.showAlert("❌ Заполните все поля!");
+            return;
+        }
+        
+        const ticket = {
+            id: Date.now(),
+            user: user.name,
+            title: title,
+            status: 'open',
+            createdAt: new Date().toLocaleString(),
+            messages: [{ from: user.name, text: message, time: new Date().toLocaleString(), isAdmin: false }],
+            unread: true
+        };
+        
+        tickets.push(ticket);
+        localStorage.setItem('tickets', JSON.stringify(tickets));
+        tg.showAlert("✅ Тикет создан! Администратор ответит в ближайшее время.");
+        
+        document.getElementById('ticket-title').value = '';
+        document.getElementById('ticket-message').value = '';
+        updateMyTicketsList();
+        if(user.role === 'owner') updateAdminTicketsList();
+    }
+    
+    function updateMyTicketsList() {
+        const myTickets = tickets.filter(t => t.user === user.name);
+        const container = document.getElementById('my-tickets-list');
+        
+        if(myTickets.length === 0) {
+            container.innerHTML = '<div style="color:gray; text-align:center;">У вас нет обращений</div>';
+            return;
+        }
+        
+        container.innerHTML = myTickets.map(ticket => `
+            <div class="ticket ${ticket.unread && ticket.messages[ticket.messages.length-1].from !== user.name ? 'unread' : ''}" onclick="viewTicket(${ticket.id})">
+                <b>${ticket.title}</b>
+                <span class="badge" style="background: ${ticket.status === 'open' ? 'var(--green)' : 'var(--red)'}">
+                    ${ticket.status === 'open' ? 'Открыт' : 'Закрыт'}
+                </span>
+                <div style="font-size: 11px; color: gray;">${ticket.createdAt}</div>
+                <div style="font-size: 12px; margin-top: 5px;">Последнее: ${ticket.messages[ticket.messages.length-1].text.substring(0, 50)}</div>
+            </div>
+        `).join('');
+    }
+    
+    function updateAdminTicketsList() {
+        if(user.role !== 'owner') return;
+        const container = document.getElementById('admin-tickets-list');
+        const openTickets = tickets.filter(t => t.status === 'open');
+        
+        if(openTickets.length === 0) {
+            container.innerHTML = '<div style="color:gray;">Нет активных тикетов</div>';
+            return;
+        }
+        
+        container.innerHTML = openTickets.map(ticket => `
+            <div class="ticket ${ticket.unread ? 'unread' : ''}" onclick="viewTicket(${ticket.id})">
+                <b>${ticket.title}</b>
+                <div>👤 @${ticket.user}</div>
+                <div style="font-size: 11px;">${ticket.createdAt}</div>
+            </div>
+        `).join('');
+    }
+    
+    function viewTicket(ticketId) {
+        const ticket = tickets.find(t => t.id === ticketId);
+        if(!ticket) return;
+        
+        currentTicketView = ticket;
+        document.getElementById('dialog-title').innerHTML = `Тикет #${ticket.id} - ${ticket.title}`;
+        
+        const messagesContainer = document.getElementById('ticket-messages');
+        messagesContainer.innerHTML = ticket.messages.map(msg => `
+            <div class="message-bubble ${msg.isAdmin ? 'admin' : ''}">
+                <b>${msg.from === user.name ? 'Вы' : '@' + msg.from}</b>
+                <div style="font-size: 11px; color: gray;">${msg.time}</div>
+                <div style="margin-top: 5px;">${msg.text}</div>
+            </div>
+        `).join('');
+        
+        // Отмечаем как прочитанное
+        ticket.unread = false;
+        localStorage.setItem('tickets', JSON.stringify(tickets));
+        updateMyTicketsList();
+        if(user.role === 'owner') updateAdminTicketsList();
+        
+        document.getElementById('modal-ticket-dialog').style.display = 'block';
+        document.getElementById('modal-support').style.display = 'none';
+    }
+    
+    function sendReply() {
+        if(!currentTicketView) return;
+        
+        const reply = document.getElementById('reply-message').value.trim();
+        if(!reply) {
+            tg.showAlert("Введите сообщение!");
+            return;
+        }
+        
+        const isAdmin = user.role === 'owner';
+        
+        currentTicketView.messages.push({
+            from: user.name,
+            text: reply,
+            time: new Date().toLocaleString(),
+            isAdmin: isAdmin
+        });
+        
+        // Если админ отвечает, тикет остается открытым
+        if(!isAdmin) {
+            currentTicketView.unread = true;
+        }
+        
+        localStorage.setItem('tickets', JSON.stringify(tickets));
+        
+        // Обновляем отображение
+        const messagesContainer = document.getElementById('ticket-messages');
+        messagesContainer.innerHTML += `
+            <div class="message-bubble ${isAdmin ? 'admin' : ''}">
+                <b>${isAdmin ? '⭐ Администратор' : 'Вы'}</b>
+                <div style="font-size: 11px; color: gray;">${new Date().toLocaleString()}</div>
+                <div style="margin-top: 5px;">${reply}</div>
+            </div>
+        `;
+        
+        document.getElementById('reply-message').value = '';
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        if(isAdmin) {
+            tg.showAlert("✅ Ответ отправлен пользователю!");
+            updateAdminTicketsList();
+        } else {
+            tg.showAlert("✅ Сообщение отправлено администратору!");
+        }
+        
+        updateMyTicketsList();
     }
 
     init();
