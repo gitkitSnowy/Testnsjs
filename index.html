@@ -3,878 +3,783 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Rolls Master PvP MAGNUM OPUS v22</title>
+    <title>Rolls Master PvP HYPERION v23</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         /* =====================================================================
-           [1.0] CSS GLOBAL VARIABLES (THEME SYSTEM)
-           =====================================================================
-        */
+           CORE CSS: THE HYPERION DESIGN SYSTEM
+           ===================================================================== */
         :root {
-            /* Core Backgrounds */
-            --bg-deep-black: #020202;
-            --bg-main: #08080a;
-            --bg-panel: #0f0f12;
-            --bg-card: #16161a;
-            --bg-overlay: rgba(0, 0, 0, 0.85);
-            
-            /* Primary Accents */
-            --accent-blue: #007aff;
-            --accent-blue-rgb: 0, 122, 255;
-            --accent-glow: rgba(0, 122, 255, 0.35);
-            
-            /* Status Colors */
-            --status-gold: #ffcc00;
-            --status-gold-rgb: 255, 204, 0;
-            --status-red: #ff3b30;
-            --status-green: #34c759;
-            --status-purple: #af52de;
-            --status-orange: #ff9500;
-            
-            /* Borders & Glass */
-            --brd-thin: rgba(255, 255, 255, 0.06);
-            --brd-heavy: rgba(255, 255, 255, 0.12);
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            
-            /* Fonts */
-            --font-display: 'Orbitron', sans-serif;
-            --font-body: 'Inter', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            
-            /* Safe Areas for Mobile */
-            --sat: env(safe-area-inset-top);
-            --sab: env(safe-area-inset-bottom);
-            
-            /* Animation Curves */
-            --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
-            --ease-in-out-cubic: cubic-bezier(0.65, 0, 0.35, 1);
+            --bg-ultra: #020203;
+            --bg-main: #0a0a0c;
+            --bg-card: #121215;
+            --accent: #007aff;
+            --accent-glow: rgba(0, 122, 255, 0.4);
+            --gold: #ffcc00;
+            --red: #ff3b30;
+            --green: #28cd41;
+            --brd: rgba(255, 255, 255, 0.07);
+            --glass: rgba(255, 255, 255, 0.03);
+            --safe-top: env(safe-area-inset-top);
+            --safe-bot: env(safe-area-inset-bottom);
         }
 
-        /* =====================================================================
-           [2.0] GLOBAL RESET & BASE STYLES
-           =====================================================================
-        */
         * {
             margin: 0; padding: 0; box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
             -webkit-tap-highlight-color: transparent;
-            user-select: none;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            scrollbar-width: none;
+        }
+        *::-webkit-scrollbar { display: none; }
+
+        body {
+            background-color: var(--bg-ultra);
+            height: 100vh; width: 100vw;
+            overflow: hidden;
+            display: flex; justify-content: center;
         }
 
-        html, body {
-            background-color: var(--bg-deep-black);
-            color: #ffffff;
-            font-family: var(--font-body);
-            height: 100%; width: 100%;
-            overflow: hidden; /* Lock scroll for app feel */
-        }
-
-        /* =====================================================================
-           [3.0] ANIMATION KEYFRAMES
-           =====================================================================
-        */
-        @keyframes k-fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes k-slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes k-pulse-blue { 
-            0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(0, 122, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
-        }
-        @keyframes k-rotate-loading { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes k-scale-win { 0% { transform: scale(1); } 50% { transform: scale(1.15); color: var(--status-gold); } 100% { transform: scale(1); } }
-
-        /* =====================================================================
-           [4.0] APP LAYOUT STRUCTURE
-           =====================================================================
-        */
-        .app-wrapper {
-            display: flex; flex-direction: column;
+        .shell {
             width: 100%; max-width: 500px;
-            height: 100vh; margin: 0 auto;
-            position: relative;
-            background: radial-gradient(circle at 50% -20%, #151520 0%, var(--bg-deep-black) 70%);
-            border-left: 1px solid var(--brd-thin);
-            border-right: 1px solid var(--brd-thin);
+            height: 100vh; position: relative;
+            background: radial-gradient(circle at top, #16161a 0%, var(--bg-ultra) 100%);
+            display: flex; flex-direction: column;
+            border-left: 1px solid var(--brd);
+            border-right: 1px solid var(--brd);
         }
 
-        /* [4.1] Header Design */
-        .app-header {
-            padding: calc(15px + var(--sat)) 20px 15px;
-            background: rgba(15, 15, 18, 0.85);
-            backdrop-filter: blur(25px);
-            border-bottom: 1px solid var(--brd-thin);
+        /* HEADER */
+        .h {
+            padding: calc(15px + var(--safe-top)) 20px 15px;
+            background: rgba(18, 18, 21, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--brd);
             display: flex; justify-content: space-between; align-items: center;
-            z-index: 5000;
+            z-index: 2000;
+        }
+        .h-user { display: flex; align-items: center; gap: 12px; }
+        .h-av-wrap {
+            width: 46px; height: 46px; border-radius: 14px;
+            padding: 2px; background: linear-gradient(45deg, var(--accent), #8e2de2);
+            position: relative;
+        }
+        .h-av-wrap img { width: 100%; height: 100%; border-radius: 12px; object-fit: cover; }
+        .h-lvl {
+            position: absolute; -right: 5px; -bottom: 4px;
+            background: var(--gold); color: #000; font-size: 9px;
+            font-weight: 900; padding: 2px 5px; border-radius: 5px;
+            border: 2px solid var(--bg-main);
         }
 
-        .profile-trigger { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .header-av-frame {
-            width: 44px; height: 44px; border-radius: 12px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--status-purple));
-            padding: 2px; position: relative;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        .h-bal {
+            background: var(--bg-card); border: 1px solid var(--brd);
+            padding: 10px 15px; border-radius: 16px; text-align: right;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        .header-av-frame img { width: 100%; height: 100%; border-radius: 10px; object-fit: cover; }
-        .lvl-tag {
-            position: absolute; -right: 6px; -bottom: 4px;
-            background: var(--status-gold); color: #000;
-            font-size: 8px; font-weight: 900; padding: 2px 4px;
-            border-radius: 4px; border: 1.5px solid var(--bg-panel);
+        .h-bal-val { font-family: 'Orbitron'; color: var(--gold); font-size: 18px; font-weight: 900; }
+
+        /* VIEWPORT */
+        .v-scroll {
+            flex: 1; overflow-y: auto; padding: 20px;
+            padding-bottom: 120px;
         }
+        .v-page { display: none; animation: fadeIn 0.3s ease; }
+        .v-page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .bal-container {
-            text-align: right; background: var(--bg-card);
-            padding: 8px 14px; border-radius: 14px;
-            border: 1px solid var(--brd-heavy);
-            min-width: 110px;
+        /* ROULETTE */
+        .game-card {
+            background: var(--bg-card); border-radius: 30px;
+            padding: 25px; margin-bottom: 20px;
+            border: 1px solid var(--brd);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
-        .bal-label { font-size: 8px; color: var(--accent-blue); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
-        .bal-amount { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--status-gold); }
-
-        /* [4.2] Content Area */
-        .app-viewport {
-            flex: 1; overflow-y: scroll;
-            padding: 20px; padding-bottom: 120px;
-            scrollbar-width: none; -ms-overflow-style: none;
-        }
-        .app-viewport::-webkit-scrollbar { display: none; }
-
-        .view-section { display: none; animation: k-fadeIn 0.4s ease; }
-        .view-section.active { display: block; }
-
-        /* =====================================================================
-           [5.0] ROULETTE ENGINE UI
-           =====================================================================
-        */
-        .roulette-arena {
+        .wheel-arena {
             position: relative; width: 100%; aspect-ratio: 1;
-            margin: 10px 0 30px; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 25px; display: flex; align-items: center; justify-content: center;
         }
-
-        .wheel-outer {
-            width: 90%; height: 90%; border-radius: 50%;
-            position: relative; transition: transform 6s var(--ease-out-expo);
+        .wheel-svg {
+            width: 90%; height: 90%;
+            transition: transform 6s cubic-bezier(0.1, 0, 0, 1);
+            filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
         }
-        .wheel-svg { width: 100%; height: 100%; transform: rotate(-90deg); filter: drop-shadow(0 0 20px rgba(0,0,0,0.6)); }
-
-        .center-hub {
+        .wheel-pointer {
+            position: absolute; top: -5px; width: 24px; height: 35px;
+            background: var(--gold); clip-path: polygon(50% 100%, 0 0, 100% 0);
+            z-index: 100; filter: drop-shadow(0 0 10px var(--gold));
+        }
+        .wheel-hub {
             position: absolute; width: 100px; height: 100px;
-            background: radial-gradient(circle, #1a1a22 0%, #050507 100%);
-            border-radius: 50%; z-index: 10;
+            background: radial-gradient(circle, #1a1a20 0%, #0a0a0c 100%);
+            border-radius: 50%; z-index: 10; border: 2px solid var(--brd);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 2px solid var(--brd-heavy);
-            box-shadow: inset 0 0 15px var(--accent-glow), 0 10px 30px rgba(0,0,0,0.8);
-        }
-        .hub-timer { font-family: var(--font-display); font-size: 36px; font-weight: 900; line-height: 1; }
-        .hub-status { font-size: 9px; font-weight: 900; color: var(--accent-blue); text-transform: uppercase; margin-top: 4px; }
-
-        .win-pointer {
-            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: 20px; height: 30px; background: var(--status-gold);
-            clip-path: polygon(100% 0, 0 0, 50% 100%); z-index: 100;
-            filter: drop-shadow(0 0 10px var(--status-gold));
+            box-shadow: inset 0 0 20px var(--accent-glow);
         }
 
-        /* [5.1] Game Stats */
-        .game-meta { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .meta-item { background: var(--bg-card); padding: 12px 18px; border-radius: 18px; flex: 1; border: 1px solid var(--brd-thin); }
-        .meta-item:first-child { margin-right: 10px; }
-        .meta-label { font-size: 9px; color: var(--p-text-dim); text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; opacity: 0.6; }
-        .meta-value { font-family: var(--font-display); font-size: 18px; }
-
-        /* [5.2] Input Controls */
-        .control-panel { background: var(--bg-card); border-radius: 28px; padding: 25px; border: 1px solid var(--brd-thin); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
-        .bet-input-field {
-            background: #000; border-radius: 20px; padding: 18px;
-            text-align: center; border: 1px solid var(--brd-heavy);
-            margin-bottom: 15px; cursor: pointer; transition: 0.3s;
+        /* TOWER GAME */
+        .tower-grid {
+            display: grid; grid-template-rows: repeat(5, 1fr); gap: 10px;
+            margin-top: 20px;
         }
-        .bet-input-field:active { transform: scale(0.98); border-color: var(--accent-blue); }
-        .bet-val { font-family: var(--font-display); font-size: 28px; color: var(--status-gold); letter-spacing: 1px; }
-
-        .btn-main {
-            width: 100%; padding: 20px; border-radius: 20px; border: none;
-            background: linear-gradient(90deg, var(--accent-blue), #47a1ff);
-            color: #fff; font-family: var(--font-display); font-weight: 800;
-            font-size: 16px; text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 10px 25px var(--accent-glow); transition: 0.3s;
+        .tower-row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            opacity: 0.4; pointer-events: none; transition: 0.3s;
         }
-        .btn-main:disabled { background: #222; box-shadow: none; color: #555; }
-
-        /* =====================================================================
-           [6.0] PROFILE & LEVELING UI
-           =====================================================================
-        */
-        .profile-card { text-align: center; margin-bottom: 25px; }
-        .big-av {
-            width: 100px; height: 100px; border-radius: 30px; margin: 0 auto 15px;
-            border: 4px solid var(--accent-blue); padding: 5px; background: var(--bg-panel);
-        }
-        .big-av img { width: 100%; height: 100%; border-radius: 22px; }
-
-        .exp-bar-wrap { width: 100%; height: 8px; background: #1a1a1a; border-radius: 10px; margin: 15px 0; overflow: hidden; }
-        .exp-bar-fill { height: 100%; background: var(--accent-blue); width: 45%; border-radius: 10px; box-shadow: 0 0 10px var(--accent-glow); }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .stat-box { background: var(--bg-card); padding: 15px; border-radius: 20px; border: 1px solid var(--brd-thin); }
-        .stat-num { font-family: var(--font-display); font-size: 18px; color: var(--accent-blue); display: block; }
-        .stat-txt { font-size: 9px; color: #666; text-transform: uppercase; font-weight: 800; }
-
-        /* [6.1] Inventory & Achievements */
-        .scroll-row { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; }
-        .scroll-row::-webkit-scrollbar { display: none; }
-        .inv-item {
-            min-width: 80px; aspect-ratio: 1; background: var(--bg-panel);
-            border-radius: 18px; border: 1px solid var(--brd-thin);
-            display: flex; align-items: center; justify-content: center; font-size: 24px;
-        }
-
-        /* =====================================================================
-           [7.0] CUSTOM VIRTUAL KEYBOARD (TITAN_OS KB v3)
-           =====================================================================
-        */
-        .kb-overlay {
-            position: fixed; bottom: -100%; left: 0; width: 100%;
-            background: #09090b; border-top: 1px solid var(--brd-heavy);
-            padding: 10px 10px calc(25px + var(--sab)); z-index: 10000;
-            transition: bottom 0.5s var(--ease-out-expo);
-        }
-        .kb-overlay.open { bottom: 0; }
-        .kb-top { display: flex; justify-content: space-between; align-items: center; padding: 0 10px 10px; }
-        .kb-row { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
-        .key {
-            background: #1c1c1e; height: 54px; flex: 1; border-radius: 12px;
+        .tower-row.active { opacity: 1; pointer-events: auto; }
+        .tower-cell {
+            background: #1c1c22; height: 60px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 20px; font-weight: 600; border-bottom: 4px solid #000;
-            transition: 0.1s;
+            font-size: 24px; border: 1px solid var(--brd);
+            transition: 0.2s;
         }
-        .key:active { transform: translateY(3px); border-bottom-width: 0px; background: #333; }
-        .key.special { background: #2c2c2e; font-size: 12px; font-weight: 800; flex: 1.5; color: var(--accent-blue); }
-        .key.space { flex: 4; }
+        .tower-cell:active { transform: scale(0.95); }
+        .tower-cell.win { background: var(--green); border-color: #fff; }
+        .tower-cell.lose { background: var(--red); opacity: 0.5; }
 
-        /* =====================================================================
-           [8.0] NAVIGATION SYSTEM
-           =====================================================================
-        */
-        .nav-dock {
+        /* CHAT SYSTEM */
+        .chat-wrap {
+            background: var(--bg-card); border-radius: 20px;
+            height: 350px; display: flex; flex-direction: column;
+            border: 1px solid var(--brd); overflow: hidden;
+        }
+        .chat-tabs {
+            display: flex; background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid var(--brd);
+        }
+        .chat-tab {
+            flex: 1; padding: 12px; text-align: center;
+            font-size: 11px; font-weight: 800; text-transform: uppercase;
+            color: #555; transition: 0.3s;
+        }
+        .chat-tab.active { color: var(--accent); background: rgba(255,255,255,0.02); }
+        
+        .chat-msgs {
+            flex: 1; overflow-y: auto; padding: 15px;
+            display: flex; flex-direction: column-reverse; gap: 10px;
+        }
+        .msg-bbl {
+            background: var(--glass); padding: 10px 14px;
+            border-radius: 15px; max-width: 85%; align-self: flex-start;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .msg-bbl.me { align-self: flex-end; background: var(--accent); color: #fff; }
+        .msg-info { font-size: 10px; opacity: 0.5; margin-bottom: 4px; font-weight: 800; }
+        .msg-text { font-size: 13px; line-height: 1.4; }
+
+        /* KEYBOARD FLASH v4 */
+        .kb {
+            position: fixed; bottom: -100%; left: 0; width: 100%;
+            background: #0d0d0f; border-top: 1px solid var(--brd);
+            padding: 10px 10px calc(20px + var(--safe-bot)); z-index: 5000;
+            transition: bottom 0.25s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+        .kb.show { bottom: 0; }
+        .kb-row { display: flex; gap: 6px; margin-bottom: 6px; }
+        .key {
+            flex: 1; height: 60px; background: #1c1c22; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 700; border-bottom: 4px solid #000;
+        }
+        .key:active { background: #25252d; border-bottom-width: 0; transform: translateY(3px); }
+        .key.wide { flex: 4; background: var(--accent); font-size: 13px; text-transform: uppercase; }
+        .key.del { flex: 1.5; background: #2c2c35; }
+
+        /* ADMIN PANEL */
+        .adm-panel {
+            position: fixed; inset: 0; background: #000; z-index: 10000;
+            display: none; flex-direction: column; padding: 25px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .adm-head { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .adm-btn {
+            background: #222; border: 1px solid #444; padding: 12px;
+            border-radius: 8px; font-size: 12px; margin-bottom: 10px;
+        }
+
+        /* NAVIGATION */
+        .nav {
             position: fixed; bottom: 0; width: 100%; max-width: 500px;
-            background: rgba(10, 10, 12, 0.95); backdrop-filter: blur(25px);
-            display: flex; justify-content: space-around; padding: 12px 0 calc(15px + var(--sab));
-            border-top: 1px solid var(--brd-thin); z-index: 4000;
+            background: rgba(10, 10, 12, 0.98); backdrop-filter: blur(30px);
+            display: flex; justify-content: space-around; padding: 12px 0 calc(15px + var(--safe-bot));
+            border-top: 1px solid var(--brd); z-index: 1900;
         }
-        .nav-tab { flex: 1; text-align: center; color: #444; transition: 0.3s; position: relative; }
-        .nav-tab.active { color: var(--accent-blue); }
-        .nav-tab.active::after { content: ''; position: absolute; top: -13px; left: 50%; transform: translateX(-50%); width: 40px; height: 3px; background: var(--accent-blue); border-radius: 0 0 5px 5px; box-shadow: 0 0 15px var(--accent-glow); }
-        .nav-tab i { font-size: 22px; display: block; margin-bottom: 4px; font-style: normal; }
-        .nav-tab span { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+        .nav-link { text-align: center; color: #444; text-decoration: none; transition: 0.3s; width: 25%; }
+        .nav-link.active { color: var(--accent); }
+        .nav-link i { font-size: 24px; display: block; margin-bottom: 4px; font-style: normal; }
+        .nav-link span { font-size: 10px; font-weight: 800; text-transform: uppercase; }
 
-        /* =====================================================================
-           [9.0] ADMIN CONSOLE (ROOT ACCESS)
-           =====================================================================
-        */
-        #admin-panel {
-            position: fixed; inset: 0; background: #000; z-index: 99999;
-            display: none; flex-direction: column; padding: 30px;
-            font-family: var(--font-mono);
+        /* UTILS */
+        .btn-p {
+            width: 100%; padding: 20px; border-radius: 20px; border: none;
+            background: var(--accent); color: #fff; font-family: 'Orbitron';
+            font-weight: 900; font-size: 16px; box-shadow: 0 10px 20px var(--accent-glow);
         }
-        .terminal-line { color: var(--status-green); font-size: 12px; margin-bottom: 5px; }
-        .term-input { background: transparent; border: none; border-left: 10px solid var(--status-green); color: #fff; padding: 10px; width: 100%; outline: none; margin-top: 20px; font-family: var(--font-mono); font-size: 18px; }
-
-        /* =====================================================================
-           [10.0] NOTIFICATION TOASTS
-           =====================================================================
-        */
-        .toast {
-            position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
-            background: var(--bg-card); border: 1px solid var(--accent-blue);
-            padding: 12px 24px; border-radius: 100px; z-index: 9999;
-            font-weight: 800; font-size: 13px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: none; animation: k-slideUp 0.3s var(--ease-out-expo);
+        .btn-p:disabled { background: #222; box-shadow: none; color: #555; }
+        .bet-box {
+            background: #000; border-radius: 20px; padding: 18px;
+            text-align: center; border: 1px solid var(--brd); margin-bottom: 15px;
         }
+        .tag-win { color: var(--green); font-weight: 900; }
+        .tag-lose { color: var(--red); font-weight: 900; }
     </style>
 </head>
 <body>
 
-    <div id="toast-notify" class="toast">TEST NOTIFICATION</div>
-
-    <div class="app-wrapper">
-        <header class="app-header">
-            <div class="profile-trigger" onclick="ui.navigate('profile')">
-                <div class="header-av-frame">
-                    <img id="h-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alexander">
-                    <div class="lvl-tag" id="h-lvl">1</div>
+    <div class="shell">
+        <header class="h">
+            <div class="h-user" onclick="APP.navigate('profile')">
+                <div class="h-av-wrap">
+                    <img id="u-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex">
+                    <div class="h-lvl" id="u-lvl">17</div>
                 </div>
                 <div>
-                    <div id="h-name" style="font-weight: 800; font-size: 15px;">Alexander</div>
-                    <div id="h-rank" style="font-size: 9px; color: var(--accent-blue); font-weight: 900; text-transform: uppercase;">Novice</div>
+                    <div style="font-weight: 900; font-size: 16px;" id="u-name">Alexander</div>
+                    <div style="font-size: 9px; color: var(--accent); font-weight: 900; text-transform: uppercase;">Lead Developer</div>
                 </div>
             </div>
-            <div class="bal-container">
-                <div class="bal-label">Wallet Balance</div>
-                <div class="bal-amount" id="h-bal">0.00</div>
+            <div class="h-bal">
+                <div id="u-bal" class="h-bal-val">1000.00</div>
+                <div style="font-size: 8px; color: #555; font-weight: 900; letter-spacing: 1px;">TON COIN</div>
             </div>
         </header>
 
-        <main class="app-viewport">
+        <main class="v-scroll">
             
-            <section id="v-battle" class="view-section active">
-                <div class="roulette-arena">
-                    <div class="win-pointer"></div>
-                    <div class="wheel-outer" id="wheel-obj">
-                        <svg viewBox="0 0 100 100" id="wheel-svg" class="wheel-svg"></svg>
-                    </div>
-                    <div class="center-hub">
-                        <span class="hub-timer" id="timer-val">15</span>
-                        <span class="hub-status" id="timer-label">Wait</span>
-                    </div>
-                </div>
-
-                <div class="game-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">Round Bank</span>
-                        <div class="meta-value" id="round-bank">0.00</div>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Active Players</span>
-                        <div class="meta-value" id="round-players">0</div>
-                    </div>
-                </div>
-
-                <div class="control-panel">
-                    <div class="bet-input-field" onclick="ui.kbOpen('num', 'bet-val-display')">
-                        <span class="meta-label">Stake Amount (TON)</span>
-                        <div class="bet-val" id="bet-val-display">1.00</div>
-                    </div>
-                    <button class="btn-main" id="bet-btn" onclick="game.placeBet()">Enter Battle</button>
-                </div>
-                
-                <div style="margin-top: 25px;">
-                    <h4 class="meta-label">Live Feed</h4>
-                    <div id="roll-history" style="font-size: 11px; color: #444;">Waiting for bets...</div>
-                </div>
-            </section>
-
-            <section id="v-profile" class="view-section">
-                <div class="profile-card game-card control-panel" style="background: transparent;">
-                    <div class="big-av">
-                        <img id="p-av" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alexander">
-                    </div>
-                    <h2 id="p-name" style="font-family: var(--font-display); font-size: 20px;">Alexander</h2>
-                    <div id="p-rank-label" style="color: var(--accent-blue); font-weight: 800; font-size: 11px; margin-top: 5px;">ELITE DEVELOPER</div>
-                    
-                    <div class="exp-bar-wrap">
-                        <div class="exp-bar-fill" id="exp-fill"></div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:900; color:#555; text-transform:uppercase;">
-                        <span id="p-lvl-current">LVL 1</span>
-                        <span id="p-exp-text">450 / 1000 XP</span>
-                    </div>
-
-                    <div class="stats-grid" style="margin-top:25px;">
-                        <div class="stat-box"><span class="stat-num" id="st-games">0</span><span class="stat-txt">Total Games</span></div>
-                        <div class="stat-box"><span class="stat-num" id="st-won">0.0</span><span class="stat-txt">TON Won</span></div>
-                        <div class="stat-box"><span class="stat-num" id="st-rate">0%</span><span class="stat-txt">Win Rate</span></div>
-                        <div class="stat-box"><span class="stat-num" id="st-streak">0</span><span class="stat-txt">Best Streak</span></div>
-                    </div>
-                </div>
-
-                <h4 class="meta-label" style="margin: 20px 0 10px;">Your Collection</h4>
-                <div class="scroll-row">
-                    <div class="inv-item">🛡️</div>
-                    <div class="inv-item">🗡️</div>
-                    <div class="inv-item">💎</div>
-                    <div class="inv-item" style="opacity: 0.2;">🔒</div>
-                </div>
-            </section>
-
-            <section id="v-shop" class="view-section">
-                <div class="control-panel">
-                    <h3 style="font-family: var(--font-display); margin-bottom: 15px;">MARKETPLACE</h3>
-                    <p style="font-size: 12px; color: #666; margin-bottom: 20px;">Unlock exclusive skins and custom colors.</p>
-                    
-                    <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #000; border-radius: 15px; border: 1px solid var(--brd-heavy);">
-                        <div style="font-size: 24px;">🎨</div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: 800; font-size: 14px;">Neon Cyan Skin</div>
-                            <div style="font-size: 10px; color: var(--accent-blue);">15.00 TON</div>
+            <div id="v-battle" class="v-page active">
+                <div class="game-card">
+                    <div class="wheel-arena">
+                        <div class="wheel-pointer"></div>
+                        <svg viewBox="0 0 100 100" class="wheel-svg" id="roulette-svg"></svg>
+                        <div class="wheel-hub">
+                            <div id="timer" style="font-family: 'Orbitron'; font-size: 38px; font-weight: 900;">15</div>
+                            <div style="font-size: 9px; font-weight: 900; color: var(--accent);">WAITING</div>
                         </div>
-                        <button style="padding: 8px 12px; background: var(--accent-blue); border: none; border-radius: 8px; color: #fff; font-size: 10px; font-weight: 900;">BUY</button>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                        <div>
+                            <span style="font-size: 10px; color: #666; font-weight: 800;">BANKROLL</span>
+                            <div id="game-bank" style="font-family: 'Orbitron'; font-size: 22px; color: var(--gold);">0.00</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 10px; color: #666; font-weight: 800;">PLAYERS</span>
+                            <div id="game-players" style="font-family: 'Orbitron'; font-size: 22px;">0</div>
+                        </div>
+                    </div>
+
+                    <div class="bet-box" onclick="KB.open('num', 'bet-val')">
+                        <span style="font-size: 9px; color: var(--accent); font-weight: 900;">YOUR STAKE</span>
+                        <div id="bet-val" style="font-family: 'Orbitron'; font-size: 28px; margin-top: 5px;">1.00</div>
+                    </div>
+                    <button class="btn-p" id="btn-bet" onclick="GAME.placeBet()">ENTER BATTLE</button>
+                </div>
+            </div>
+
+            <div id="v-tower" class="v-page">
+                <div class="game-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 style="font-family: 'Orbitron'; font-size: 18px;">TOWER MODE</h2>
+                        <div id="tower-status" style="font-size: 10px; font-weight: 900; color: var(--gold);">STEP 1/5</div>
+                    </div>
+                    
+                    <div class="tower-grid" id="tower-container"></div>
+                    
+                    <div style="margin-top: 25px;">
+                        <div class="bet-box" id="tower-bet-area" onclick="KB.open('num', 'tower-bet-val')">
+                            <span style="font-size: 9px; color: var(--accent); font-weight: 900;">STAKE</span>
+                            <div id="tower-bet-val" style="font-family: 'Orbitron'; font-size: 28px;">1.00</div>
+                        </div>
+                        <button class="btn-p" id="btn-tower-start" onclick="TOWER.start()">START CLIMB</button>
+                        <button class="btn-p" id="btn-tower-cashout" style="display:none; background: var(--green);" onclick="TOWER.cashout()">CASHOUT</button>
                     </div>
                 </div>
-            </section>
+            </div>
+
+            <div id="v-chat" class="v-page">
+                <div class="chat-wrap">
+                    <div class="chat-tabs">
+                        <div class="chat-tab active" id="tab-global" onclick="CHAT.switch('global')">GLOBAL</div>
+                        <div class="chat-tab" id="tab-support" onclick="CHAT.switch('support')">SUPPORT</div>
+                    </div>
+                    <div class="chat-msgs" id="chat-flow"></div>
+                    <div style="padding: 15px; border-top: 1px solid var(--brd); display: flex; gap: 10px;">
+                        <div class="bet-box" style="flex: 1; margin: 0; padding: 12px; text-align: left;" onclick="KB.open('alpha', 'chat-input')">
+                            <div id="chat-input" style="font-size: 14px; color: #888; overflow: hidden; white-space: nowrap;">Message...</div>
+                        </div>
+                        <button style="width: 50px; border-radius: 15px; border: none; background: var(--accent);" onclick="CHAT.send()">🚀</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="v-profile" class="v-page">
+                <div class="game-card" style="text-align: center;">
+                    <div style="width: 100px; height: 100px; margin: 0 auto 15px; border: 4px solid var(--accent); padding: 5px; border-radius: 30px;">
+                        <img id="prof-av" src="" style="width:100%; height:100%; border-radius: 22px;">
+                    </div>
+                    <h2 id="prof-name" style="font-family: 'Orbitron';">Alexander</h2>
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">Level 17 Developer</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px;">
+                        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px;">
+                            <span style="display:block; font-family: 'Orbitron'; color: var(--accent); font-size: 20px;" id="st-games">0</span>
+                            <span style="font-size: 9px; font-weight: 800; color: #444;">GAMES</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px;">
+                            <span style="display:block; font-family: 'Orbitron'; color: var(--gold); font-size: 20px;" id="st-won">0.0</span>
+                            <span style="font-size: 9px; font-weight: 800; color: #444;">WON TON</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </main>
 
-        <nav class="nav-dock">
-            <div class="nav-tab active" onclick="ui.navigate('battle', this)"><i>⚔️</i><span>Battle</span></div>
-            <div class="nav-tab" onclick="ui.navigate('profile', this)"><i>👤</i><span>Profile</span></div>
-            <div class="nav-tab" onclick="ui.navigate('shop', this)"><i>💎</i><span>Shop</span></div>
+        <nav class="nav">
+            <div class="nav-link active" onclick="APP.navigate('battle', this)"><i>⚔️</i><span>Battle</span></div>
+            <div class="nav-link" onclick="APP.navigate('tower', this)"><i>🗼</i><span>Tower</span></div>
+            <div class="nav-link" onclick="APP.navigate('chat', this)"><i>💬</i><span>Chat</span></div>
+            <div class="nav-link" onclick="APP.navigate('profile', this)"><i>👤</i><span>Profile</span></div>
         </nav>
 
-        <div class="kb-overlay" id="kb-engine">
-            <div class="kb-top">
-                <span style="font-weight: 900; font-size: 10px; color: var(--accent-blue); letter-spacing: 1px;">TITAN_OS V.3.0</span>
-                <div onclick="ui.kbClose()" style="padding: 5px 15px; background: var(--bg-card); border-radius: 8px; font-weight: 800; color: var(--accent-blue); font-size: 12px;">DONE</div>
+        <div class="kb" id="kb-shell">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding: 0 10px 15px;">
+                <span style="font-weight: 900; font-size: 11px; color: var(--accent);">HYPERION_INPUT_SYS</span>
+                <div onclick="KB.close()" style="background: var(--bg-card); padding: 6px 15px; border-radius: 10px; font-weight: 800; color: var(--accent); font-size: 12px;">ГОТОВО</div>
             </div>
-            <div id="kb-keys-area"></div>
+            <div id="kb-grid"></div>
         </div>
 
-        <div id="admin-panel">
-            <div class="terminal-line">> Initializing TITAN_ROOT_SHELL...</div>
-            <div class="terminal-line">> Authorized: ALEXANDER_DEV</div>
-            <div id="admin-logs" style="flex: 1; overflow-y: auto;"></div>
-            <input type="text" class="term-input" id="admin-cmd" placeholder="Enter command..." onkeydown="admin.exec(event)">
+        <div class="adm-panel" id="adm-root">
+            <div class="adm-head">
+                <span style="color: var(--green);">[SYSTEM_ROOT@TITAN]</span>
+                <span onclick="ADMIN.close()" style="color: var(--red);">[CLOSE]</span>
+            </div>
+            <div style="flex: 1; overflow-y: auto;" id="adm-logs"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="adm-btn" onclick="ADMIN.addBal()">+1000 TON</button>
+                <button class="adm-btn" onclick="ADMIN.spawnBot()">SPAWN BOT</button>
+                <button class="adm-btn" onclick="ADMIN.clearChat()">CLEAR CHAT</button>
+                <button class="adm-btn" onclick="ADMIN.resetData()">HARD RESET</button>
+            </div>
         </div>
     </div>
 
     <script>
         /**
          * =====================================================================
-         * [CORE] APPLICATION STATE & DATA
+         * HYPERION ENGINE SCRIPT
          * =====================================================================
          */
-        
+
         const tg = window.Telegram.WebApp;
 
-        // The central data structure
-        const DB = {
-            user: {
-                name: "Alexander",
+        // GLOBAL DATA
+        const DATA = {
+            u: {
                 id: "6418873752",
+                name: "Alexander",
                 bal: 1000.00,
-                lvl: 1,
-                exp: 0,
+                lvl: 17,
                 games: 0,
-                wins: 0,
-                wonTon: 0.0,
-                streak: 0,
-                av: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alexander",
-                rank: "Owner"
+                won: 0,
+                av: ""
             },
-            session: {
+            game: {
                 timer: 15,
-                bank: 0.0,
+                bank: 0,
                 players: [],
-                myBet: 0,
                 spinning: false,
-                lastWinner: null,
-                logs: []
+                myBet: 0
             },
-            kb: {
-                target: null,
-                mode: 'num'
+            tower: {
+                active: false,
+                step: 0,
+                bet: 0,
+                multiplier: [1.5, 3.2, 6.8, 14.5, 30.0],
+                grid: []
             },
-            config: {
-                fee: 0.05, // 5% dev fee
-                houseEdge: 0.95,
-                expPerBet: 25,
-                expPerWin: 100
+            chat: {
+                current: 'global',
+                global: [],
+                support: []
+            },
+            kb: { target: null, mode: 'num' }
+        };
+
+        // KEYBOARD ENGINE (FAST INPUT)
+        const KB = {
+            layouts: {
+                num: [["1","2","3"],["4","5","6"],["7","8","9"],[".","0","⌫"]],
+                alpha: [
+                    ["Q","W","E","R","T","Y","U","I","O","P"],
+                    ["A","S","D","F","G","H","J","K","L"],
+                    ["Z","X","C","V","B","N","M","⌫"],
+                    [" ","↩"]
+                ]
+            },
+            open(mode, targetId) {
+                DATA.kb.mode = mode;
+                DATA.kb.target = document.getElementById(targetId);
+                if(DATA.kb.target.innerText === 'Message...' || DATA.kb.target.innerText === '0.00') {
+                    DATA.kb.target.innerText = '';
+                }
+                document.getElementById('kb-shell').classList.add('show');
+                this.render();
+                tg.HapticFeedback.impactOccurred('medium');
+            },
+            close() { 
+                document.getElementById('kb-shell').classList.remove('show');
+                if(DATA.kb.target.innerText === '') DATA.kb.target.innerText = '0.00';
+            },
+            render() {
+                const grid = document.getElementById('kb-grid');
+                grid.innerHTML = '';
+                this.layouts[DATA.kb.mode].forEach(row => {
+                    const r = document.createElement('div');
+                    r.className = 'kb-row';
+                    row.forEach(key => {
+                        const k = document.createElement('div');
+                        k.className = 'key';
+                        k.innerText = key;
+                        if(key === ' ') k.classList.add('wide');
+                        if(key === '⌫') k.classList.add('del');
+                        
+                        // Используем pointerdown для мгновенного срабатывания
+                        k.onpointerdown = (e) => {
+                            e.preventDefault();
+                            this.press(key);
+                        };
+                        r.appendChild(k);
+                    });
+                    grid.appendChild(r);
+                });
+            },
+            press(key) {
+                tg.HapticFeedback.impactOccurred('light');
+                const t = DATA.kb.target;
+                if(key === '⌫') t.innerText = t.innerText.slice(0, -1);
+                else if(key === '↩') this.close();
+                else t.innerText += key;
             }
         };
 
-        const KEYBOARDS = {
-            num: [["1","2","3"],["4","5","6"],["7","8","9"],[".","0","⌫"]],
-            alpha: [
-                ["Q","W","E","R","T","Y","U","I","O","P"],
-                ["A","S","D","F","G","H","J","K","L"],
-                ["Z","X","C","V","B","N","M","⌫"],
-                [" ","↩"]
-            ]
-        };
-
-        /**
-         * =====================================================================
-         * [MODULE] UI CONTROLLER (SYSTEM INTERFACE)
-         * =====================================================================
-         */
-        const ui = {
-            navigate(target, el) {
-                // Haptic feedback for interaction
-                this.haptic('impact', 'light');
-
-                // View Switching
-                document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-                document.getElementById('v-' + target).classList.add('active');
-
-                // Nav Styling
-                if(el) {
-                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                    el.classList.add('active');
+        // UI SYSTEM
+        const APP = {
+            init() {
+                tg.ready();
+                tg.expand();
+                
+                // Загрузка данных из ТГ
+                if(tg.initDataUnsafe?.user) {
+                    const user = tg.initDataUnsafe.user;
+                    DATA.u.name = user.first_name;
+                    DATA.u.id = String(user.id);
+                    DATA.u.av = user.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`;
                 }
+
+                // Локальное хранилище
+                const saved = localStorage.getItem('hyp_data');
+                if(saved) {
+                    const p = JSON.parse(saved);
+                    DATA.u.bal = p.bal;
+                    DATA.u.games = p.games;
+                    DATA.u.won = p.won;
+                    DATA.chat.global = p.chat_g || [];
+                }
+
+                // Секретный вход в админку
+                let clicks = 0;
+                document.getElementById('u-lvl').onclick = () => {
+                    clicks++;
+                    if(clicks >= 5) ADMIN.open();
+                };
 
                 this.sync();
+                GAME.loop();
+                TOWER.render();
+                CHAT.render();
             },
-
             sync() {
-                // Sync Balance
-                document.getElementById('h-bal').innerText = DB.user.bal.toFixed(2);
-                document.getElementById('h-lvl').innerText = DB.user.lvl;
-                document.getElementById('h-name').innerText = DB.user.name;
+                document.getElementById('u-bal').innerText = DATA.u.bal.toFixed(2);
+                document.getElementById('u-name').innerText = DATA.u.name;
+                document.getElementById('u-av').src = DATA.u.av;
+                document.getElementById('prof-av').src = DATA.u.av;
+                document.getElementById('prof-name').innerText = DATA.u.name;
+                document.getElementById('st-games').innerText = DATA.u.games;
+                document.getElementById('st-won').innerText = DATA.u.won.toFixed(1);
 
-                // Profile Sync
-                document.getElementById('p-name').innerText = DB.user.name;
-                document.getElementById('st-games').innerText = DB.user.games;
-                document.getElementById('st-won').innerText = DB.user.wonTon.toFixed(1);
-                
-                const winRate = DB.user.games > 0 ? Math.round((DB.user.wins / DB.user.games) * 100) : 0;
-                document.getElementById('st-rate').innerText = winRate + '%';
-                document.getElementById('st-streak').innerText = DB.user.streak;
-
-                // Level Progress
-                const nextLvlExp = DB.user.lvl * 1000;
-                const progress = (DB.user.exp / nextLvlExp) * 100;
-                document.getElementById('exp-fill').style.width = progress + '%';
-                document.getElementById('p-exp-text').innerText = `${DB.user.exp} / ${nextLvlExp} XP`;
-                document.getElementById('p-lvl-current').innerText = `LVL ${DB.user.lvl}`;
+                localStorage.setItem('hyp_data', JSON.stringify({
+                    bal: DATA.u.bal,
+                    games: DATA.u.games,
+                    won: DATA.u.won,
+                    chat_g: DATA.chat.global
+                }));
             },
-
-            toast(msg) {
-                const t = document.getElementById('toast-notify');
-                t.innerText = msg;
-                t.style.display = 'block';
-                setTimeout(() => { t.style.display = 'none'; }, 2500);
-            },
-
-            haptic(type, style) {
-                if(type === 'impact') tg.HapticFeedback.impactOccurred(style);
-                if(type === 'notif') tg.HapticFeedback.notificationOccurred(style);
-            },
-
-            kbOpen(mode, targetId) {
-                this.haptic('impact', 'medium');
-                DB.kb.mode = mode;
-                DB.kb.target = document.getElementById(targetId);
-                document.getElementById('kb-engine').classList.add('open');
-                this.kbRender();
-            },
-
-            kbClose() {
-                document.getElementById('kb-engine').classList.remove('open');
-            },
-
-            kbRender() {
-                const area = document.getElementById('kb-keys-area');
-                const set = KEYBOARDS[DB.kb.mode];
-                area.innerHTML = '';
-
-                set.forEach(row => {
-                    const rDiv = document.createElement('div');
-                    rDiv.className = 'kb-row';
-                    row.forEach(k => {
-                        const key = document.createElement('div');
-                        key.className = 'key';
-                        key.innerText = k;
-
-                        if(k === '⌫') { key.classList.add('special'); key.onclick = () => ui.kbDel(); }
-                        else if(k === '↩') { key.classList.add('special'); key.onclick = () => ui.kbClose(); }
-                        else if(k === ' ') { 
-                            key.classList.add('space'); 
-                            key.innerText = 'SPACE'; 
-                            key.onclick = () => ui.kbType(' '); 
-                        }
-                        else {
-                            key.onclick = () => ui.kbType(k);
-                        }
-                        rDiv.appendChild(key);
-                    });
-                    area.appendChild(rDiv);
-                });
-            },
-
-            kbType(k) {
-                this.haptic('impact', 'light');
-                // ФИКС ПРОБЕЛА: Вставляем реальный символ пробела
-                DB.kb.target.innerText += k;
-            },
-
-            kbDel() {
-                this.haptic('impact', 'light');
-                const cur = DB.kb.target.innerText;
-                DB.kb.target.innerText = cur.slice(0, -1);
+            navigate(page, el) {
+                document.querySelectorAll('.v-page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+                document.getElementById('v-' + page).classList.add('active');
+                if(el) el.classList.add('active');
+                tg.HapticFeedback.impactOccurred('light');
             }
         };
 
-        /**
-         * =====================================================================
-         * [MODULE] GAME ENGINE (THE CORE LOOP)
-         * =====================================================================
-         */
-        const game = {
-            init() {
-                // Game Loop: runs every second
+        // ROULETTE ENGINE
+        const GAME = {
+            loop() {
                 setInterval(() => {
-                    if(DB.session.spinning) return;
-
-                    DB.session.timer--;
-                    
-                    // Bot AI: Spawn random bets
-                    if(DB.session.timer > 3 && Math.random() > 0.65) {
-                        this.addBot();
-                    }
-
-                    if(DB.session.timer <= 0) {
-                        this.spin();
-                    }
-
-                    this.updateUI();
+                    if(DATA.game.spinning) return;
+                    DATA.game.timer--;
+                    if(DATA.game.timer > 3 && Math.random() > 0.7) this.addBot();
+                    if(DATA.game.timer <= 0) this.spin();
+                    this.draw();
                 }, 1000);
             },
-
             addBot() {
-                // БОТЫ СТАВЯТ ОТ 0.1 ДО 4.0 ТОН
-                const amount = parseFloat((Math.random() * (4.0 - 0.1) + 0.1).toFixed(1));
-                const botId = Math.floor(Math.random() * 9000) + 1000;
-                const bot = {
-                    id: botId,
-                    name: "Player_" + botId,
-                    bet: amount,
-                    av: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${botId}`,
-                    me: false
-                };
-                DB.session.players.push(bot);
-                DB.session.bank += amount;
-                
-                // Logging for the feed
-                this.log(`${bot.name} bet ${amount} TON`);
+                const b = (Math.random() * 4 + 0.1).toFixed(1);
+                DATA.game.players.push({ name: 'User_'+Math.floor(Math.random()*999), bet: parseFloat(b), me: false });
+                DATA.game.bank += parseFloat(b);
             },
-
             placeBet() {
-                const input = document.getElementById('bet-val-display').innerText;
-                const amt = parseFloat(input);
-
-                if(isNaN(amt) || amt <= 0) {
-                    ui.toast("Invalid amount!");
+                const val = parseFloat(document.getElementById('bet-val').innerText);
+                if(val > 0 && val <= DATA.u.bal && DATA.game.myBet === 0) {
+                    DATA.u.bal -= val;
+                    DATA.game.myBet = val;
+                    DATA.game.bank += val;
+                    DATA.game.players.push({ name: DATA.u.name, bet: val, me: true });
+                    document.getElementById('btn-bet').disabled = true;
+                    document.getElementById('btn-bet').innerText = "СТАВКА ПРИНЯТА";
+                    APP.sync();
+                    tg.HapticFeedback.notificationOccurred('success');
+                }
+            },
+            draw() {
+                document.getElementById('timer').innerText = DATA.game.timer;
+                document.getElementById('game-bank').innerText = DATA.game.bank.toFixed(2);
+                document.getElementById('game-players').innerText = DATA.game.players.length;
+                
+                const svg = document.getElementById('routte-svg'); // Опечатка в id в HTML была, поправил в коде
+                const realSvg = document.getElementById('roulette-svg');
+                realSvg.innerHTML = '';
+                if(DATA.game.players.length === 0) {
+                    realSvg.innerHTML = '<circle cx="50" cy="50" r="40" fill="none" stroke="#1c1c22" stroke-width="14"/>';
                     return;
                 }
-                if(amt > DB.user.bal) {
-                    ui.toast("Insufficient balance!");
-                    return;
-                }
-                if(DB.session.myBet > 0) {
-                    ui.toast("Bet already placed!");
-                    return;
-                }
-
-                // Execute bet
-                DB.user.bal -= amt;
-                DB.session.myBet = amt;
-                DB.session.bank += amt;
-                DB.session.players.push({
-                    id: DB.user.id,
-                    name: DB.user.name,
-                    bet: amt,
-                    av: DB.user.av,
-                    me: true
+                let offset = 0;
+                const colors = ["#007aff", "#5856d6", "#ff3b30", "#ffcc00", "#34c759"];
+                DATA.game.players.forEach((p, i) => {
+                    const ratio = p.bet / DATA.game.bank;
+                    const dash = ratio * 251.2;
+                    const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    c.setAttribute("cx", "50"); c.setAttribute("cy", "50"); c.setAttribute("r", "40");
+                    c.setAttribute("fill", "none"); c.setAttribute("stroke-width", "14");
+                    c.setAttribute("stroke", p.me ? "var(--accent)" : colors[i % colors.length]);
+                    c.setAttribute("stroke-dasharray", `${dash} 251.2`);
+                    c.setAttribute("stroke-dashoffset", -offset);
+                    realSvg.appendChild(c);
+                    offset += dash;
                 });
-
-                document.getElementById('bet-btn').disabled = true;
-                document.getElementById('bet-btn').innerText = "IN BATTLE";
-                
-                ui.sync();
-                ui.haptic('notif', 'success');
-                ui.toast("Bet Confirmed!");
             },
-
             spin() {
-                DB.session.spinning = true;
-                document.getElementById('timer-label').innerText = "Spinning";
-                ui.haptic('impact', 'heavy');
+                DATA.game.spinning = true;
+                const wheel = document.getElementById('roulette-svg');
+                const deg = 2000 + Math.random() * 2000;
+                wheel.style.transform = `rotate(${deg}deg)`;
+                tg.HapticFeedback.impactOccurred('heavy');
 
-                const wheel = document.getElementById('wheel-obj');
-                // Calculate random stop degree (at least 5 full spins)
-                const randomStop = 1800 + Math.floor(Math.random() * 3600);
-                wheel.style.transform = `rotate(${randomStop}deg)`;
-
-                // Wait for animation
                 setTimeout(() => {
-                    this.resolve(randomStop);
-                }, 6000);
+                    this.resolve(deg);
+                }, 6500);
             },
+            resolve(deg) {
+                const final = (360 - (deg % 360)) % 360;
+                const winRatio = final / 360;
+                let cur = 0;
+                let winner = DATA.game.players[0];
 
-            resolve(totalDeg) {
-                // Determine winner based on angle
-                const finalAngle = (360 - (totalDeg % 360)) % 360;
-                const winRatio = finalAngle / 360;
-
-                let cumulative = 0;
-                let winner = DB.session.players[0];
-
-                for(let p of DB.session.players) {
-                    cumulative += (p.bet / DB.session.bank);
-                    if(winRatio <= cumulative) {
-                        winner = p;
-                        break;
-                    }
+                for(let p of DATA.game.players) {
+                    cur += (p.bet / DATA.game.bank);
+                    if(winRatio <= cur) { winner = p; break; }
                 }
 
-                DB.session.lastWinner = winner;
-
-                // Handle Win/Loss
                 if(winner.me) {
-                    const prize = DB.session.bank * DB.config.houseEdge;
-                    DB.user.bal += prize;
-                    DB.user.wins++;
-                    DB.user.wonTon += prize;
-                    DB.user.streak++;
-                    DB.user.exp += DB.config.expPerWin;
-                    ui.haptic('notif', 'success');
-                    tg.showAlert(`VICTORY! You won ${prize.toFixed(2)} TON`);
-                } else {
-                    DB.user.streak = 0;
-                    ui.haptic('notif', 'error');
-                    ui.toast(`${winner.name} won the round!`);
+                    const prize = DATA.game.bank * 0.95;
+                    DATA.u.bal += prize;
+                    DATA.u.won += prize;
+                    tg.showAlert(`ПОБЕДА! Ты выиграл ${prize.toFixed(2)} TON`);
                 }
-
-                DB.user.games++;
-                DB.user.exp += DB.config.expPerBet;
-                
-                // Level Up Check
-                if(DB.user.exp >= DB.user.lvl * 1000) {
-                    DB.user.exp = 0;
-                    DB.user.lvl++;
-                    tg.showConfirm(`LEVEL UP! You are now level ${DB.user.lvl}`);
-                }
-
-                // Reset for next round
-                setTimeout(() => {
-                    this.resetSession();
-                }, 4000);
+                DATA.u.games++;
+                APP.sync();
+                setTimeout(() => this.reset(), 3000);
             },
-
-            resetSession() {
-                const wheel = document.getElementById('wheel-obj');
+            reset() {
+                DATA.game.timer = 15;
+                DATA.game.bank = 0;
+                DATA.game.players = [];
+                DATA.game.myBet = 0;
+                DATA.game.spinning = false;
+                const wheel = document.getElementById('roulette-svg');
                 wheel.style.transition = 'none';
                 wheel.style.transform = 'rotate(0deg)';
                 setTimeout(() => wheel.style.transition = '', 50);
+                document.getElementById('btn-bet').disabled = false;
+                document.getElementById('btn-bet').innerText = "ENTER BATTLE";
+            }
+        };
 
-                DB.session.timer = 15;
-                DB.session.bank = 0;
-                DB.session.players = [];
-                DB.session.myBet = 0;
-                DB.session.spinning = false;
-                DB.session.logs = [];
-
-                document.getElementById('bet-btn').disabled = false;
-                document.getElementById('bet-btn').innerText = "Enter Battle";
-                document.getElementById('timer-label').innerText = "Wait";
-                document.getElementById('roll-history').innerText = "Waiting for bets...";
-                
-                ui.sync();
-            },
-
-            updateUI() {
-                document.getElementById('timer-val').innerText = DB.session.timer;
-                document.getElementById('round-bank').innerText = DB.session.bank.toFixed(2);
-                document.getElementById('round-players').innerText = DB.session.players.length;
-                this.drawWheel();
-            },
-
-            drawWheel() {
-                const svg = document.getElementById('wheel-svg');
-                svg.innerHTML = '';
-
-                if(DB.session.players.length === 0) {
-                    svg.innerHTML = `<circle cx="50" cy="50" r="40" fill="none" stroke="#1c1c1e" stroke-width="12" />`;
-                    return;
+        // TOWER ENGINE
+        const TOWER = {
+            render() {
+                const container = document.getElementById('tower-container');
+                container.innerHTML = '';
+                for(let i = 4; i >= 0; i--) {
+                    const row = document.createElement('div');
+                    row.className = `tower-row ${i === 0 ? 'active' : ''}`;
+                    row.id = `row-${i}`;
+                    for(let j = 0; j < 3; j++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'tower-cell';
+                        cell.innerText = '❓';
+                        cell.onclick = () => this.play(i, j);
+                        row.appendChild(cell);
+                    }
+                    container.appendChild(row);
                 }
+            },
+            start() {
+                const bet = parseFloat(document.getElementById('tower-bet-val').innerText);
+                if(bet > 0 && bet <= DATA.u.bal) {
+                    DATA.u.bal -= bet;
+                    DATA.tower.bet = bet;
+                    DATA.tower.active = true;
+                    DATA.tower.step = 0;
+                    DATA.tower.grid = Array.from({length: 5}, () => Math.floor(Math.random() * 3));
+                    document.getElementById('btn-tower-start').style.display = 'none';
+                    document.getElementById('btn-tower-cashout').style.display = 'block';
+                    document.getElementById('tower-bet-area').style.opacity = '0.3';
+                    document.getElementById('tower-bet-area').style.pointerEvents = 'none';
+                    APP.sync();
+                }
+            },
+            play(rowIndex, cellIndex) {
+                if(!DATA.tower.active || rowIndex !== DATA.tower.step) return;
 
-                let currentOffset = 0;
-                const colors = ["#007aff", "#5856d6", "#ff3b30", "#ffcc00", "#34c759", "#af52de", "#ff9500", "#5ac8fa"];
-
-                DB.session.players.forEach((p, index) => {
-                    const ratio = p.bet / DB.session.bank;
-                    const dash = ratio * 251.2; // 251.2 = 2 * PI * R(40)
-                    const offset = -currentOffset;
-
-                    const arc = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                    arc.setAttribute("cx", "50");
-                    arc.setAttribute("cy", "50");
-                    arc.setAttribute("r", "40");
-                    arc.setAttribute("fill", "none");
-                    arc.setAttribute("stroke", p.me ? "var(--accent-blue)" : colors[index % colors.length]);
-                    arc.setAttribute("stroke-width", "12");
-                    arc.setAttribute("stroke-dasharray", `${dash} 251.2`);
-                    arc.setAttribute("stroke-dashoffset", offset);
+                const cells = document.getElementById(`row-${rowIndex}`).children;
+                if(cellIndex === DATA.tower.grid[rowIndex]) {
+                    // WIN STEP
+                    cells[cellIndex].innerText = '💎';
+                    cells[cellIndex].classList.add('win');
+                    DATA.tower.step++;
+                    tg.HapticFeedback.notificationOccurred('success');
                     
-                    svg.appendChild(arc);
-                    currentOffset += dash;
-                });
+                    if(DATA.tower.step === 5) {
+                        this.cashout();
+                    } else {
+                        document.getElementById(`row-${DATA.tower.step}`).classList.add('active');
+                        document.getElementById('tower-status').innerText = `STEP ${DATA.tower.step + 1}/5 | x${DATA.tower.multiplier[DATA.tower.step]}`;
+                    }
+                } else {
+                    // LOSE
+                    cells[cellIndex].innerText = '💥';
+                    cells[cellIndex].classList.add('lose');
+                    DATA.tower.active = false;
+                    tg.HapticFeedback.notificationOccurred('error');
+                    setTimeout(() => this.reset(), 1500);
+                }
             },
-
-            log(msg) {
-                DB.session.logs.unshift(msg);
-                if(DB.session.logs.length > 3) DB.session.logs.pop();
-                document.getElementById('roll-history').innerHTML = DB.session.logs.map(l => `<div>> ${l}</div>`).join('');
+            cashout() {
+                if(DATA.tower.step === 0) return;
+                const win = DATA.tower.bet * DATA.tower.multiplier[DATA.tower.step - 1];
+                DATA.u.bal += win;
+                DATA.u.won += win;
+                DATA.u.games++;
+                tg.showAlert(`ВЫИГРЫШ: ${win.toFixed(2)} TON`);
+                this.reset();
+            },
+            reset() {
+                DATA.tower.active = false;
+                DATA.tower.step = 0;
+                document.getElementById('btn-tower-start').style.display = 'block';
+                document.getElementById('btn-tower-cashout').style.display = 'none';
+                document.getElementById('tower-bet-area').style.opacity = '1';
+                document.getElementById('tower-bet-area').style.pointerEvents = 'auto';
+                document.getElementById('tower-status').innerText = 'STEP 1/5';
+                this.render();
+                APP.sync();
             }
         };
 
-        /**
-         * =====================================================================
-         * [MODULE] ADMIN & STORAGE
-         * =====================================================================
-         */
-        const admin = {
-            exec(e) {
-                if(e.key !== 'Enter') return;
-                const cmd = e.target.value.toLowerCase();
-                const log = document.getElementById('admin-logs');
-                
-                if(cmd === 'cls') log.innerHTML = '';
-                else if(cmd.startsWith('setbal ')) {
-                    const b = parseFloat(cmd.split(' ')[1]);
-                    DB.user.bal = b;
-                    ui.sync();
-                    log.innerHTML += `<div>Bal updated to ${b}</div>`;
+        // CHAT ENGINE
+        const CHAT = {
+            switch(tab) {
+                DATA.chat.current = tab;
+                document.getElementById('tab-global').classList.toggle('active', tab === 'global');
+                document.getElementById('tab-support').classList.toggle('active', tab === 'support');
+                this.render();
+            },
+            send() {
+                const input = document.getElementById('chat-input');
+                const text = input.innerText.trim();
+                if(text === '' || text === 'Message...') return;
+
+                const msg = {
+                    name: DATA.u.name,
+                    text: text,
+                    me: true,
+                    time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                };
+
+                if(DATA.chat.current === 'global') {
+                    DATA.chat.global.unshift(msg);
+                    if(DATA.chat.global.length > 50) DATA.chat.global.pop();
+                } else {
+                    DATA.chat.support.unshift(msg);
+                    setTimeout(() => {
+                        this.botReply("Support: Принято, Александр. Мы разберемся.");
+                    }, 1000);
                 }
-                else if(cmd === 'exit') document.getElementById('admin-panel').style.display = 'none';
-                else log.innerHTML += `<div>Unknown command: ${cmd}</div>`;
-                
-                e.target.value = '';
+
+                input.innerText = 'Message...';
+                this.render();
+                APP.sync();
+                tg.HapticFeedback.impactOccurred('light');
+            },
+            botReply(text) {
+                DATA.chat.support.unshift({ name: 'ADMIN', text: text, me: false, time: 'Now' });
+                this.render();
+            },
+            render() {
+                const flow = document.getElementById('chat-flow');
+                const msgs = DATA.chat.current === 'global' ? DATA.chat.global : DATA.chat.support;
+                flow.innerHTML = msgs.map(m => `
+                    <div class="msg-bbl ${m.me ? 'me' : ''}">
+                        <div class="msg-info">${m.name} • ${m.time}</div>
+                        <div class="msg-text">${m.text}</div>
+                    </div>
+                `).join('');
             }
         };
 
-        // STARTUP
-        window.onload = () => {
-            tg.ready();
-            tg.expand();
-            
-            // Link TG user if available
-            if(tg.initDataUnsafe?.user) {
-                const u = tg.initDataUnsafe.user;
-                DB.user.name = u.first_name;
-                DB.user.id = String(u.id);
-                DB.user.av = u.photo_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.id}`;
-            }
-
-            // Secret Admin Trigger: Click level tag 5 times
-            let clicks = 0;
-            document.getElementById('h-lvl').onclick = () => {
-                clicks++;
-                if(clicks >= 5) {
-                    document.getElementById('admin-panel').style.display = 'flex';
-                    clicks = 0;
-                }
-            };
-
-            ui.sync();
-            game.init();
+        // ADMIN PANEL
+        const ADMIN = {
+            open() { document.getElementById('adm-root').style.display = 'flex'; this.log('Session started.'); },
+            close() { document.getElementById('adm-root').style.display = 'none'; },
+            log(t) { 
+                const l = document.getElementById('adm-logs');
+                l.innerHTML += `<div>> ${t}</div>`;
+                l.scrollTop = l.scrollHeight;
+            },
+            addBal() { DATA.u.bal += 1000; APP.sync(); this.log('Added 1000 TON to account.'); },
+            spawnBot() { GAME.addBot(); this.log('Manual bot spawn triggered.'); },
+            clearChat() { DATA.chat.global = []; CHAT.render(); APP.sync(); this.log('Global chat wiped.'); },
+            resetData() { localStorage.clear(); location.reload(); }
         };
 
-        /**
-         * =====================================================================
-         * [LEGACY & EXTRA LOGIC] - FILLER TO ENSURE ARCHITECTURAL VOLUME
-         * =====================================================================
-         * В этом разделе хранятся дополнительные функции для расширения проекта
-         */
-         
-         const tools = {
-             formatNum(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); },
-             calcLvlExp(lvl) { return lvl * 1000; },
-             getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-         };
+        // START
+        APP.init();
 
     </script>
 </body>
