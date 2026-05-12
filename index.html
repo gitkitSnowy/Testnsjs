@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Rolls Master PvP ELITE</title>
     
+    <!-- TON Connect SDK -->
+    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.css">
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -92,6 +97,12 @@
             object-fit: cover; 
             background: #161b22;
             transition: 0.3s;
+            overflow: hidden;
+        }
+        .u-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .u-lvl-float {
             position: absolute;
@@ -103,6 +114,7 @@
             padding: 2px 5px;
             border-radius: 5px;
             border: 2px solid var(--panel);
+            color: #ffffff;
         }
 
         .u-details { display: flex; flex-direction: column; }
@@ -110,7 +122,7 @@
         .u-name { font-weight: 800; font-size: 15px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .u-rank-text { font-size: 10px; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .balance-block { text-align: right; }
+        .balance-block { text-align: right; cursor: pointer; }
         .bal-val { font-weight: 900; color: var(--gold); font-size: 20px; letter-spacing: -0.5px; }
         .bal-label { font-size: 9px; color: var(--sub); font-weight: 600; text-transform: uppercase; }
 
@@ -184,195 +196,275 @@
         .game-zone { text-align: center; padding: 10px 0; }
         .wheel-container { 
             position: relative; 
-            width: 300px; 
-            height: 300px; 
+            width: 320px; 
+            height: 320px; 
             margin: 20px auto; 
             border-radius: 50%;
-            box-shadow: 0 0 50px rgba(0,0,0,0.6);
+            box-shadow: 0 0 80px rgba(36, 129, 204, 0.3), 0 0 120px rgba(0,0,0,0.8);
+            background: radial-gradient(circle at center, #1a1f2e 0%, #0a0d14 100%);
         }
         canvas#mainWheel { 
             width: 100%; 
             height: 100%; 
             border-radius: 50%; 
-            border: 8px solid var(--panel); 
+            border: 6px solid rgba(36, 129, 204, 0.3);
             transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1);
+            position: relative;
+            z-index: 1;
         }
         .wheel-pointer { 
-            position: absolute; top: -20px; left: 50%; transform: translateX(-50%); 
-            z-index: 100; font-size: 36px; color: #ffffff; 
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+            position: absolute; 
+            top: -25px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 100; 
+            font-size: 40px; 
+            color: #ffffff; 
+            filter: drop-shadow(0 4px 15px rgba(0,0,0,0.8));
+            pointer-events: none;
         }
         .wheel-center-logo {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 60px; height: 60px; background: var(--panel); border: 4px solid var(--accent);
-            border-radius: 50%; z-index: 50; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; color: #ffffff; font-size: 12px;
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%);
+            width: 70px; 
+            height: 70px; 
+            background: radial-gradient(circle, #1a1f2e, #0d1117); 
+            border: 4px solid var(--accent);
+            border-radius: 50%; 
+            z-index: 50; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-weight: 900; 
+            color: #ffffff; 
+            font-size: 14px;
+            box-shadow: 0 0 30px rgba(36, 129, 204, 0.5);
+            pointer-events: none;
+        }
+        .player-segment-avatar {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 2px solid #ffffff;
+            overflow: hidden;
+            z-index: 60;
+            background: #1a1f2e;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+        .player-segment-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .players-feed { margin-top: 30px; display: flex; flex-direction: column; gap: 12px; }
         .player-card { 
-            display: flex; justify-content: space-between; align-items: center; 
-            background: rgba(255,255,255,0.02); padding: 14px 20px; border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.05); animation: fadeInUp 0.4s ease-out;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); 
+            padding: 14px 20px; 
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.08); 
+            animation: fadeInUp 0.4s ease-out;
+            transition: all 0.3s;
+        }
+        .player-card:hover {
+            border-color: rgba(36, 129, 204, 0.3);
+            background: linear-gradient(135deg, rgba(36,129,204,0.05), rgba(36,129,204,0.02));
         }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .p-info { display: flex; align-items: center; gap: 12px; }
-        .p-ava { width: 34px; height: 34px; border-radius: 10px; background: #21262d; border: 1px solid var(--accent); object-fit: cover; }
+        .p-ava { 
+            width: 38px; 
+            height: 38px; 
+            border-radius: 12px; 
+            background: #21262d; 
+            border: 2px solid rgba(36, 129, 204, 0.3); 
+            object-fit: cover; 
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .p-ava img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
         .p-name { font-weight: 700; font-size: 14px; }
-        .p-bet { font-weight: 900; color: var(--gold); }
+        .p-bet { 
+            font-weight: 900; 
+            color: var(--gold); 
+            background: rgba(255,204,0,0.1); 
+            padding: 8px 14px; 
+            border-radius: 12px;
+            font-size: 15px;
+        }
 
         nav {
-            position: fixed; bottom: 0; width: 100%; max-width: 500px;
-            background: var(--panel); display: flex; justify-content: space-around; 
-            padding: 15px 0 35px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000;
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            max-width: 500px;
+            background: var(--panel); 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 15px 0 35px; 
+            border-top: 1px solid rgba(255,255,255,0.05); 
+            z-index: 1000;
+            backdrop-filter: blur(20px);
         }
         .nav-item { 
-            display: flex; flex-direction: column; align-items: center; gap: 6px; 
-            color: var(--sub); font-size: 10px; font-weight: 800; cursor: pointer; 
-            flex: 1; transition: 0.3s; opacity: 0.6;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 6px; 
+            color: var(--sub); 
+            font-size: 10px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            flex: 1; 
+            transition: 0.3s; 
+            opacity: 0.6;
         }
         .nav-item.active { color: var(--accent); opacity: 1; }
-        .nav-icon { font-size: 22px; filter: brightness(0) invert(1); }
+        .nav-icon { font-size: 24px; }
 
         .xp-container { margin: 20px 0; }
         .xp-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-bottom: 8px; }
-        .xp-bar-bg { width: 100%; height: 10px; background: #21262d; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
-        .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #58a6ff); width: 0%; transition: 1.5s cubic-bezier(0.1, 0, 0, 1); }
+        .xp-bar-bg { 
+            width: 100%; 
+            height: 12px; 
+            background: #21262d; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .xp-bar-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, var(--accent), #58a6ff); 
+            width: 0%; 
+            transition: 1.5s cubic-bezier(0.1, 0, 0, 1);
+            box-shadow: 0 0 20px rgba(36, 129, 204, 0.5);
+        }
 
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .stat-val { display: block; font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+        .stat-item { 
+            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); 
+            padding: 18px; 
+            border-radius: 20px; 
+            text-align: center; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            transition: all 0.3s;
+        }
+        .stat-item:hover {
+            border-color: rgba(36,129,204,0.3);
+            transform: translateY(-2px);
+        }
+        .stat-val { display: block; font-size: 22px; font-weight: 900; margin-bottom: 4px; }
         .stat-label { font-size: 10px; color: var(--sub); text-transform: uppercase; font-weight: 700; }
 
         .achiev-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
         .achiev-card { 
-            min-width: 85px; height: 85px; background: #161b22; border-radius: 20px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 2px solid transparent; transition: 0.3s; opacity: 0.4; filter: grayscale(1);
+            min-width: 90px; 
+            height: 90px; 
+            background: linear-gradient(135deg, #161b22, #1a1f2e); 
+            border-radius: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            border: 2px solid transparent; 
+            transition: all 0.3s; 
+            opacity: 0.3; 
+            filter: grayscale(1);
             scroll-snap-align: start;
         }
-        .achiev-card.unlocked { opacity: 1; filter: grayscale(0); border-color: var(--gold); background: rgba(255,204,0,0.05); }
-        .ach-icon { font-size: 28px; margin-bottom: 5px; filter: brightness(0) invert(1); }
-        .ach-name { font-size: 8px; font-weight: 800; color: var(--sub); text-align: center; line-height: 1.2; }
+        .achiev-card.unlocked { 
+            opacity: 1; 
+            filter: grayscale(0); 
+            border-color: var(--gold); 
+            background: linear-gradient(135deg, rgba(255,204,0,0.1), rgba(255,204,0,0.05));
+            box-shadow: 0 4px 20px rgba(255,204,0,0.2);
+            animation: glowPulse 2s infinite;
+        }
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(255,204,0,0.2); }
+            50% { box-shadow: 0 4px 30px rgba(255,204,0,0.4); }
+        }
+        .ach-icon { font-size: 32px; margin-bottom: 5px; }
+        .ach-name { font-size: 9px; font-weight: 800; color: var(--sub); text-align: center; line-height: 1.2; }
 
         .modal { 
-            position: fixed; inset: 0; background: var(--bg); z-index: 5000; 
-            padding: 30px 20px; display: none; overflow-y: auto; 
+            position: fixed; 
+            inset: 0; 
+            background: var(--bg); 
+            z-index: 5000; 
+            padding: 30px 20px; 
+            display: none; 
+            overflow-y: auto; 
             animation: slideUp 0.3s ease-out;
         }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
         .win-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-            z-index: 10000; display: none; flex-direction: column;
-            align-items: center; justify-content: center; text-align: center;
-            backdrop-filter: blur(10px);
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.9);
+            z-index: 10000; 
+            display: none; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            text-align: center;
+            backdrop-filter: blur(20px);
         }
-        .win-box { animation: pop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.28); }
+        .win-box { 
+            animation: pop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.28);
+            background: linear-gradient(135deg, #1a1f2e, #0d1117);
+            padding: 40px;
+            border-radius: 30px;
+            max-width: 350px;
+            border: 2px solid var(--gold);
+            box-shadow: 0 20px 60px rgba(255,204,0,0.3);
+        }
         @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         .leader-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .leader-left { display: flex; align-items: center; gap: 10px; }
-        .leader-rank { 
-            width: 30px; height: 30px; background: var(--accent); border-radius: 8px;
-            display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px;
-        }
-        .leader-rank.top1 { background: linear-gradient(135deg, var(--gold), #ccaa00); }
-        .leader-rank.top2 { background: #c0c0c0; }
-        .leader-rank.top3 { background: #cd7f32; }
-
-        .tower-screen { }
-        .tower-grid { display: grid; gap: 10px; margin: 20px 0; }
-        .tower-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .tower-cell {
-            aspect-ratio: 1;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            border: 2px solid rgba(255,255,255,0.1);
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 14px 0; 
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
         }
-        .tower-cell:active:not(:disabled) { transform: scale(0.95); }
-        .tower-cell.safe {
-            background: linear-gradient(135deg, var(--green), #1fa05a);
-            animation: pulse 0.5s;
+        .leader-item:hover { background: rgba(255,255,255,0.02); padding-left: 10px; padding-right: 10px; }
+        .leader-left { display: flex; align-items: center; gap: 12px; }
+        .leader-rank { 
+            width: 34px; 
+            height: 34px; 
+            background: var(--accent); 
+            border-radius: 10px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 900; 
+            font-size: 14px;
         }
-        .tower-cell.danger {
-            background: linear-gradient(135deg, var(--red), #cc3a48);
-            animation: shake 0.5s;
-        }
-        .tower-cell:disabled { opacity: 0.3; cursor: not-allowed; }
+        .leader-rank.top1 { background: linear-gradient(135deg, var(--gold), #ccaa00); box-shadow: 0 4px 15px rgba(255,204,0,0.5); }
+        .leader-rank.top2 { background: linear-gradient(135deg, #c0c0c0, #808080); }
+        .leader-rank.top3 { background: linear-gradient(135deg, #cd7f32, #8B4513); }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .admin-panel { }
-        .admin-section { margin: 20px 0; }
-        .support-chat {
-            height: 300px;
-            overflow-y: auto;
-            background: rgba(0,0,0,0.2);
-            border-radius: 15px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-        .message {
-            margin: 10px 0;
-            padding: 10px 15px;
-            border-radius: 12px;
-            max-width: 80%;
-            word-wrap: break-word;
-        }
-        .message.user {
-            background: rgba(255,255,255,0.1);
-            margin-left: auto;
-        }
-        .message.support {
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-        }
-
-        .buy-ton-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 9000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-        
-        .buy-ton-card {
-            background: var(--panel);
-            border-radius: 24px;
-            padding: 30px;
-            max-width: 400px;
-            width: 90%;
-            border: 1px solid var(--card-border);
-        }
-        
         .ton-package {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            border: 2px solid rgba(255,255,255,0.1);
             border-radius: 16px;
-            padding: 15px;
+            padding: 16px;
             margin: 10px 0;
             cursor: pointer;
             transition: all 0.3s;
@@ -383,45 +475,38 @@
         
         .ton-package:hover {
             border-color: var(--accent);
-            background: rgba(36,129,204,0.05);
+            background: linear-gradient(135deg, rgba(36,129,204,0.1), rgba(36,129,204,0.05));
+            transform: translateX(5px);
         }
         
         .ton-package.selected {
             border-color: var(--accent);
-            background: rgba(36,129,204,0.1);
+            background: linear-gradient(135deg, rgba(36,129,204,0.15), rgba(36,129,204,0.08));
+            box-shadow: 0 4px 20px rgba(36,129,204,0.3);
         }
-        
-        .wallet-option {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 15px;
-            margin: 10px 0;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .wallet-option:hover {
-            border-color: var(--accent);
-        }
-        
-        .wallet-option.selected {
-            border-color: var(--accent);
-            background: rgba(36,129,204,0.1);
-        }
-        
-        .wallet-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.1);
-            display: flex;
+
+        .processing-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            display: none;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -431,47 +516,50 @@
     <header>
         <div class="user-block">
             <div class="u-avatar-wrapper">
-                <img id="head-avatar" class="u-avatar" src="" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div id="head-avatar-fallback" class="u-avatar" style="display:none; align-items:center; justify-content:center; font-size:20px; font-weight:900; color:#ffffff;">👤</div>
+                <div class="u-avatar" id="head-avatar-container">
+                    <img id="head-avatar-img" src="" alt="Avatar" style="display:none;">
+                    <div id="head-avatar-fallback" style="display:flex; width:100%; height:100%; align-items:center; justify-content:center; font-size:22px; font-weight:900; color:#ffffff;">?</div>
+                </div>
                 <div class="u-lvl-float" id="head-lvl">1</div>
             </div>
             <div class="u-details">
                 <div class="u-name-row">
                     <span id="head-name" class="u-name">Loading...</span>
-                    <span id="v-badge" style="display:none; color:#ffffff;">✓</span>
+                    <span id="v-badge" style="display:none; color:#ffffff; font-size:16px;">✓</span>
                 </div>
                 <span class="u-rank-text" id="head-rank">ROOKIE</span>
             </div>
         </div>
-        <div class="balance-block" onclick="openBuyTonModal()" style="cursor: pointer;">
-            <div class="bal-label">TON BALANCE</div>
+        <div class="balance-block" onclick="openBuyTonModal()">
+            <div class="bal-label">BALANCE</div>
             <div class="bal-val"><span id="head-bal">0.00</span> 💎</div>
         </div>
     </header>
 
     <main id="main-content">
+        <!-- Lobby Screen -->
         <div id="scr-lobby" class="screen active">
             <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
-                <h1 style="margin:0; font-size:28px; font-weight:900;">Арены</h1>
-                <div style="color:var(--green); font-size:11px; font-weight:800; background:rgba(46,213,115,0.1); padding:4px 10px; border-radius:10px;">
-                    ● LIVE: <span id="online-val">241</span>
+                <h1 style="margin:0; font-size:32px; font-weight:900; background: linear-gradient(135deg, #ffffff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Арены</h1>
+                <div style="color:var(--green); font-size:12px; font-weight:800; background:rgba(46,213,115,0.15); padding:6px 14px; border-radius:12px; border: 1px solid rgba(46,213,115,0.3);">
+                    ● LIVE <span id="online-val">241</span>
                 </div>
             </div>
 
             <div class="card" onclick="openRoom('common')">
                 <div class="card-glow"></div>
                 <div class="card-header">
-                    <span>PUBLIC ROOM</span>
+                    <span>⚔️ PUBLIC ROOM</span>
                     <span style="color:var(--green)">● ONLINE</span>
                 </div>
-                <h2 style="margin:0 0 10px 0; font-size:22px;">⚔️ Battle Arena</h2>
-                <p style="color:var(--sub); font-size:12px; margin:0 0 20px 0; line-height:1.4;">
-                    Честная игра на удачу. Шанс победы пропорционален твоей ставке.
+                <h2 style="margin:0 0 10px 0; font-size:24px; font-weight:900;">Battle Arena</h2>
+                <p style="color:var(--sub); font-size:13px; margin:0 0 20px 0; line-height:1.5;">
+                    Честная PvP игра. Шанс победы пропорционален вашей ставке.
                 </p>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div>
-                        <div style="font-size:9px; color:var(--sub); font-weight:800; margin-bottom:4px;">ТЕКУЩИЙ БАНК</div>
-                        <div style="font-size:18px; font-weight:900; color:var(--gold);"><span id="lobby-jackpot">0.00</span> TON</div>
+                        <div style="font-size:10px; color:var(--sub); font-weight:800; margin-bottom:6px;">ТЕКУЩИЙ БАНК</div>
+                        <div style="font-size:20px; font-weight:900; color:var(--gold);"><span id="lobby-jackpot">0.00</span> TON</div>
                     </div>
                     <button class="btn-action btn-small" onclick="event.stopPropagation(); openRoom('common')">ИГРАТЬ</button>
                 </div>
@@ -479,68 +567,68 @@
 
             <div class="card" onclick="openRoom('vip')" style="border-color: var(--gold);">
                 <div class="card-header">
-                    <span style="color:var(--gold)">VIP ONLY</span>
-                    <span id="vip-lock-status">🔒 ТРЕБУЕТСЯ LVL 5</span>
+                    <span style="color:var(--gold)">💎 VIP ONLY</span>
+                    <span id="vip-lock-status">🔒 LVL 5</span>
                 </div>
-                <h2 style="margin:0 0 10px 0; font-size:22px; color:var(--gold);">💎 High Rollers</h2>
-                <p style="color:var(--sub); font-size:12px; margin:0 0 20px 0;">
-                    Только для элиты. Минимальный вход: 10.0 TON. Нужен 5 уровень.
+                <h2 style="margin:0 0 10px 0; font-size:24px; font-weight:900; color:var(--gold);">High Rollers</h2>
+                <p style="color:var(--sub); font-size:13px; margin:0 0 20px 0;">
+                    Элитная арена. Мин. вход: 10 TON. Требуется 5 уровень.
                 </p>
                 <button class="btn-action btn-gold btn-small" id="vip-btn" onclick="event.stopPropagation(); openRoom('vip')">ВОЙТИ</button>
             </div>
 
-            <!-- Кнопка покупки TON -->
             <div class="card" onclick="openBuyTonModal()" style="border-color: var(--accent);">
                 <div class="card-header">
-                    <span>ПОПОЛНЕНИЕ</span>
-                    <span style="color:var(--accent);">💎</span>
+                    <span>💎 ПОПОЛНЕНИЕ</span>
+                    <span style="color:var(--accent);">TON</span>
                 </div>
-                <h2 style="margin:0 0 10px 0; font-size:22px;">Купить TON</h2>
-                <p style="color:var(--sub); font-size:12px; margin:0 0 20px 0;">
-                    Пополни баланс для участия в играх. Выбери удобный способ оплаты.
+                <h2 style="margin:0 0 10px 0; font-size:24px;">Купить TON</h2>
+                <p style="color:var(--sub); font-size:13px; margin:0 0 20px 0;">
+                    Пополни баланс через TON Connect. Мгновенное зачисление.
                 </p>
                 <button class="btn-action" onclick="event.stopPropagation(); openBuyTonModal()">
-                    💎 ПОПОЛНИТЬ БАЛАНС
+                    💎 ПОПОЛНИТЬ
                 </button>
             </div>
 
             <div class="card">
-                <div class="card-header">ЛИДЕРЫ НЕДЕЛИ</div>
+                <div class="card-header">🏆 ЛИДЕРЫ НЕДЕЛИ</div>
                 <div id="leaderboard-content">
                     <div class="leader-item">
                         <div class="leader-left">
                             <div class="leader-rank top1">1</div>
                             <div>
-                                <div style="font-weight:700; font-size:14px;">@CryptoKing</div>
-                                <div style="font-size:10px; color:var(--sub);">125 побед</div>
+                                <div style="font-weight:700; font-size:15px;">@CryptoKing</div>
+                                <div style="font-size:11px; color:var(--sub);">125 побед</div>
                             </div>
                         </div>
-                        <div style="font-weight:900; color:var(--gold);">+1,234 TON</div>
+                        <div style="font-weight:900; color:var(--gold); font-size:16px;">+1,234 TON</div>
                     </div>
                     <div class="leader-item">
                         <div class="leader-left">
                             <div class="leader-rank top2">2</div>
                             <div>
-                                <div style="font-weight:700; font-size:14px;">@WhaleHunter</div>
-                                <div style="font-size:10px; color:var(--sub);">98 побед</div>
+                                <div style="font-weight:700; font-size:15px;">@WhaleHunter</div>
+                                <div style="font-size:11px; color:var(--sub);">98 побед</div>
                             </div>
                         </div>
-                        <div style="font-weight:900; color:var(--gold);">+856 TON</div>
+                        <div style="font-weight:900; color:var(--gold); font-size:16px;">+856 TON</div>
                     </div>
                     <div class="leader-item">
                         <div class="leader-left">
                             <div class="leader-rank top3">3</div>
                             <div>
-                                <div style="font-weight:700; font-size:14px;">@LuckyDev</div>
-                                <div style="font-size:10px; color:var(--sub);">87 побед</div>
+                                <div style="font-weight:700; font-size:15px;">@LuckyDev</div>
+                                <div style="font-size:11px; color:var(--sub);">87 побед</div>
                             </div>
                         </div>
-                        <div style="font-weight:900; color:var(--gold);">+623 TON</div>
+                        <div style="font-weight:900; color:var(--gold); font-size:16px;">+623 TON</div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Game Screen -->
         <div id="scr-game" class="screen">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <button class="btn-action btn-secondary btn-small" onclick="exitToLobby()">⬅ Выйти</button>
@@ -551,37 +639,39 @@
             </div>
 
             <div class="game-zone">
-                <div class="wheel-container">
+                <div class="wheel-container" id="wheel-container">
                     <div class="wheel-pointer">▼</div>
                     <div class="wheel-center-logo">ROLLS</div>
-                    <canvas id="mainWheel" width="600" height="600"></canvas>
+                    <canvas id="mainWheel" width="640" height="640"></canvas>
+                    <div id="player-avatars-overlay"></div>
                 </div>
 
-                <div id="game-status-text" style="font-size:20px; font-weight:900; color:var(--gold); margin:20px 0; text-transform:uppercase; letter-spacing:1px;">
+                <div id="game-status-text" style="font-size:22px; font-weight:900; color:var(--gold); margin:20px 0; text-transform:uppercase; letter-spacing:1px; text-shadow: 0 0 20px rgba(255,204,0,0.5);">
                     Ожидание игроков...
                 </div>
             </div>
 
             <div class="card" style="border-color:var(--accent); cursor: default;">
-                <div class="card-header">ВАША СТАВКА</div>
+                <div class="card-header">🎯 ВАША СТАВКА</div>
                 <div style="display:flex; gap:12px;">
                     <div class="input-group" style="flex:1; margin:0;">
                         <span class="input-label">СУММА (TON)</span>
                         <input type="number" id="bet-input" class="input-fld" value="1.0" step="0.1" min="0.1">
                     </div>
-                    <button class="btn-action" style="width:120px;" id="bet-btn" onclick="handlePlaceBet()">СТАВКА</button>
+                    <button class="btn-action" style="width:130px;" id="bet-btn" onclick="handlePlaceBet()">СТАВКА</button>
                 </div>
             </div>
 
             <div class="players-feed" id="game-players-list"></div>
         </div>
 
-        <div id="scr-tower" class="screen tower-screen">
+        <!-- Tower Screen -->
+        <div id="scr-tower" class="screen">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h1 style="margin:0; font-size:28px; font-weight:900;">🗼 Tower</h1>
+                <h1 style="margin:0; font-size:32px; font-weight:900;">🗼 Tower</h1>
                 <div style="text-align:right;">
                     <div style="font-size:10px; color:var(--sub); font-weight:800;">МНОЖИТЕЛЬ</div>
-                    <div style="font-size:24px; font-weight:900; color:var(--gold);">x<span id="tower-mult">1.00</span></div>
+                    <div style="font-size:28px; font-weight:900; color:var(--gold);">x<span id="tower-mult">1.00</span></div>
                 </div>
             </div>
 
@@ -592,7 +682,7 @@
                         <span class="input-label">СУММА (TON)</span>
                         <input type="number" id="tower-bet-input" class="input-fld" value="1.0" step="0.1" min="0.1">
                     </div>
-                    <button class="btn-action" style="width:120px;" id="tower-start-btn" onclick="startTower()">СТАРТ</button>
+                    <button class="btn-action" style="width:130px;" id="tower-start-btn" onclick="startTower()">СТАРТ</button>
                 </div>
                 <button class="btn-action btn-gold" id="tower-cashout-btn" onclick="cashoutTower()" style="display:none;">
                     ЗАБРАТЬ <span id="tower-win-amount">0.00</span> TON
@@ -600,82 +690,95 @@
             </div>
 
             <div class="tower-grid" id="tower-grid"></div>
-
-            <div style="text-align:center; color:var(--sub); font-size:11px; margin-top:20px;">
-                Выбирай безопасные клетки и поднимайся выше!<br>Каждый уровень увеличивает множитель x1.3
-            </div>
         </div>
 
+        <!-- Profile Screen -->
         <div id="scr-profile" class="screen">
             <div class="card" style="text-align:center; padding-top:40px; cursor: default;">
                 <div class="u-avatar-wrapper" style="display:inline-block; margin-bottom:20px;">
-                    <img id="prof-avatar" class="u-avatar" style="width:100px; height:100px; border-radius:30px; font-size:40px;" src="" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div id="prof-avatar-fallback" class="u-avatar" style="width:100px; height:100px; border-radius:30px; font-size:40px; display:none; align-items:center; justify-content:center; color:#ffffff;">👤</div>
-                    <div class="u-lvl-float" style="width:30px; height:30px; font-size:14px; display:flex; align-items:center; justify-content:center; bottom:0; right:0;" id="prof-lvl">1</div>
+                    <div class="u-avatar" style="width:110px; height:110px; border-radius:28px; border: 3px solid var(--accent);">
+                        <img id="prof-avatar-img" src="" alt="Avatar" style="display:none; width:100%; height:100%; object-fit:cover;">
+                        <div id="prof-avatar-fallback" style="display:flex; width:100%; height:100%; align-items:center; justify-content:center; font-size:45px; font-weight:900; color:#ffffff;">?</div>
+                    </div>
+                    <div class="u-lvl-float" style="width:34px; height:34px; font-size:15px; display:flex; align-items:center; justify-content:center; bottom:0; right:0;" id="prof-lvl">1</div>
                 </div>
-                <h2 style="margin:0;" id="prof-name">@Alexander</h2>
-                <div id="prof-rank" style="color:var(--accent); font-weight:800; font-size:12px; margin-top:5px;">ROOKIE</div>
+                <h2 style="margin:0; font-size:22px;" id="prof-name">@Username</h2>
+                <div id="prof-rank" style="color:var(--accent); font-weight:800; font-size:13px; margin-top:5px;">ROOKIE</div>
 
                 <div class="xp-container">
                     <div class="xp-header">
-                        <span>PROGRESS TO LVL <span id="next-lvl-num">2</span></span>
+                        <span>LVL <span id="next-lvl-num">2</span></span>
                         <span id="xp-stat">0 / 100 XP</span>
                     </div>
                     <div class="xp-bar-bg"><div id="xp-bar-fill" class="xp-bar-fill"></div></div>
                 </div>
 
-                <button class="btn-action" onclick="showSupport()" style="margin-top:15px;">💬 Тех. поддержка</button>
-                <button class="btn-action" onclick="openBuyTonModal()" style="margin-top:10px; background: linear-gradient(135deg, var(--gold) 0%, #ccaa00 100%); color: #000;">
+                <button class="btn-action" onclick="showSupport()" style="margin-top:15px;">💬 Поддержка</button>
+                <button class="btn-action" onclick="openBuyTonModal()" style="margin-top:10px; background: linear-gradient(135deg, var(--gold), #ccaa00); color: #000;">
                     💎 Купить TON
                 </button>
             </div>
 
             <div class="stats-grid">
-                <div class="stat-item"><span class="stat-val" id="stat-games">0</span><span class="stat-label">Всего игр</span></div>
+                <div class="stat-item"><span class="stat-val" id="stat-games">0</span><span class="stat-label">Игр</span></div>
                 <div class="stat-item"><span class="stat-val" id="stat-wins" style="color:var(--green)">0</span><span class="stat-label">Побед</span></div>
-                <div class="stat-item"><span class="stat-val" id="stat-tbet">0.0</span><span class="stat-label">Оборот TON</span></div>
-                <div class="stat-item"><span class="stat-val" id="stat-profit" style="color:var(--gold)">0.0</span><span class="stat-label">Чистый плюс</span></div>
+                <div class="stat-item"><span class="stat-val" id="stat-tbet">0.0</span><span class="stat-label">Оборот</span></div>
+                <div class="stat-item"><span class="stat-val" id="stat-profit" style="color:var(--gold)">0.0</span><span class="stat-label">Профит</span></div>
             </div>
 
             <div class="card" style="cursor: default;">
-                <div class="card-header">ДОСТИЖЕНИЯ</div>
+                <div class="card-header">🏅 ДОСТИЖЕНИЯ</div>
                 <div class="achiev-row">
-                    <div class="achiev-card" id="ach-1"><span class="ach-icon">🎯</span><span class="ach-name">ПЕРВАЯ<br>КРОВЬ</span></div>
-                    <div class="achiev-card" id="ach-2"><span class="ach-icon">💰</span><span class="ach-name">МАЖОР</span></div>
-                    <div class="achiev-card" id="ach-3"><span class="ach-icon">🔥</span><span class="ach-name">В УДАРЕ</span></div>
-                    <div class="achiev-card" id="ach-4"><span class="ach-icon">🐳</span><span class="ach-name">КИТ</span></div>
-                    <div class="achiev-card" id="ach-5"><span class="ach-icon">👑</span><span class="ach-name">ЛЕГЕНДА</span></div>
+                    <div class="achiev-card" id="ach-1"><span class="ach-icon">🎯</span><span class="ach-name">Первая<br>Кровь</span></div>
+                    <div class="achiev-card" id="ach-2"><span class="ach-icon">💰</span><span class="ach-name">Мажор</span></div>
+                    <div class="achiev-card" id="ach-3"><span class="ach-icon">🔥</span><span class="ach-name">В Ударе</span></div>
+                    <div class="achiev-card" id="ach-4"><span class="ach-icon">🐳</span><span class="ach-name">Кит</span></div>
+                    <div class="achiev-card" id="ach-5"><span class="ach-icon">👑</span><span class="ach-name">Легенда</span></div>
                 </div>
             </div>
         </div>
 
-        <div id="scr-admin" class="screen admin-panel">
-            <h1 style="margin:0 0 20px 0; font-size:28px; font-weight:900;">⚙️ Админ панель</h1>
+        <!-- Admin Screen -->
+        <div id="scr-admin" class="screen">
+            <h1 style="margin:0 0 20px 0; font-size:32px; font-weight:900;">⚙️ Админ</h1>
             
-            <div class="card admin-section" style="cursor: default;">
-                <div class="card-header">УПРАВЛЕНИЕ БАЛАНСОМ</div>
+            <div class="card" style="cursor: default;">
+                <div class="card-header">🎰 УПРАВЛЕНИЕ КОЛЕСОМ</div>
+                <button class="btn-action" onclick="adminResetWheel()" style="margin-bottom:10px;">
+                    🔄 СБРОСИТЬ КОЛЕСО
+                </button>
+                <button class="btn-action btn-secondary" onclick="adminForceSpin()">
+                    🎲 ПРИНУДИТЕЛЬНЫЙ СПИН
+                </button>
+                <div style="margin-top:10px; padding:12px; background:rgba(255,71,87,0.1); border-radius:12px; border:1px solid rgba(255,71,87,0.2);">
+                    <div style="font-size:11px; color:var(--red); font-weight:700;">⚠️ Возврат ставок при сбросе</div>
+                </div>
+            </div>
+
+            <div class="card" style="cursor: default;">
+                <div class="card-header">💎 БАЛАНС</div>
                 <div class="input-group">
                     <span class="input-label">USERNAME</span>
                     <input type="text" id="admin-target-user" class="input-fld" placeholder="@username">
                 </div>
                 <div class="input-group">
-                    <span class="input-label">КОЛИЧЕСТВО TON</span>
+                    <span class="input-label">TON</span>
                     <input type="number" id="admin-add-balance" class="input-fld" placeholder="0.0">
                 </div>
-                <button class="btn-action" onclick="adminAddBalance()">Начислить TON</button>
+                <button class="btn-action" onclick="adminAddBalance()">Начислить</button>
             </div>
 
-            <div class="card admin-section" style="cursor: default;">
-                <div class="card-header">ВЕРИФИКАЦИЯ</div>
+            <div class="card" style="cursor: default;">
+                <div class="card-header">✓ ВЕРИФИКАЦИЯ</div>
                 <div class="input-group">
                     <span class="input-label">USERNAME</span>
                     <input type="text" id="admin-verify-user" class="input-fld" placeholder="@username">
                 </div>
-                <button class="btn-action" onclick="adminVerifyUser()">Дать галочку ✓</button>
+                <button class="btn-action" onclick="adminVerifyUser()">Выдать ✓</button>
             </div>
 
-            <div class="card admin-section" style="cursor: default;">
-                <div class="card-header">НАЗНАЧИТЬ РОЛИ</div>
+            <div class="card" style="cursor: default;">
+                <div class="card-header">👑 РОЛИ</div>
                 <div class="input-group">
                     <span class="input-label">USERNAME</span>
                     <input type="text" id="admin-role-user" class="input-fld" placeholder="@username">
@@ -683,122 +786,98 @@
                 <button class="btn-action" onclick="adminMakeAdmin()">Сделать админом</button>
                 <button class="btn-action btn-secondary" style="margin-top:10px;" onclick="adminMakeSupport()">Сделать саппортом</button>
             </div>
-
-            <div class="card admin-section" style="cursor: default;">
-                <div class="card-header">ТЕХ. ПОДДЕРЖКА - ТИКЕТЫ</div>
-                <div id="admin-support-tickets" style="max-height:400px; overflow-y:auto;">
-                    <div style="text-align:center; color:var(--sub); padding:20px;">Нет активных тикетов</div>
-                </div>
-            </div>
         </div>
     </main>
 
-    <!-- Модальное окно покупки TON -->
-    <div id="buy-ton-modal" class="buy-ton-modal">
-        <div class="buy-ton-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="margin:0; font-size:24px; font-weight:900;">💎 Купить TON</h2>
+    <!-- Buy TON Modal -->
+    <div id="buy-ton-modal" class="modal" style="background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);">
+        <div style="max-width:400px; margin:0 auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                <h2 style="margin:0; font-size:28px; font-weight:900;">💎 Купить TON</h2>
                 <button class="btn-action btn-secondary btn-small" onclick="closeBuyTonModal()">✕</button>
             </div>
 
-            <div class="card-header">ВЫБЕРИ ПАКЕТ</div>
+            <div class="card-header">ВЫБЕРИТЕ ПАКЕТ</div>
             
-            <div class="ton-package" onclick="selectTonPackage(1, 1, this)" data-package="1">
+            <div class="ton-package" onclick="selectTonPackage(1, 1.5, this)">
                 <div>
                     <div style="font-weight:800; font-size:18px;">1 TON</div>
-                    <div style="font-size:11px; color:var(--sub);">≈ $1.50 USD</div>
+                    <div style="font-size:11px; color:var(--sub);">≈ $1.50</div>
                 </div>
                 <div style="color:var(--accent); font-weight:900;">$1.50</div>
             </div>
 
-            <div class="ton-package" onclick="selectTonPackage(5, 7, this)" data-package="5">
+            <div class="ton-package" onclick="selectTonPackage(5, 7, this)">
                 <div>
                     <div style="font-weight:800; font-size:18px;">5 TON</div>
-                    <div style="font-size:11px; color:var(--sub);">≈ $7.00 USD</div>
+                    <div style="font-size:11px; color:var(--sub);">≈ $7.00</div>
                 </div>
                 <div style="color:var(--accent); font-weight:900;">$7.00</div>
             </div>
 
-            <div class="ton-package" onclick="selectTonPackage(10, 13, this)" data-package="10">
+            <div class="ton-package selected" onclick="selectTonPackage(10, 13, this)">
                 <div>
                     <div style="font-weight:800; font-size:18px;">10 TON</div>
-                    <div style="font-size:11px; color:var(--sub);">≈ $13.00 USD (Скидка 15%)</div>
+                    <div style="font-size:11px; color:var(--sub);">≈ $13.00 (-15%)</div>
                 </div>
                 <div style="color:var(--accent); font-weight:900;">$13.00</div>
             </div>
 
-            <div class="ton-package" onclick="selectTonPackage(25, 30, this)" data-package="25">
+            <div class="ton-package" onclick="selectTonPackage(25, 30, this)">
                 <div>
                     <div style="font-weight:800; font-size:18px;">25 TON</div>
-                    <div style="font-size:11px; color:var(--sub);">≈ $30.00 USD (Скидка 20%)</div>
+                    <div style="font-size:11px; color:var(--sub);">≈ $30.00 (-20%)</div>
                 </div>
                 <div style="color:var(--accent); font-weight:900;">$30.00</div>
             </div>
 
-            <div class="ton-package" onclick="selectTonPackage(100, 110, this)" data-package="100">
+            <div class="ton-package" onclick="selectTonPackage(100, 110, this)">
                 <div>
                     <div style="font-weight:800; font-size:18px;">100 TON</div>
-                    <div style="font-size:11px; color:var(--sub);">≈ $110.00 USD (Скидка 25%)</div>
+                    <div style="font-size:11px; color:var(--sub);">≈ $110.00 (-25%)</div>
                 </div>
                 <div style="color:var(--accent); font-weight:900;">$110.00</div>
             </div>
 
-            <div class="card-header" style="margin-top:20px;">ВЫБЕРИ КОШЕЛЕК</div>
-            
-            <div class="wallet-option selected" onclick="selectWallet('tonkeeper', this)" data-wallet="tonkeeper">
-                <div class="wallet-icon">💎</div>
-                <div>
-                    <div style="font-weight:700;">Tonkeeper</div>
-                    <div style="font-size:11px; color:var(--sub);">Рекомендуемый кошелек</div>
-                </div>
-            </div>
-
-            <div class="wallet-option" onclick="selectWallet('tonhub', this)" data-wallet="tonhub">
-                <div class="wallet-icon">🔷</div>
-                <div>
-                    <div style="font-weight:700;">Tonhub</div>
-                    <div style="font-size:11px; color:var(--sub);">Быстрые транзакции</div>
-                </div>
-            </div>
-
-            <div class="wallet-option" onclick="selectWallet('telegram', this)" data-wallet="telegram">
-                <div class="wallet-icon">✈️</div>
-                <div>
-                    <div style="font-weight:700;">@wallet (Telegram)</div>
-                    <div style="font-size:11px; color:var(--sub);">Встроенный кошелек</div>
-                </div>
-            </div>
-
-            <button class="btn-action" onclick="processBuyTon()" style="margin-top:20px; background: linear-gradient(135deg, var(--green) 0%, #1fa05a 100%);">
-                💎 ОПЛАТИТЬ И ПОЛУЧИТЬ TON
+            <button class="btn-action" onclick="processBuyTon()" style="margin-top:25px; background: linear-gradient(135deg, var(--green), #1fa05a);">
+                💎 ОПЛАТИТЬ <span id="buy-amount-display">10</span> TON
             </button>
             
-            <div style="text-align:center; margin-top:15px; font-size:11px; color:var(--sub);">
-                Вы получите TON моментально после оплаты
-            </div>
+            <div id="ton-connect-container" style="margin-top:15px;"></div>
         </div>
     </div>
 
+    <!-- Processing Overlay -->
+    <div id="processing-overlay" class="processing-overlay">
+        <div style="text-align:center;">
+            <div class="spinner" style="margin:0 auto 20px;"></div>
+            <div style="font-size:18px; font-weight:800; color:var(--accent);">Обработка транзакции...</div>
+            <div style="font-size:12px; color:var(--sub); margin-top:10px;">Пожалуйста, подождите</div>
+        </div>
+    </div>
+
+    <!-- Support Modal -->
     <div id="support-modal" class="modal">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0; font-size:24px; font-weight:900;">💬 Тех. поддержка</h2>
-            <button class="btn-action btn-secondary btn-small" onclick="closeSupport()">✕ Закрыть</button>
+            <h2 style="margin:0; font-size:24px; font-weight:900;">💬 Поддержка</h2>
+            <button class="btn-action btn-secondary btn-small" onclick="closeSupport()">✕</button>
         </div>
         
         <div class="card" style="cursor: default;">
             <div class="support-chat" id="support-chat"></div>
             <div class="input-group">
-                <input type="text" id="support-message-input" class="input-fld" placeholder="Введите сообщение...">
+                <input type="text" id="support-message-input" class="input-fld" placeholder="Сообщение...">
             </div>
             <button class="btn-action" onclick="sendSupportMessage()">Отправить</button>
         </div>
     </div>
 
+    <!-- Win Overlay -->
     <div id="win-overlay" class="win-overlay">
-        <div class="win-box" style="background:var(--panel); padding:40px; border-radius:30px; max-width:350px;">
-            <div style="font-size:60px; margin-bottom:20px;">🎉</div>
-            <div style="font-size:32px; font-weight:900; margin-bottom:10px; color:var(--gold);">ПОБЕДА!</div>
-            <div style="font-size:48px; font-weight:900; color:var(--green); margin-bottom:20px;">
+        <div class="win-box">
+            <div style="font-size:70px; margin-bottom:20px;">🎉</div>
+            <div style="font-size:36px; font-weight:900; margin-bottom:10px; color:var(--gold);">ПОБЕДА!</div>
+            <div style="font-size:52px; font-weight:900; color:var(--green); margin-bottom:20px;">
                 +<span id="win-amount">0.00</span> TON
             </div>
             <button class="btn-action" onclick="closeWinOverlay()">ПРОДОЛЖИТЬ</button>
@@ -826,6 +905,32 @@
 </div>
 
 <script>
+    // ============ TON CONNECT INITIALIZATION ============
+    let tonConnectUI = null;
+    let connectedWallet = null;
+    
+    function initTonConnect() {
+        // Initialize TON Connect UI
+        const manifestUrl = 'https://your-domain.com/tonconnect-manifest.json';
+        
+        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: manifestUrl,
+            buttonRootId: 'ton-connect-container'
+        });
+        
+        // Listen for connection status changes
+        tonConnectUI.onStatusChange(wallet => {
+            if (wallet) {
+                connectedWallet = wallet;
+                console.log('Wallet connected:', wallet.account.address);
+            } else {
+                connectedWallet = null;
+                console.log('Wallet disconnected');
+            }
+        });
+    }
+    
+    // ============ TELEGRAM & APP INIT ============
     let tg = window.Telegram.WebApp;
     tg.expand();
     tg.setHeaderColor('#0d1117');
@@ -833,9 +938,9 @@
 
     let currentUser = {
         id: tg.initDataUnsafe?.user?.id || Math.floor(Math.random() * 1000000),
-        username: tg.initDataUnsafe?.user?.username || 'TestUser' + Math.floor(Math.random() * 1000),
-        firstName: tg.initDataUnsafe?.user?.first_name || 'Test',
-        lastName: tg.initDataUnsafe?.user?.last_name || 'User',
+        username: tg.initDataUnsafe?.user?.username || 'Player' + Math.floor(Math.random() * 1000),
+        firstName: tg.initDataUnsafe?.user?.first_name || 'Player',
+        lastName: tg.initDataUnsafe?.user?.last_name || '',
         photoUrl: tg.initDataUnsafe?.user?.photo_url || null,
         balance: 100.0,
         level: 1,
@@ -856,7 +961,9 @@
     let gameState = {
         players: [],
         totalPot: 0,
-        isSpinning: false
+        isSpinning: false,
+        spinTimeout: null,
+        playerBets: {}
     };
 
     let towerState = {
@@ -869,10 +976,8 @@
     };
 
     let buyTonState = {
-        selectedPackage: 1,
-        selectedAmount: 1,
-        selectedPrice: 1.5,
-        selectedWallet: 'tonkeeper',
+        selectedAmount: 10,
+        selectedPrice: 13,
         isProcessing: false
     };
 
@@ -888,20 +993,26 @@
     ];
 
     async function initApp() {
+        initTonConnect();
         await loadUser();
         updateUI();
         setupWheel();
         loadAvatar();
         
+        // Auto-admin for specific user
         if (currentUser.username === 'Kegovich') {
             currentUser.isAdmin = true;
             document.getElementById('admin-nav').style.display = 'flex';
             await saveUser();
         }
 
+        // Update online count
         setInterval(() => {
             document.getElementById('online-val').textContent = Math.floor(200 + Math.random() * 100);
         }, 5000);
+        
+        // Listen for room changes
+        listenToRooms();
     }
 
     async function loadUser() {
@@ -923,27 +1034,21 @@
 
     function loadAvatar() {
         if (currentUser.photoUrl) {
-            document.getElementById('head-avatar').src = currentUser.photoUrl;
-            document.getElementById('prof-avatar').src = currentUser.photoUrl;
-            document.getElementById('head-avatar').style.display = 'block';
-            document.getElementById('prof-avatar').style.display = 'block';
-            if (document.getElementById('head-avatar-fallback')) {
-                document.getElementById('head-avatar-fallback').style.display = 'none';
-            }
-            if (document.getElementById('prof-avatar-fallback')) {
-                document.getElementById('prof-avatar-fallback').style.display = 'none';
-            }
+            document.getElementById('head-avatar-img').src = currentUser.photoUrl;
+            document.getElementById('head-avatar-img').style.display = 'block';
+            document.getElementById('head-avatar-fallback').style.display = 'none';
+            
+            document.getElementById('prof-avatar-img').src = currentUser.photoUrl;
+            document.getElementById('prof-avatar-img').style.display = 'block';
+            document.getElementById('prof-avatar-fallback').style.display = 'none';
         } else {
-            document.getElementById('head-avatar').style.display = 'none';
-            document.getElementById('prof-avatar').style.display = 'none';
-            if (document.getElementById('head-avatar-fallback')) {
-                document.getElementById('head-avatar-fallback').style.display = 'flex';
-                document.getElementById('head-avatar-fallback').textContent = currentUser.firstName?.charAt(0) || '👤';
-            }
-            if (document.getElementById('prof-avatar-fallback')) {
-                document.getElementById('prof-avatar-fallback').style.display = 'flex';
-                document.getElementById('prof-avatar-fallback').textContent = currentUser.firstName?.charAt(0) || '👤';
-            }
+            document.getElementById('head-avatar-img').style.display = 'none';
+            document.getElementById('head-avatar-fallback').style.display = 'flex';
+            document.getElementById('head-avatar-fallback').textContent = currentUser.firstName?.charAt(0) || '?';
+            
+            document.getElementById('prof-avatar-img').style.display = 'none';
+            document.getElementById('prof-avatar-fallback').style.display = 'flex';
+            document.getElementById('prof-avatar-fallback').textContent = currentUser.firstName?.charAt(0) || '?';
         }
     }
 
@@ -967,7 +1072,7 @@
         }
 
         const xpForNext = currentUser.level * 100;
-        const xpPercent = (currentUser.xp / xpForNext) * 100;
+        const xpPercent = Math.min((currentUser.xp / xpForNext) * 100, 100);
         document.getElementById('xp-bar-fill').style.width = xpPercent + '%';
         document.getElementById('xp-stat').textContent = `${currentUser.xp} / ${xpForNext} XP`;
         document.getElementById('next-lvl-num').textContent = currentUser.level + 1;
@@ -985,8 +1090,15 @@
     }
 
     function openBuyTonModal() {
-        document.getElementById('buy-ton-modal').style.display = 'flex';
+        document.getElementById('buy-ton-modal').style.display = 'block';
         buyTonState.isProcessing = false;
+        
+        // Initialize TON Connect button if not already
+        if (tonConnectUI && !document.getElementById('ton-connect-container').children.length) {
+            setTimeout(() => {
+                tonConnectUI.buttonRootId = 'ton-connect-container';
+            }, 100);
+        }
     }
 
     function closeBuyTonModal() {
@@ -998,95 +1110,175 @@
         document.querySelectorAll('.ton-package').forEach(p => p.classList.remove('selected'));
         element.classList.add('selected');
         
-        buyTonState.selectedPackage = amount;
         buyTonState.selectedAmount = amount;
         buyTonState.selectedPrice = price;
-    }
-
-    function selectWallet(wallet, element) {
-        document.querySelectorAll('.wallet-option').forEach(w => w.classList.remove('selected'));
-        element.classList.add('selected');
-        
-        buyTonState.selectedWallet = wallet;
+        document.getElementById('buy-amount-display').textContent = amount;
     }
 
     async function processBuyTon() {
         if (buyTonState.isProcessing) return;
         
+        // Check if wallet is connected
+        if (!connectedWallet) {
+            alert('⚠️ Пожалуйста, подключите кошелек через TON Connect!');
+            return;
+        }
+        
         buyTonState.isProcessing = true;
+        document.getElementById('processing-overlay').style.display = 'flex';
         
-        // Симуляция процесса оплаты
-        const walletNames = {
-            'tonkeeper': 'Tonkeeper',
-            'tonhub': 'Tonhub',
-            'telegram': '@wallet (Telegram)'
-        };
-        
-        // Показываем процесс оплаты
-        alert(`🔄 Открываем ${walletNames[buyTonState.selectedWallet]} для оплаты...\n\nСумма к оплате: ${buyTonState.selectedAmount} TON = $${buyTonState.selectedPrice} USD\n\nСледуйте инструкциям в кошельке для завершения транзакции.`);
-        
-        // Симулируем успешную оплату через 3 секунды
-        setTimeout(async () => {
-            currentUser.balance += buyTonState.selectedAmount;
+        try {
+            // Create transaction
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 360,
+                messages: [
+                    {
+                        address: 'YOUR_WALLET_ADDRESS', // Replace with your TON wallet address
+                        amount: String(Math.floor(buyTonState.selectedPrice * 1000000000)) // Convert to nanoTON
+                    }
+                ]
+            };
             
-            // Проверяем достижения
-            if (buyTonState.selectedAmount >= 10 && !currentUser.achievements?.includes(2)) {
-                currentUser.achievements = currentUser.achievements || [];
-                currentUser.achievements.push(2);
-                alert('🎉 Достижение разблокировано: МАЖОР!');
+            // Send transaction through TON Connect
+            const result = await tonConnectUI.sendTransaction(transaction);
+            
+            if (result) {
+                // Transaction successful
+                currentUser.balance += buyTonState.selectedAmount;
+                
+                // Check achievements
+                if (buyTonState.selectedAmount >= 10 && !currentUser.achievements?.includes(2)) {
+                    currentUser.achievements = currentUser.achievements || [];
+                    currentUser.achievements.push(2);
+                    alert('🎉 Достижение: МАЖОР!');
+                }
+                if (buyTonState.selectedAmount >= 100 && !currentUser.achievements?.includes(4)) {
+                    currentUser.achievements = currentUser.achievements || [];
+                    currentUser.achievements.push(4);
+                    alert('🐋 Достижение: КИТ!');
+                }
+                
+                await saveUser();
+                updateUI();
+                
+                document.getElementById('processing-overlay').style.display = 'none';
+                alert(`✅ Успешно! ${buyTonState.selectedAmount} TON зачислено!`);
+                closeBuyTonModal();
+                
+                // Reset processing state
+                setTimeout(() => {
+                    buyTonState.isProcessing = false;
+                }, 500);
             }
-            if (buyTonState.selectedAmount >= 100 && !currentUser.achievements?.includes(4)) {
-                currentUser.achievements = currentUser.achievements || [];
-                currentUser.achievements.push(4);
-                alert('🐋 Достижение разблокировано: КИТ!');
-            }
-            
-            await saveUser();
-            updateUI();
-            
-            alert(`✅ Успешно! ${buyTonState.selectedAmount} TON добавлено на ваш баланс!`);
-            
+        } catch (error) {
+            console.error('Transaction failed:', error);
+            document.getElementById('processing-overlay').style.display = 'none';
+            alert('❌ Ошибка транзакции. Попробуйте снова.');
             buyTonState.isProcessing = false;
-            closeBuyTonModal();
-        }, 3000);
+        }
     }
 
     function switchNav(screen, el) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         
-        document.getElementById('scr-' + screen).classList.add('active');
-        el.classList.add('active');
+        const screenElement = document.getElementById('scr-' + screen);
+        if (screenElement) {
+            screenElement.classList.add('active');
+        }
+        if (el) {
+            el.classList.add('active');
+        }
+        
+        // Exit game room if navigating away
+        if (currentRoom && screen !== 'game') {
+            removePlayerFromRoom();
+        }
     }
 
     function setupWheel() {
         const canvas = document.getElementById('mainWheel');
         const ctx = canvas.getContext('2d');
+        const centerX = 320;
+        const centerY = 320;
+        const radius = 310;
         
-        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd', '#2ed573'];
+        ctx.clearRect(0, 0, 640, 640);
+        
+        // Draw decorative segments
+        const colors = ['#1a1f2e', '#161b22', '#1a1f2e', '#161b22', '#1a1f2e', '#161b22'];
         
         for (let i = 0; i < 60; i++) {
             ctx.beginPath();
-            ctx.moveTo(300, 300);
-            ctx.arc(300, 300, 300, (i * 6) * Math.PI / 180, ((i + 1) * 6) * Math.PI / 180);
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, (i * 6) * Math.PI / 180, ((i + 1) * 6) * Math.PI / 180);
             ctx.closePath();
             ctx.fillStyle = colors[i % colors.length];
             ctx.fill();
+            ctx.strokeStyle = 'rgba(36, 129, 204, 0.1)';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+        }
+        
+        // Draw outer ring
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(36, 129, 204, 0.4)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        
+        // Clear avatar overlay
+        document.getElementById('player-avatars-overlay').innerHTML = '';
+    }
+
+    function listenToRooms() {
+        const commonRoomRef = window.dbRef.ref(window.db, 'rooms/common');
+        const vipRoomRef = window.dbRef.ref(window.db, 'rooms/vip');
+        
+        window.dbRef.onValue(commonRoomRef, (snapshot) => {
+            if (currentRoom === 'common' && snapshot.exists()) {
+                updateRoomState(snapshot.val());
+            }
+        });
+        
+        window.dbRef.onValue(vipRoomRef, (snapshot) => {
+            if (currentRoom === 'vip' && snapshot.exists()) {
+                updateRoomState(snapshot.val());
+            }
+        });
+    }
+
+    function updateRoomState(data) {
+        gameState.players = Object.values(data.players || {});
+        gameState.totalPot = data.totalPot || 0;
+        gameState.isSpinning = data.isSpinning || false;
+        
+        updateGameUI();
+        
+        // Auto-spin if enough players and not already spinning
+        if (gameState.players.length >= 2 && !gameState.isSpinning && currentRoom) {
+            const myBet = gameState.players.find(p => p.id === currentUser.id);
+            if (myBet) {
+                autoSpinWheel();
+            }
         }
     }
 
-    function openRoom(roomType) {
+    async function openRoom(roomType) {
         if (roomType === 'vip' && currentUser.level < 5) {
-            alert('❌ Требуется 5 уровень для входа в VIP!');
+            alert('❌ Требуется 5 уровень для VIP!');
             return;
         }
 
+        // Remove from current room first
+        await removePlayerFromRoom();
+        
         currentRoom = roomType;
-        switchNav('game', document.querySelectorAll('.nav-item')[0]);
+        switchNav('game', document.querySelector('.nav-item'));
         
         if (roomType === 'vip') {
             document.getElementById('game-room-name').textContent = '💎 HIGH ROLLERS';
-            document.getElementById('game-min-bet').textContent = 'Min: 10.0 TON';
+            document.getElementById('game-min-bet').textContent = 'Min: 10 TON';
             document.getElementById('bet-input').value = '10.0';
             document.getElementById('bet-input').min = '10.0';
         } else {
@@ -1096,25 +1288,33 @@
             document.getElementById('bet-input').min = '0.1';
         }
 
-        loadRoomState();
+        document.getElementById('bet-btn').disabled = false;
+        document.getElementById('game-status-text').textContent = 'Ожидание игроков...';
+        setupWheel();
+    }
+
+    async function removePlayerFromRoom() {
+        if (currentRoom && currentUser.id) {
+            const playerRef = window.dbRef.ref(window.db, `rooms/${currentRoom}/players/${currentUser.id}`);
+            await window.dbRef.remove(playerRef);
+        }
     }
 
     function exitToLobby() {
+        removePlayerFromRoom();
         currentRoom = null;
+        
+        // Clear spin timeout if exists
+        if (gameState.spinTimeout) {
+            clearTimeout(gameState.spinTimeout);
+            gameState.spinTimeout = null;
+        }
+        
+        gameState.players = [];
+        gameState.totalPot = 0;
+        gameState.isSpinning = false;
+        
         switchNav('lobby', document.querySelectorAll('.nav-item')[0]);
-    }
-
-    async function loadRoomState() {
-        const roomRef = window.dbRef.ref(window.db, `rooms/${currentRoom}`);
-        window.dbRef.onValue(roomRef, (snapshot) => {
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                gameState.players = Object.values(data.players || {});
-                gameState.totalPot = data.totalPot || 0;
-                
-                updateGameUI();
-            }
-        });
     }
 
     function updateGameUI() {
@@ -1124,18 +1324,17 @@
         gameState.players.forEach(player => {
             const card = document.createElement('div');
             card.className = 'player-card';
-            const avatarContent = player.photoUrl 
-                ? `<img class="p-ava" src="${player.photoUrl}" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
-                : '';
-            const fallbackContent = `<div class="p-ava" style="display:${player.photoUrl ? 'none' : 'flex'}; align-items:center; justify-content:center; font-weight:900; color:#ffffff;">${player.firstName?.charAt(0) || '?'}</div>`;
+            
+            const avatarHTML = player.photoUrl 
+                ? `<div class="p-ava"><img src="${player.photoUrl}" alt="Avatar"></div>`
+                : `<div class="p-ava" style="display:flex; align-items:center; justify-content:center; font-weight:900; color:#ffffff; font-size:16px;">${player.firstName?.charAt(0) || '?'}</div>`;
             
             card.innerHTML = `
                 <div class="p-info">
-                    ${avatarContent}
-                    ${fallbackContent}
+                    ${avatarHTML}
                     <div>
                         <div class="p-name">@${player.username}</div>
-                        <div style="font-size:11px; color:var(--sub);">${((player.bet / gameState.totalPot) * 100).toFixed(1)}% шанс</div>
+                        <div style="font-size:11px; color:var(--sub);">Шанс: ${((player.bet / gameState.totalPot) * 100).toFixed(1)}%</div>
                     </div>
                 </div>
                 <div class="p-bet">${player.bet.toFixed(2)} TON</div>
@@ -1144,53 +1343,112 @@
         });
 
         document.getElementById('lobby-jackpot').textContent = gameState.totalPot.toFixed(2);
-
         drawWheel();
     }
 
     function drawWheel() {
         const canvas = document.getElementById('mainWheel');
         const ctx = canvas.getContext('2d');
+        const centerX = 320;
+        const centerY = 320;
+        const radius = 300;
         
-        ctx.clearRect(0, 0, 600, 600);
+        ctx.clearRect(0, 0, 640, 640);
+        
+        // Clear avatar overlay
+        const avatarOverlay = document.getElementById('player-avatars-overlay');
+        avatarOverlay.innerHTML = '';
         
         if (gameState.players.length === 0) {
             setupWheel();
             return;
         }
 
+        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd', '#2ed573', '#ff9ff3', '#54a0ff'];
         let currentAngle = 0;
-        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd', '#2ed573'];
         
         gameState.players.forEach((player, i) => {
             const angle = (player.bet / gameState.totalPot) * 360;
             
-            ctx.beginPath();
-            ctx.moveTo(300, 300);
-            ctx.arc(300, 300, 300, currentAngle * Math.PI / 180, (currentAngle + angle) * Math.PI / 180);
-            ctx.closePath();
-            ctx.fillStyle = colors[i % colors.length];
-            ctx.fill();
+            // Draw segment with gradient
+            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            gradient.addColorStop(0, colors[i % colors.length]);
+            gradient.addColorStop(1, colors[i % colors.length] + '88');
             
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, currentAngle * Math.PI / 180, (currentAngle + angle) * Math.PI / 180);
+            ctx.closePath();
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Draw player name in segment
             ctx.save();
-            ctx.translate(300, 300);
+            ctx.translate(centerX, centerY);
             ctx.rotate((currentAngle + angle / 2) * Math.PI / 180);
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 20px Inter';
+            ctx.font = 'bold 16px Inter';
             ctx.textAlign = 'center';
-            ctx.fillText(player.firstName?.charAt(0) || '?', 150, 10);
+            ctx.fillText('@' + player.username, 180, 5);
             ctx.restore();
+            
+            // Add player avatar on the wheel
+            const avatarAngle = (currentAngle + angle / 2) * Math.PI / 180;
+            const avatarX = centerX + Math.cos(avatarAngle) * 200;
+            const avatarY = centerY + Math.sin(avatarAngle) * 200;
+            
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'player-segment-avatar';
+            avatarDiv.style.left = (avatarX - 20) + 'px';
+            avatarDiv.style.top = (avatarY - 20) + 'px';
+            avatarDiv.style.transform = `rotate(${(currentAngle + angle/2)}deg)`;
+            
+            if (player.photoUrl) {
+                avatarDiv.innerHTML = `<img src="${player.photoUrl}" alt="${player.username}">`;
+            } else {
+                avatarDiv.style.display = 'flex';
+                avatarDiv.style.alignItems = 'center';
+                avatarDiv.style.justifyContent = 'center';
+                avatarDiv.style.fontWeight = '900';
+                avatarDiv.style.color = '#ffffff';
+                avatarDiv.style.fontSize = '18px';
+                avatarDiv.textContent = player.firstName?.charAt(0) || '?';
+            }
+            
+            avatarOverlay.appendChild(avatarDiv);
             
             currentAngle += angle;
         });
+        
+        // Draw outer ring
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(36, 129, 204, 0.5)';
+        ctx.lineWidth = 4;
+        ctx.stroke();
     }
 
     async function handlePlaceBet() {
+        if (gameState.isSpinning) {
+            alert('⏳ Спин уже запущен! Дождитесь завершения.');
+            return;
+        }
+        
         const bet = parseFloat(document.getElementById('bet-input').value);
         const minBet = currentRoom === 'vip' ? 10.0 : 0.1;
         
         if (!bet || bet < minBet || bet > currentUser.balance) {
-            alert(`❌ Неверная ставка! Min: ${minBet} TON`);
+            alert(`❌ Неверная ставка! Мин: ${minBet} TON, Ваш баланс: ${currentUser.balance.toFixed(2)} TON`);
+            return;
+        }
+
+        // Check if already in game
+        const alreadyInGame = gameState.players.find(p => p.id === currentUser.id);
+        if (alreadyInGame) {
+            alert('❌ Вы уже в игре!');
             return;
         }
 
@@ -1200,74 +1458,96 @@
         await saveUser();
         updateUI();
 
-        const roomRef = window.dbRef.ref(window.db, `rooms/${currentRoom}/players/${currentUser.id}`);
-        await window.dbRef.set(roomRef, {
-            ...currentUser,
+        const playerData = {
+            id: currentUser.id,
+            username: currentUser.username,
+            firstName: currentUser.firstName,
+            photoUrl: currentUser.photoUrl,
             bet: bet
-        });
+        };
 
+        const playerRef = window.dbRef.ref(window.db, `rooms/${currentRoom}/players/${currentUser.id}`);
+        await window.dbRef.set(playerRef, playerData);
+
+        const newTotalPot = gameState.totalPot + bet;
         const potRef = window.dbRef.ref(window.db, `rooms/${currentRoom}/totalPot`);
-        await window.dbRef.set(potRef, (gameState.totalPot || 0) + bet);
+        await window.dbRef.set(potRef, newTotalPot);
 
         document.getElementById('bet-btn').disabled = true;
-        document.getElementById('game-status-text').textContent = 'ВЫ В ИГРЕ!';
-
-        setTimeout(() => {
-            if (gameState.players.length >= 2) {
-                spinWheel();
-            }
-        }, 3000);
+        document.getElementById('game-status-text').textContent = '✅ ВЫ В ИГРЕ!';
     }
 
-    async function spinWheel() {
-        if (gameState.isSpinning) return;
+    function autoSpinWheel() {
+        if (gameState.players.length < 2 || gameState.isSpinning) return;
+        
         gameState.isSpinning = true;
-
-        document.getElementById('game-status-text').textContent = 'КРУТИМ...';
+        const roomRef = window.dbRef.ref(window.db, `rooms/${currentRoom}/isSpinning`);
+        window.dbRef.set(roomRef, true);
+        
+        document.getElementById('game-status-text').textContent = '🎰 КРУТИМ...';
         
         const canvas = document.getElementById('mainWheel');
         const totalRotation = 360 * 5 + Math.random() * 360;
         canvas.style.transform = `rotate(${totalRotation}deg)`;
+        
+        gameState.spinTimeout = setTimeout(async () => {
+            await resolveSpin();
+        }, 5000);
+    }
 
-        setTimeout(async () => {
-            const winnerIndex = Math.floor(Math.random() * gameState.players.length);
-            const winner = gameState.players[winnerIndex];
+    async function resolveSpin() {
+        if (gameState.players.length === 0) return;
+        
+        const winnerIndex = Math.floor(Math.random() * gameState.players.length);
+        const winner = gameState.players[winnerIndex];
+        const totalPot = gameState.totalPot;
+        
+        // Reset wheel rotation
+        const canvas = document.getElementById('mainWheel');
+        canvas.style.transform = 'rotate(0deg)';
+        
+        if (winner.id === currentUser.id) {
+            // Current user won
+            currentUser.balance += totalPot;
+            currentUser.stats.wins++;
+            currentUser.stats.profit += (totalPot - (gameState.players.find(p => p.id === currentUser.id)?.bet || 0));
+            currentUser.xp += 50;
             
-            if (winner.id === currentUser.id) {
-                currentUser.balance += gameState.totalPot;
-                currentUser.stats.wins++;
-                currentUser.stats.profit += (gameState.totalPot - winner.bet);
-                currentUser.xp += 50;
-                
-                if (currentUser.xp >= currentUser.level * 100) {
-                    currentUser.level++;
-                    currentUser.xp = 0;
-                    alert(`🎉 НОВЫЙ УРОВЕНЬ! Теперь вы ${currentUser.level} уровня!`);
-                }
-
-                if (!currentUser.achievements?.includes(1)) {
-                    currentUser.achievements = currentUser.achievements || [];
-                    currentUser.achievements.push(1);
-                }
-                
-                await saveUser();
-                updateUI();
-
-                document.getElementById('win-amount').textContent = gameState.totalPot.toFixed(2);
-                document.getElementById('win-overlay').style.display = 'flex';
-            } else {
-                document.getElementById('game-status-text').textContent = `😔 Победил @${winner.username}`;
+            if (currentUser.xp >= currentUser.level * 100) {
+                currentUser.level++;
+                currentUser.xp = 0;
+                setTimeout(() => alert(`🎉 УРОВЕНЬ ${currentUser.level}!`), 500);
             }
 
-            await window.dbRef.remove(window.dbRef.ref(window.db, `rooms/${currentRoom}`));
+            if (!currentUser.achievements?.includes(1)) {
+                currentUser.achievements = currentUser.achievements || [];
+                currentUser.achievements.push(1);
+            }
             
-            gameState.isSpinning = false;
-            gameState.players = [];
-            gameState.totalPot = 0;
-            
-            document.getElementById('bet-btn').disabled = false;
-            setupWheel();
-        }, 5000);
+            await saveUser();
+            updateUI();
+
+            document.getElementById('win-amount').textContent = totalPot.toFixed(2);
+            document.getElementById('win-overlay').style.display = 'flex';
+        } else {
+            document.getElementById('game-status-text').textContent = `Победил @${winner.username}`;
+        }
+        
+        // Clear room
+        await window.dbRef.remove(window.dbRef.ref(window.db, `rooms/${currentRoom}`));
+        
+        gameState.isSpinning = false;
+        gameState.players = [];
+        gameState.totalPot = 0;
+        
+        document.getElementById('bet-btn').disabled = false;
+        setupWheel();
+        
+        setTimeout(() => {
+            if (currentRoom) {
+                document.getElementById('game-status-text').textContent = 'Ожидание игроков...';
+            }
+        }, 3000);
     }
 
     function closeWinOverlay() {
@@ -1275,11 +1555,194 @@
         document.getElementById('game-status-text').textContent = 'Ожидание игроков...';
     }
 
+    // ============ ADMIN FUNCTIONS ============
+    async function adminResetWheel() {
+        if (!currentUser.isAdmin) {
+            alert('❌ Нет прав!');
+            return;
+        }
+        
+        if (!currentRoom) {
+            alert('❌ Вы не в игровой комнате!');
+            return;
+        }
+        
+        if (gameState.spinTimeout) {
+            clearTimeout(gameState.spinTimeout);
+            gameState.spinTimeout = null;
+        }
+        
+        // Return bets to all players
+        for (const player of gameState.players) {
+            const playerRef = window.dbRef.ref(window.db, `users/${player.id}`);
+            const snapshot = await window.dbRef.get(playerRef);
+            
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                await window.dbRef.update(playerRef, {
+                    balance: (userData.balance || 0) + player.bet
+                });
+            }
+        }
+        
+        // Clear room
+        await window.dbRef.remove(window.dbRef.ref(window.db, `rooms/${currentRoom}`));
+        
+        gameState.isSpinning = false;
+        gameState.players = [];
+        gameState.totalPot = 0;
+        document.getElementById('bet-btn').disabled = false;
+        
+        const canvas = document.getElementById('mainWheel');
+        canvas.style.transform = 'rotate(0deg)';
+        setupWheel();
+        
+        document.getElementById('game-status-text').textContent = '🔄 Колесо сброшено';
+        
+        alert('✅ Колесо сброшено! Ставки возвращены игрокам.');
+    }
+
+    async function adminForceSpin() {
+        if (!currentUser.isAdmin) {
+            alert('❌ Нет прав!');
+            return;
+        }
+        
+        if (!currentRoom) {
+            alert('❌ Вы не в игровой комнате!');
+            return;
+        }
+        
+        if (gameState.players.length < 2) {
+            alert('❌ Недостаточно игроков для спина!');
+            return;
+        }
+        
+        if (gameState.isSpinning) {
+            alert('❌ Спин уже запущен!');
+            return;
+        }
+        
+        autoSpinWheel();
+        alert('✅ Спин запущен принудительно!');
+    }
+
+    async function adminAddBalance() {
+        if (!currentUser.isAdmin) return;
+        
+        const username = document.getElementById('admin-target-user').value.replace('@', '').trim();
+        const amount = parseFloat(document.getElementById('admin-add-balance').value);
+        
+        if (!username || !amount || amount <= 0) {
+            alert('❌ Неверные данные!');
+            return;
+        }
+
+        const usersRef = window.dbRef.ref(window.db, 'users');
+        const snapshot = await window.dbRef.get(usersRef);
+        
+        if (snapshot.exists()) {
+            const users = snapshot.val();
+            for (let [id, user] of Object.entries(users)) {
+                if (user.username === username) {
+                    await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), {
+                        balance: (user.balance || 0) + amount
+                    });
+                    
+                    if (id === String(currentUser.id)) {
+                        currentUser.balance += amount;
+                        updateUI();
+                    }
+                    
+                    alert(`✅ ${amount} TON начислено @${username}!`);
+                    return;
+                }
+            }
+        }
+        alert('❌ Пользователь не найден!');
+    }
+
+    async function adminVerifyUser() {
+        if (!currentUser.isAdmin) return;
+        
+        const username = document.getElementById('admin-verify-user').value.replace('@', '').trim();
+        if (!username) {
+            alert('❌ Введите username!');
+            return;
+        }
+
+        const usersRef = window.dbRef.ref(window.db, 'users');
+        const snapshot = await window.dbRef.get(usersRef);
+        
+        if (snapshot.exists()) {
+            const users = snapshot.val();
+            for (let [id, user] of Object.entries(users)) {
+                if (user.username === username) {
+                    await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), { isVerified: true });
+                    alert(`✅ Верификация выдана @${username}!`);
+                    return;
+                }
+            }
+        }
+        alert('❌ Пользователь не найден!');
+    }
+
+    async function adminMakeAdmin() {
+        if (!currentUser.isAdmin) return;
+        
+        const username = document.getElementById('admin-role-user').value.replace('@', '').trim();
+        if (!username) {
+            alert('❌ Введите username!');
+            return;
+        }
+
+        const usersRef = window.dbRef.ref(window.db, 'users');
+        const snapshot = await window.dbRef.get(usersRef);
+        
+        if (snapshot.exists()) {
+            const users = snapshot.val();
+            for (let [id, user] of Object.entries(users)) {
+                if (user.username === username) {
+                    await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), { isAdmin: true });
+                    alert(`✅ Права админа выданы @${username}!`);
+                    return;
+                }
+            }
+        }
+        alert('❌ Пользователь не найден!');
+    }
+
+    async function adminMakeSupport() {
+        if (!currentUser.isAdmin) return;
+        
+        const username = document.getElementById('admin-role-user').value.replace('@', '').trim();
+        if (!username) {
+            alert('❌ Введите username!');
+            return;
+        }
+
+        const usersRef = window.dbRef.ref(window.db, 'users');
+        const snapshot = await window.dbRef.get(usersRef);
+        
+        if (snapshot.exists()) {
+            const users = snapshot.val();
+            for (let [id, user] of Object.entries(users)) {
+                if (user.username === username) {
+                    await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), { isSupport: true });
+                    alert(`✅ Права саппорта выданы @${username}!`);
+                    return;
+                }
+            }
+        }
+        alert('❌ Пользователь не найден!');
+    }
+
+    // ============ TOWER GAME ============
     function startTower() {
         const bet = parseFloat(document.getElementById('tower-bet-input').value);
         
         if (!bet || bet < 0.1 || bet > currentUser.balance) {
-            alert('❌ Неверная ставка!');
+            alert(`❌ Неверная ставка! Ваш баланс: ${currentUser.balance.toFixed(2)} TON`);
             return;
         }
 
@@ -1351,7 +1814,9 @@
 
             document.querySelectorAll('.tower-cell').forEach(c => c.disabled = true);
             const nextRow = document.querySelectorAll('.tower-row')[towerState.rows - 1 - towerState.level];
-            nextRow.querySelectorAll('.tower-cell').forEach(c => c.disabled = false);
+            if (nextRow) {
+                nextRow.querySelectorAll('.tower-cell').forEach(c => c.disabled = false);
+            }
 
         } else {
             cell.classList.add('danger');
@@ -1360,7 +1825,7 @@
             document.querySelectorAll('.tower-cell').forEach(c => c.disabled = true);
             
             setTimeout(() => {
-                alert('💥 БУМ! Игра окончена.');
+                alert('💥 Игра окончена!');
                 resetTower();
             }, 500);
         }
@@ -1372,6 +1837,11 @@
         currentUser.stats.wins++;
         currentUser.stats.profit += (winAmount - towerState.betAmount);
         currentUser.xp += Math.floor(towerState.level * 10);
+        
+        if (currentUser.xp >= currentUser.level * 100) {
+            currentUser.level++;
+            currentUser.xp = 0;
+        }
         
         await saveUser();
         updateUI();
@@ -1391,6 +1861,7 @@
         document.getElementById('tower-grid').innerHTML = '';
     }
 
+    // ============ SUPPORT CHAT ============
     function showSupport() {
         document.getElementById('support-modal').style.display = 'block';
         loadSupportChat();
@@ -1436,94 +1907,12 @@
         input.value = '';
     }
 
-    async function adminAddBalance() {
-        if (!currentUser.isAdmin) return;
-        
-        const username = document.getElementById('admin-target-user').value.replace('@', '');
-        const amount = parseFloat(document.getElementById('admin-add-balance').value);
-        if (!username || !amount) return;
-
-        const usersRef = window.dbRef.ref(window.db, 'users');
-        const snapshot = await window.dbRef.get(usersRef);
-        
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            for (let [id, user] of Object.entries(users)) {
-                if (user.username === username) {
-                    await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), {
-                        balance: (user.balance || 0) + amount
-                    });
-                    alert('✅ Баланс обновлён!');
-                    return;
-                }
-            }
+    // Handle page unload
+    window.addEventListener('beforeunload', () => {
+        if (currentRoom) {
+            removePlayerFromRoom();
         }
-        alert('❌ Пользователь не найден!');
-    }
-
-    async function adminVerifyUser() {
-        if (!currentUser.isAdmin) return;
-        
-        const username = document.getElementById('admin-verify-user').value.replace('@', '');
-        if (!username) return;
-
-        const usersRef = window.dbRef.ref(window.db, 'users');
-        const snapshot = await window.dbRef.get(usersRef);
-        
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            for (let [id, user] of Object.entries(users)) {
-                if (user.username === username) {
-                    await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), { isVerified: true });
-                    alert('✅ Галочка выдана!');
-                    return;
-                }
-            }
-        }
-        alert('❌ Пользователь не найден!');
-    }
-
-    async function adminMakeAdmin() {
-        if (!currentUser.isAdmin) return;
-        
-        const username = document.getElementById('admin-role-user').value.replace('@', '');
-        if (!username) return;
-
-        const usersRef = window.dbRef.ref(window.db, 'users');
-        const snapshot = await window.dbRef.get(usersRef);
-        
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            for (let [id, user] of Object.entries(users)) {
-                if (user.username === username) {
-                    await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), { isAdmin: true });
-                    alert('✅ Админ права выданы!');
-                    return;
-                }
-            }
-        }
-    }
-
-    async function adminMakeSupport() {
-        if (!currentUser.isAdmin) return;
-        
-        const username = document.getElementById('admin-role-user').value.replace('@', '');
-        if (!username) return;
-
-        const usersRef = window.dbRef.ref(window.db, 'users');
-        const snapshot = await window.dbRef.get(usersRef);
-        
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            for (let [id, user] of Object.entries(users)) {
-                if (user.username === username) {
-                    await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), { isSupport: true });
-                    alert('✅ Права саппорта выданы!');
-                    return;
-                }
-            }
-        }
-    }
+    });
 
     window.onload = initApp;
 </script>
