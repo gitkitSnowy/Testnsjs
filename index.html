@@ -2,1920 +2,303 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Rolls Master PvP ELITE</title>
-    
-    <!-- TON Connect SDK -->
-    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.css">
-    
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, set, get, onValue, push, update, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyDQgyNz7P5K4_dlNQsKqniO-kEALW3_OWg",
-            authDomain: "casino-213b9.firebaseapp.com",
-            databaseURL: "https://casino-213b9-default-rtdb.firebaseio.com",
-            projectId: "casino-213b9",
-            storageBucket: "casino-213b9.firebasestorage.app",
-            messagingSenderId: "104292026196",
-            appId: "1:104292026196:web:4b33abbb085143ce69eac1"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        window.db = db;
-        window.dbRef = { ref, set, get, onValue, push, update, remove };
-    </script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Rolls - PvP</title>
     <style>
-        :root {
-            --bg: #05070a; 
-            --panel: #0d1117; 
-            --accent: #2481cc; 
-            --accent-dark: #1a5d93;
-            --gold: #ffcc00; 
-            --red: #ff4757; 
-            --green: #2ed573; 
-            --text: #ffffff;
-            --sub: #8b949e;
-            --card-border: rgba(36, 129, 204, 0.2);
-            --glass: rgba(255, 255, 255, 0.03);
-        }
-
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-        }
-
-        body { 
-            margin: 0; 
+        /* Базовые настройки и фон */
+        body {
+            margin: 0;
             padding: 0;
-            background: var(--bg); 
-            color: var(--text); 
-            overflow: hidden; 
-            height: 100vh; 
-            user-select: none;
-        }
-
-        ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
-
-        .app-wrapper { 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-            max-width: 500px; 
-            margin: 0 auto; 
-            position: relative;
-            background: radial-gradient(circle at top, #161b22 0%, #05070a 100%);
-        }
-
-        header {
-            padding: 16px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            background: var(--panel); 
-            border-bottom: 1px solid var(--card-border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-            z-index: 1000;
-        }
-
-        .user-block { display: flex; align-items: center; gap: 14px; }
-        
-        .u-avatar-wrapper { position: relative; }
-        .u-avatar { 
-            width: 48px; 
-            height: 48px; 
-            border-radius: 14px; 
-            border: 2px solid var(--accent); 
-            object-fit: cover; 
-            background: #161b22;
-            transition: 0.3s;
-            overflow: hidden;
-        }
-        .u-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .u-lvl-float {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            background: var(--accent);
-            font-size: 10px;
-            font-weight: 900;
-            padding: 2px 5px;
-            border-radius: 5px;
-            border: 2px solid var(--panel);
-            color: #ffffff;
-        }
-
-        .u-details { display: flex; flex-direction: column; }
-        .u-name-row { display: flex; align-items: center; gap: 6px; }
-        .u-name { font-weight: 800; font-size: 15px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .u-rank-text { font-size: 10px; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        .balance-block { text-align: right; cursor: pointer; }
-        .bal-val { font-weight: 900; color: var(--gold); font-size: 20px; letter-spacing: -0.5px; }
-        .bal-label { font-size: 9px; color: var(--sub); font-weight: 600; text-transform: uppercase; }
-
-        main { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 20px; 
-            padding-bottom: 120px; 
-            scrollbar-gutter: stable;
-        }
-
-        .screen { display: none; opacity: 0; transform: translateY(15px); transition: 0.4s cubic-bezier(0.2, 0, 0, 1); }
-        .screen.active { display: block; opacity: 1; transform: translateY(0); }
-
-        .card { 
-            background: var(--panel); 
-            border-radius: 24px; 
-            padding: 22px; 
-            margin-bottom: 18px; 
-            border: 1px solid var(--card-border); 
-            position: relative; 
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .card:active { transform: scale(0.98); }
-
-        .card-glow {
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(36,129,204,0.05) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .card-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 15px;
-            font-size: 12px; 
-            font-weight: 800; 
-            color: var(--sub); 
-            text-transform: uppercase;
-        }
-
-        .btn-action {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-            border: none; color: white; padding: 18px; border-radius: 20px; 
-            width: 100%; font-weight: 800; font-size: 16px; cursor: pointer; 
-            transition: all 0.3s; display: flex; justify-content: center; 
-            align-items: center; gap: 10px; box-shadow: 0 8px 25px rgba(36, 129, 204, 0.25);
-        }
-        .btn-action:active { transform: scale(0.97); box-shadow: none; }
-        .btn-action:disabled { background: #2d333b; color: #57606a; box-shadow: none; cursor: not-allowed; }
-
-        .btn-secondary { background: #1c2128; border: 1px solid #30363d; color: var(--text); box-shadow: none; }
-        .btn-small { padding: 10px 18px; font-size: 12px; border-radius: 12px; width: auto; }
-        .btn-gold { background: linear-gradient(135deg, var(--gold) 0%, #ccaa00 100%); color: #000; }
-
-        .input-group { position: relative; margin-bottom: 15px; }
-        .input-fld {
-            width: 100%; background: #0d1117; border: 1.5px solid #30363d;
-            color: white; padding: 18px; border-radius: 18px; outline: none; 
-            font-size: 16px; transition: 0.3s; font-weight: 600;
-        }
-        .input-fld:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(36, 129, 204, 0.15); }
-        .input-label { position: absolute; top: -8px; left: 15px; background: var(--panel); padding: 0 5px; font-size: 10px; color: var(--accent); font-weight: 800; }
-
-        .game-zone { text-align: center; padding: 10px 0; }
-        .wheel-container { 
-            position: relative; 
-            width: 320px; 
-            height: 320px; 
-            margin: 20px auto; 
-            border-radius: 50%;
-            box-shadow: 0 0 80px rgba(36, 129, 204, 0.3), 0 0 120px rgba(0,0,0,0.8);
-            background: radial-gradient(circle at center, #1a1f2e 0%, #0a0d14 100%);
-        }
-        canvas#mainWheel { 
-            width: 100%; 
-            height: 100%; 
-            border-radius: 50%; 
-            border: 6px solid rgba(36, 129, 204, 0.3);
-            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1);
-            position: relative;
-            z-index: 1;
-        }
-        .wheel-pointer { 
-            position: absolute; 
-            top: -25px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            z-index: 100; 
-            font-size: 40px; 
-            color: #ffffff; 
-            filter: drop-shadow(0 4px 15px rgba(0,0,0,0.8));
-            pointer-events: none;
-        }
-        .wheel-center-logo {
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%);
-            width: 70px; 
-            height: 70px; 
-            background: radial-gradient(circle, #1a1f2e, #0d1117); 
-            border: 4px solid var(--accent);
-            border-radius: 50%; 
-            z-index: 50; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            font-weight: 900; 
-            color: #ffffff; 
-            font-size: 14px;
-            box-shadow: 0 0 30px rgba(36, 129, 204, 0.5);
-            pointer-events: none;
-        }
-        .player-segment-avatar {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            border: 2px solid #ffffff;
-            overflow: hidden;
-            z-index: 60;
-            background: #1a1f2e;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            pointer-events: none;
-        }
-        .player-segment-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .players-feed { margin-top: 30px; display: flex; flex-direction: column; gap: 12px; }
-        .player-card { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); 
-            padding: 14px 20px; 
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.08); 
-            animation: fadeInUp 0.4s ease-out;
-            transition: all 0.3s;
-        }
-        .player-card:hover {
-            border-color: rgba(36, 129, 204, 0.3);
-            background: linear-gradient(135deg, rgba(36,129,204,0.05), rgba(36,129,204,0.02));
-        }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .p-info { display: flex; align-items: center; gap: 12px; }
-        .p-ava { 
-            width: 38px; 
-            height: 38px; 
-            border-radius: 12px; 
-            background: #21262d; 
-            border: 2px solid rgba(36, 129, 204, 0.3); 
-            object-fit: cover; 
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        .p-ava img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .p-name { font-weight: 700; font-size: 14px; }
-        .p-bet { 
-            font-weight: 900; 
-            color: var(--gold); 
-            background: rgba(255,204,0,0.1); 
-            padding: 8px 14px; 
-            border-radius: 12px;
-            font-size: 15px;
-        }
-
-        nav {
-            position: fixed; 
-            bottom: 0; 
-            width: 100%; 
-            max-width: 500px;
-            background: var(--panel); 
-            display: flex; 
-            justify-content: space-around; 
-            padding: 15px 0 35px; 
-            border-top: 1px solid rgba(255,255,255,0.05); 
-            z-index: 1000;
-            backdrop-filter: blur(20px);
-        }
-        .nav-item { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 6px; 
-            color: var(--sub); 
-            font-size: 10px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            flex: 1; 
-            transition: 0.3s; 
-            opacity: 0.6;
-        }
-        .nav-item.active { color: var(--accent); opacity: 1; }
-        .nav-icon { font-size: 24px; }
-
-        .xp-container { margin: 20px 0; }
-        .xp-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-bottom: 8px; }
-        .xp-bar-bg { 
-            width: 100%; 
-            height: 12px; 
-            background: #21262d; 
-            border-radius: 20px; 
-            overflow: hidden; 
-            border: 1px solid rgba(255,255,255,0.08); 
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
-        }
-        .xp-bar-fill { 
-            height: 100%; 
-            background: linear-gradient(90deg, var(--accent), #58a6ff); 
-            width: 0%; 
-            transition: 1.5s cubic-bezier(0.1, 0, 0, 1);
-            box-shadow: 0 0 20px rgba(36, 129, 204, 0.5);
-        }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-item { 
-            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); 
-            padding: 18px; 
-            border-radius: 20px; 
-            text-align: center; 
-            border: 1px solid rgba(255,255,255,0.08); 
-            transition: all 0.3s;
-        }
-        .stat-item:hover {
-            border-color: rgba(36,129,204,0.3);
-            transform: translateY(-2px);
-        }
-        .stat-val { display: block; font-size: 22px; font-weight: 900; margin-bottom: 4px; }
-        .stat-label { font-size: 10px; color: var(--sub); text-transform: uppercase; font-weight: 700; }
-
-        .achiev-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scroll-snap-type: x mandatory; }
-        .achiev-card { 
-            min-width: 90px; 
-            height: 90px; 
-            background: linear-gradient(135deg, #161b22, #1a1f2e); 
-            border-radius: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-            border: 2px solid transparent; 
-            transition: all 0.3s; 
-            opacity: 0.3; 
-            filter: grayscale(1);
-            scroll-snap-align: start;
-        }
-        .achiev-card.unlocked { 
-            opacity: 1; 
-            filter: grayscale(0); 
-            border-color: var(--gold); 
-            background: linear-gradient(135deg, rgba(255,204,0,0.1), rgba(255,204,0,0.05));
-            box-shadow: 0 4px 20px rgba(255,204,0,0.2);
-            animation: glowPulse 2s infinite;
-        }
-        @keyframes glowPulse {
-            0%, 100% { box-shadow: 0 4px 20px rgba(255,204,0,0.2); }
-            50% { box-shadow: 0 4px 30px rgba(255,204,0,0.4); }
-        }
-        .ach-icon { font-size: 32px; margin-bottom: 5px; }
-        .ach-name { font-size: 9px; font-weight: 800; color: var(--sub); text-align: center; line-height: 1.2; }
-
-        .modal { 
-            position: fixed; 
-            inset: 0; 
-            background: var(--bg); 
-            z-index: 5000; 
-            padding: 30px 20px; 
-            display: none; 
-            overflow-y: auto; 
-            animation: slideUp 0.3s ease-out;
-        }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        .win-overlay {
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.9);
-            z-index: 10000; 
-            display: none; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            /* Вставляем твой фон. Если ссылка не сработает, замени на прямую ссылку .jpg */
+            background: url('https://i.ibb.co/4g4FS3rv/image.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
             flex-direction: column;
-            align-items: center; 
-            justify-content: center; 
-            text-align: center;
-            backdrop-filter: blur(20px);
         }
-        .win-box { 
-            animation: pop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.28);
-            background: linear-gradient(135deg, #1a1f2e, #0d1117);
-            padding: 40px;
-            border-radius: 30px;
-            max-width: 350px;
-            border: 2px solid var(--gold);
-            box-shadow: 0 20px 60px rgba(255,204,0,0.3);
-        }
-        @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .leader-item {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            padding: 14px 0; 
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.3s;
-        }
-        .leader-item:hover { background: rgba(255,255,255,0.02); padding-left: 10px; padding-right: 10px; }
-        .leader-left { display: flex; align-items: center; gap: 12px; }
-        .leader-rank { 
-            width: 34px; 
-            height: 34px; 
-            background: var(--accent); 
-            border-radius: 10px;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: 900; 
-            font-size: 14px;
-        }
-        .leader-rank.top1 { background: linear-gradient(135deg, var(--gold), #ccaa00); box-shadow: 0 4px 15px rgba(255,204,0,0.5); }
-        .leader-rank.top2 { background: linear-gradient(135deg, #c0c0c0, #808080); }
-        .leader-rank.top3 { background: linear-gradient(135deg, #cd7f32, #8B4513); }
-
-        .ton-package {
-            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 16px;
-            margin: 10px 0;
-            cursor: pointer;
-            transition: all 0.3s;
+        /* Навигация (Шапка) */
+        header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        
-        .ton-package:hover {
-            border-color: var(--accent);
-            background: linear-gradient(135deg, rgba(36,129,204,0.1), rgba(36,129,204,0.05));
-            transform: translateX(5px);
-        }
-        
-        .ton-package.selected {
-            border-color: var(--accent);
-            background: linear-gradient(135deg, rgba(36,129,204,0.15), rgba(36,129,204,0.08));
-            box-shadow: 0 4px 20px rgba(36,129,204,0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .processing-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 10000;
-            display: none;
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #38bdf8;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .user-info {
+            display: flex;
             align-items: center;
+            gap: 20px;
+        }
+
+        .balance {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid #eab308;
+            color: #fef08a;
+            font-weight: bold;
+        }
+
+        nav button {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: 0.3s;
+        }
+
+        nav button:hover, nav button.active {
+            color: #fff;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Основной контейнер с эффектом стекла */
+        .main-container {
+            flex: 1;
+            display: flex;
             justify-content: center;
-            backdrop-filter: blur(10px);
+            align-items: center;
+            padding: 20px;
         }
-        
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255,255,255,0.1);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 900px;
+            min-height: 500px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            display: none; /* По умолчанию скрыто, управляется JS */
         }
+
+        .glass-panel.active {
+            display: block;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            color: #38bdf8;
+            border-bottom: 2px solid rgba(56, 189, 248, 0.3);
+            padding-bottom: 10px;
+        }
+
+        /* Стили для компонентов внутри панелей */
+        .btn-action {
+            background: linear-gradient(45deg, #0ea5e9, #2563eb);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(14, 165, 233, 0.5);
+        }
+
+        /* Макет Башни (Tower) */
+        .tower-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .tower-cell {
+            background: rgba(255, 255, 255, 0.1);
+            height: 60px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tower-cell:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Таблица Админки */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        th { color: #94a3b8; }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .input-group input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            outline: none;
         }
     </style>
 </head>
 <body>
 
-<div class="app-wrapper">
     <header>
-        <div class="user-block">
-            <div class="u-avatar-wrapper">
-                <div class="u-avatar" id="head-avatar-container">
-                    <img id="head-avatar-img" src="" alt="Avatar" style="display:none;">
-                    <div id="head-avatar-fallback" style="display:flex; width:100%; height:100%; align-items:center; justify-content:center; font-size:22px; font-weight:900; color:#ffffff;">?</div>
-                </div>
-                <div class="u-lvl-float" id="head-lvl">1</div>
-            </div>
-            <div class="u-details">
-                <div class="u-name-row">
-                    <span id="head-name" class="u-name">Loading...</span>
-                    <span id="v-badge" style="display:none; color:#ffffff; font-size:16px;">✓</span>
-                </div>
-                <span class="u-rank-text" id="head-rank">ROOKIE</span>
-            </div>
-        </div>
-        <div class="balance-block" onclick="openBuyTonModal()">
-            <div class="bal-label">BALANCE</div>
-            <div class="bal-val"><span id="head-bal">0.00</span> 💎</div>
+        <div class="logo">ROOM ROLLS</div>
+        <nav>
+            <button class="nav-btn active" onclick="openTab('roll')">Рулетка</button>
+            <button class="nav-btn" onclick="openTab('tower')">Башня</button>
+            <button class="nav-btn" onclick="openTab('promo')">Промокоды</button>
+            <button class="nav-btn" style="color: #ef4444;" onclick="openTab('admin')">Админка</button>
+        </nav>
+        <div class="user-info">
+            <div class="balance" id="user-balance">1,500 TON</div>
+            <div style="width: 40px; height: 40px; background: #334155; border-radius: 50%; display: flex; justify-content: center; align-items: center;">👤</div>
         </div>
     </header>
 
-    <main id="main-content">
-        <!-- Lobby Screen -->
-        <div id="scr-lobby" class="screen active">
-            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
-                <h1 style="margin:0; font-size:32px; font-weight:900; background: linear-gradient(135deg, #ffffff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Арены</h1>
-                <div style="color:var(--green); font-size:12px; font-weight:800; background:rgba(46,213,115,0.15); padding:6px 14px; border-radius:12px; border: 1px solid rgba(46,213,115,0.3);">
-                    ● LIVE <span id="online-val">241</span>
-                </div>
-            </div>
-
-            <div class="card" onclick="openRoom('common')">
-                <div class="card-glow"></div>
-                <div class="card-header">
-                    <span>⚔️ PUBLIC ROOM</span>
-                    <span style="color:var(--green)">● ONLINE</span>
-                </div>
-                <h2 style="margin:0 0 10px 0; font-size:24px; font-weight:900;">Battle Arena</h2>
-                <p style="color:var(--sub); font-size:13px; margin:0 0 20px 0; line-height:1.5;">
-                    Честная PvP игра. Шанс победы пропорционален вашей ставке.
-                </p>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-size:10px; color:var(--sub); font-weight:800; margin-bottom:6px;">ТЕКУЩИЙ БАНК</div>
-                        <div style="font-size:20px; font-weight:900; color:var(--gold);"><span id="lobby-jackpot">0.00</span> TON</div>
-                    </div>
-                    <button class="btn-action btn-small" onclick="event.stopPropagation(); openRoom('common')">ИГРАТЬ</button>
-                </div>
-            </div>
-
-            <div class="card" onclick="openRoom('vip')" style="border-color: var(--gold);">
-                <div class="card-header">
-                    <span style="color:var(--gold)">💎 VIP ONLY</span>
-                    <span id="vip-lock-status">🔒 LVL 5</span>
-                </div>
-                <h2 style="margin:0 0 10px 0; font-size:24px; font-weight:900; color:var(--gold);">High Rollers</h2>
-                <p style="color:var(--sub); font-size:13px; margin:0 0 20px 0;">
-                    Элитная арена. Мин. вход: 10 TON. Требуется 5 уровень.
-                </p>
-                <button class="btn-action btn-gold btn-small" id="vip-btn" onclick="event.stopPropagation(); openRoom('vip')">ВОЙТИ</button>
-            </div>
-
-            <div class="card" onclick="openBuyTonModal()" style="border-color: var(--accent);">
-                <div class="card-header">
-                    <span>💎 ПОПОЛНЕНИЕ</span>
-                    <span style="color:var(--accent);">TON</span>
-                </div>
-                <h2 style="margin:0 0 10px 0; font-size:24px;">Купить TON</h2>
-                <p style="color:var(--sub); font-size:13px; margin:0 0 20px 0;">
-                    Пополни баланс через TON Connect. Мгновенное зачисление.
-                </p>
-                <button class="btn-action" onclick="event.stopPropagation(); openBuyTonModal()">
-                    💎 ПОПОЛНИТЬ
-                </button>
-            </div>
-
-            <div class="card">
-                <div class="card-header">🏆 ЛИДЕРЫ НЕДЕЛИ</div>
-                <div id="leaderboard-content">
-                    <div class="leader-item">
-                        <div class="leader-left">
-                            <div class="leader-rank top1">1</div>
-                            <div>
-                                <div style="font-weight:700; font-size:15px;">@CryptoKing</div>
-                                <div style="font-size:11px; color:var(--sub);">125 побед</div>
-                            </div>
-                        </div>
-                        <div style="font-weight:900; color:var(--gold); font-size:16px;">+1,234 TON</div>
-                    </div>
-                    <div class="leader-item">
-                        <div class="leader-left">
-                            <div class="leader-rank top2">2</div>
-                            <div>
-                                <div style="font-weight:700; font-size:15px;">@WhaleHunter</div>
-                                <div style="font-size:11px; color:var(--sub);">98 побед</div>
-                            </div>
-                        </div>
-                        <div style="font-weight:900; color:var(--gold); font-size:16px;">+856 TON</div>
-                    </div>
-                    <div class="leader-item">
-                        <div class="leader-left">
-                            <div class="leader-rank top3">3</div>
-                            <div>
-                                <div style="font-weight:700; font-size:15px;">@LuckyDev</div>
-                                <div style="font-size:11px; color:var(--sub);">87 побед</div>
-                            </div>
-                        </div>
-                        <div style="font-weight:900; color:var(--gold); font-size:16px;">+623 TON</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Game Screen -->
-        <div id="scr-game" class="screen">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <button class="btn-action btn-secondary btn-small" onclick="exitToLobby()">⬅ Выйти</button>
-                <div style="text-align:right;">
-                    <div id="game-room-name" style="font-weight:900; color:var(--accent); font-size:14px;">BATTLE ARENA</div>
-                    <div id="game-min-bet" style="font-size:10px; color:var(--sub);">Min: 0.1 TON</div>
-                </div>
-            </div>
-
-            <div class="game-zone">
-                <div class="wheel-container" id="wheel-container">
-                    <div class="wheel-pointer">▼</div>
-                    <div class="wheel-center-logo">ROLLS</div>
-                    <canvas id="mainWheel" width="640" height="640"></canvas>
-                    <div id="player-avatars-overlay"></div>
-                </div>
-
-                <div id="game-status-text" style="font-size:22px; font-weight:900; color:var(--gold); margin:20px 0; text-transform:uppercase; letter-spacing:1px; text-shadow: 0 0 20px rgba(255,204,0,0.5);">
-                    Ожидание игроков...
-                </div>
-            </div>
-
-            <div class="card" style="border-color:var(--accent); cursor: default;">
-                <div class="card-header">🎯 ВАША СТАВКА</div>
-                <div style="display:flex; gap:12px;">
-                    <div class="input-group" style="flex:1; margin:0;">
-                        <span class="input-label">СУММА (TON)</span>
-                        <input type="number" id="bet-input" class="input-fld" value="1.0" step="0.1" min="0.1">
-                    </div>
-                    <button class="btn-action" style="width:130px;" id="bet-btn" onclick="handlePlaceBet()">СТАВКА</button>
-                </div>
-            </div>
-
-            <div class="players-feed" id="game-players-list"></div>
-        </div>
-
-        <!-- Tower Screen -->
-        <div id="scr-tower" class="screen">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h1 style="margin:0; font-size:32px; font-weight:900;">🗼 Tower</h1>
-                <div style="text-align:right;">
-                    <div style="font-size:10px; color:var(--sub); font-weight:800;">МНОЖИТЕЛЬ</div>
-                    <div style="font-size:28px; font-weight:900; color:var(--gold);">x<span id="tower-mult">1.00</span></div>
-                </div>
-            </div>
-
-            <div class="card" style="cursor: default;">
-                <div class="card-header">СТАВКА</div>
-                <div style="display:flex; gap:12px; margin-bottom:15px;">
-                    <div class="input-group" style="flex:1; margin:0;">
-                        <span class="input-label">СУММА (TON)</span>
-                        <input type="number" id="tower-bet-input" class="input-fld" value="1.0" step="0.1" min="0.1">
-                    </div>
-                    <button class="btn-action" style="width:130px;" id="tower-start-btn" onclick="startTower()">СТАРТ</button>
-                </div>
-                <button class="btn-action btn-gold" id="tower-cashout-btn" onclick="cashoutTower()" style="display:none;">
-                    ЗАБРАТЬ <span id="tower-win-amount">0.00</span> TON
-                </button>
-            </div>
-
-            <div class="tower-grid" id="tower-grid"></div>
-        </div>
-
-        <!-- Profile Screen -->
-        <div id="scr-profile" class="screen">
-            <div class="card" style="text-align:center; padding-top:40px; cursor: default;">
-                <div class="u-avatar-wrapper" style="display:inline-block; margin-bottom:20px;">
-                    <div class="u-avatar" style="width:110px; height:110px; border-radius:28px; border: 3px solid var(--accent);">
-                        <img id="prof-avatar-img" src="" alt="Avatar" style="display:none; width:100%; height:100%; object-fit:cover;">
-                        <div id="prof-avatar-fallback" style="display:flex; width:100%; height:100%; align-items:center; justify-content:center; font-size:45px; font-weight:900; color:#ffffff;">?</div>
-                    </div>
-                    <div class="u-lvl-float" style="width:34px; height:34px; font-size:15px; display:flex; align-items:center; justify-content:center; bottom:0; right:0;" id="prof-lvl">1</div>
-                </div>
-                <h2 style="margin:0; font-size:22px;" id="prof-name">@Username</h2>
-                <div id="prof-rank" style="color:var(--accent); font-weight:800; font-size:13px; margin-top:5px;">ROOKIE</div>
-
-                <div class="xp-container">
-                    <div class="xp-header">
-                        <span>LVL <span id="next-lvl-num">2</span></span>
-                        <span id="xp-stat">0 / 100 XP</span>
-                    </div>
-                    <div class="xp-bar-bg"><div id="xp-bar-fill" class="xp-bar-fill"></div></div>
-                </div>
-
-                <button class="btn-action" onclick="showSupport()" style="margin-top:15px;">💬 Поддержка</button>
-                <button class="btn-action" onclick="openBuyTonModal()" style="margin-top:10px; background: linear-gradient(135deg, var(--gold), #ccaa00); color: #000;">
-                    💎 Купить TON
-                </button>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-item"><span class="stat-val" id="stat-games">0</span><span class="stat-label">Игр</span></div>
-                <div class="stat-item"><span class="stat-val" id="stat-wins" style="color:var(--green)">0</span><span class="stat-label">Побед</span></div>
-                <div class="stat-item"><span class="stat-val" id="stat-tbet">0.0</span><span class="stat-label">Оборот</span></div>
-                <div class="stat-item"><span class="stat-val" id="stat-profit" style="color:var(--gold)">0.0</span><span class="stat-label">Профит</span></div>
-            </div>
-
-            <div class="card" style="cursor: default;">
-                <div class="card-header">🏅 ДОСТИЖЕНИЯ</div>
-                <div class="achiev-row">
-                    <div class="achiev-card" id="ach-1"><span class="ach-icon">🎯</span><span class="ach-name">Первая<br>Кровь</span></div>
-                    <div class="achiev-card" id="ach-2"><span class="ach-icon">💰</span><span class="ach-name">Мажор</span></div>
-                    <div class="achiev-card" id="ach-3"><span class="ach-icon">🔥</span><span class="ach-name">В Ударе</span></div>
-                    <div class="achiev-card" id="ach-4"><span class="ach-icon">🐳</span><span class="ach-name">Кит</span></div>
-                    <div class="achiev-card" id="ach-5"><span class="ach-icon">👑</span><span class="ach-name">Легенда</span></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Admin Screen -->
-        <div id="scr-admin" class="screen">
-            <h1 style="margin:0 0 20px 0; font-size:32px; font-weight:900;">⚙️ Админ</h1>
-            
-            <div class="card" style="cursor: default;">
-                <div class="card-header">🎰 УПРАВЛЕНИЕ КОЛЕСОМ</div>
-                <button class="btn-action" onclick="adminResetWheel()" style="margin-bottom:10px;">
-                    🔄 СБРОСИТЬ КОЛЕСО
-                </button>
-                <button class="btn-action btn-secondary" onclick="adminForceSpin()">
-                    🎲 ПРИНУДИТЕЛЬНЫЙ СПИН
-                </button>
-                <div style="margin-top:10px; padding:12px; background:rgba(255,71,87,0.1); border-radius:12px; border:1px solid rgba(255,71,87,0.2);">
-                    <div style="font-size:11px; color:var(--red); font-weight:700;">⚠️ Возврат ставок при сбросе</div>
-                </div>
-            </div>
-
-            <div class="card" style="cursor: default;">
-                <div class="card-header">💎 БАЛАНС</div>
-                <div class="input-group">
-                    <span class="input-label">USERNAME</span>
-                    <input type="text" id="admin-target-user" class="input-fld" placeholder="@username">
-                </div>
-                <div class="input-group">
-                    <span class="input-label">TON</span>
-                    <input type="number" id="admin-add-balance" class="input-fld" placeholder="0.0">
-                </div>
-                <button class="btn-action" onclick="adminAddBalance()">Начислить</button>
-            </div>
-
-            <div class="card" style="cursor: default;">
-                <div class="card-header">✓ ВЕРИФИКАЦИЯ</div>
-                <div class="input-group">
-                    <span class="input-label">USERNAME</span>
-                    <input type="text" id="admin-verify-user" class="input-fld" placeholder="@username">
-                </div>
-                <button class="btn-action" onclick="adminVerifyUser()">Выдать ✓</button>
-            </div>
-
-            <div class="card" style="cursor: default;">
-                <div class="card-header">👑 РОЛИ</div>
-                <div class="input-group">
-                    <span class="input-label">USERNAME</span>
-                    <input type="text" id="admin-role-user" class="input-fld" placeholder="@username">
-                </div>
-                <button class="btn-action" onclick="adminMakeAdmin()">Сделать админом</button>
-                <button class="btn-action btn-secondary" style="margin-top:10px;" onclick="adminMakeSupport()">Сделать саппортом</button>
-            </div>
-        </div>
-    </main>
-
-    <!-- Buy TON Modal -->
-    <div id="buy-ton-modal" class="modal" style="background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);">
-        <div style="max-width:400px; margin:0 auto;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-                <h2 style="margin:0; font-size:28px; font-weight:900;">💎 Купить TON</h2>
-                <button class="btn-action btn-secondary btn-small" onclick="closeBuyTonModal()">✕</button>
-            </div>
-
-            <div class="card-header">ВЫБЕРИТЕ ПАКЕТ</div>
-            
-            <div class="ton-package" onclick="selectTonPackage(1, 1.5, this)">
-                <div>
-                    <div style="font-weight:800; font-size:18px;">1 TON</div>
-                    <div style="font-size:11px; color:var(--sub);">≈ $1.50</div>
-                </div>
-                <div style="color:var(--accent); font-weight:900;">$1.50</div>
-            </div>
-
-            <div class="ton-package" onclick="selectTonPackage(5, 7, this)">
-                <div>
-                    <div style="font-weight:800; font-size:18px;">5 TON</div>
-                    <div style="font-size:11px; color:var(--sub);">≈ $7.00</div>
-                </div>
-                <div style="color:var(--accent); font-weight:900;">$7.00</div>
-            </div>
-
-            <div class="ton-package selected" onclick="selectTonPackage(10, 13, this)">
-                <div>
-                    <div style="font-weight:800; font-size:18px;">10 TON</div>
-                    <div style="font-size:11px; color:var(--sub);">≈ $13.00 (-15%)</div>
-                </div>
-                <div style="color:var(--accent); font-weight:900;">$13.00</div>
-            </div>
-
-            <div class="ton-package" onclick="selectTonPackage(25, 30, this)">
-                <div>
-                    <div style="font-weight:800; font-size:18px;">25 TON</div>
-                    <div style="font-size:11px; color:var(--sub);">≈ $30.00 (-20%)</div>
-                </div>
-                <div style="color:var(--accent); font-weight:900;">$30.00</div>
-            </div>
-
-            <div class="ton-package" onclick="selectTonPackage(100, 110, this)">
-                <div>
-                    <div style="font-weight:800; font-size:18px;">100 TON</div>
-                    <div style="font-size:11px; color:var(--sub);">≈ $110.00 (-25%)</div>
-                </div>
-                <div style="color:var(--accent); font-weight:900;">$110.00</div>
-            </div>
-
-            <button class="btn-action" onclick="processBuyTon()" style="margin-top:25px; background: linear-gradient(135deg, var(--green), #1fa05a);">
-                💎 ОПЛАТИТЬ <span id="buy-amount-display">10</span> TON
-            </button>
-            
-            <div id="ton-connect-container" style="margin-top:15px;"></div>
-        </div>
-    </div>
-
-    <!-- Processing Overlay -->
-    <div id="processing-overlay" class="processing-overlay">
-        <div style="text-align:center;">
-            <div class="spinner" style="margin:0 auto 20px;"></div>
-            <div style="font-size:18px; font-weight:800; color:var(--accent);">Обработка транзакции...</div>
-            <div style="font-size:12px; color:var(--sub); margin-top:10px;">Пожалуйста, подождите</div>
-        </div>
-    </div>
-
-    <!-- Support Modal -->
-    <div id="support-modal" class="modal">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0; font-size:24px; font-weight:900;">💬 Поддержка</h2>
-            <button class="btn-action btn-secondary btn-small" onclick="closeSupport()">✕</button>
-        </div>
+    <div class="main-container">
         
-        <div class="card" style="cursor: default;">
-            <div class="support-chat" id="support-chat"></div>
+        <div id="roll" class="glass-panel active">
+            <h2>Классическая Рулетка</h2>
+            <div style="text-align: center; margin: 50px 0;">
+                <div style="font-size: 64px; margin-bottom: 20px;">🎰</div>
+                <p>Выберите цвет или число для ставки</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button class="btn-action" style="background: #ef4444;">Красное (x2)</button>
+                    <button class="btn-action" style="background: #22c55e;">Зеленое (x14)</button>
+                    <button class="btn-action" style="background: #1e293b;">Черное (x2)</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tower" class="glass-panel">
+            <h2>Башня (Tower)</h2>
+            <p style="text-align: center; color: #94a3b8;">Поднимайся выше, чтобы умножить выигрыш, но берегись мин!</p>
+            <div class="tower-grid">
+                <div class="tower-cell">?</div><div class="tower-cell">?</div><div class="tower-cell">?</div>
+                <div class="tower-cell">?</div><div class="tower-cell">?</div><div class="tower-cell">?</div>
+                <div class="tower-cell" style="background: rgba(34, 197, 94, 0.3);">💎</div><div class="tower-cell">?</div><div class="tower-cell">?</div>
+                <div class="tower-cell">?</div><div class="tower-cell" style="background: rgba(239, 68, 68, 0.3);">💣</div><div class="tower-cell">?</div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn-action">Начать игру (Ставка: 10 TON)</button>
+            </div>
+        </div>
+
+        <div id="promo" class="glass-panel">
+            <h2>Активация Промокода</h2>
+            <p style="text-align: center; color: #94a3b8;">Введите секретный код для получения бонуса на баланс.</p>
             <div class="input-group">
-                <input type="text" id="support-message-input" class="input-fld" placeholder="Сообщение...">
+                <input type="text" id="promo-input" placeholder="Введите код..." style="width: 250px;">
+                <button class="btn-action" onclick="checkPromo()">Активировать</button>
             </div>
-            <button class="btn-action" onclick="sendSupportMessage()">Отправить</button>
+            <p id="promo-message" style="text-align: center; margin-top: 15px; color: #22c55e; display: none;">Промокод успешно применен!</p>
         </div>
+
+        <div id="admin" class="glass-panel">
+            <h2 style="color: #ef4444;">Панель Администратора</h2>
+            
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <button class="btn-action" style="background: #334155;">Управление пользователями</button>
+                <button class="btn-action" style="background: #334155;">Настройки игр</button>
+                <button class="btn-action" style="background: #334155;">Тикеты (Поддержка) 🔴 3</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Пользователь</th>
+                        <th>Баланс</th>
+                        <th>Статус</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#1042</td>
+                        <td>PlayerOne</td>
+                        <td>1,500 TON</td>
+                        <td><span style="color: #22c55e;">Online</span></td>
+                        <td><button class="btn-action" style="padding: 5px 10px; font-size: 12px;">Изменить</button></td>
+                    </tr>
+                    <tr>
+                        <td>#1043</td>
+                        <td>CryptoKing</td>
+                        <td>250 TON</td>
+                        <td><span style="color: #94a3b8;">Offline</span></td>
+                        <td><button class="btn-action" style="padding: 5px 10px; font-size: 12px;">Изменить</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
-    <!-- Win Overlay -->
-    <div id="win-overlay" class="win-overlay">
-        <div class="win-box">
-            <div style="font-size:70px; margin-bottom:20px;">🎉</div>
-            <div style="font-size:36px; font-weight:900; margin-bottom:10px; color:var(--gold);">ПОБЕДА!</div>
-            <div style="font-size:52px; font-weight:900; color:var(--green); margin-bottom:20px;">
-                +<span id="win-amount">0.00</span> TON
-            </div>
-            <button class="btn-action" onclick="closeWinOverlay()">ПРОДОЛЖИТЬ</button>
-        </div>
-    </div>
+    <script>
+        // Функция для переключения вкладок
+        function openTab(tabId) {
+            // Скрываем все панели
+            const panels = document.querySelectorAll('.glass-panel');
+            panels.forEach(panel => panel.classList.remove('active'));
 
-    <nav>
-        <div class="nav-item active" onclick="switchNav('lobby', this)">
-            <div class="nav-icon">🏠</div>
-            <div>ЛОББИ</div>
-        </div>
-        <div class="nav-item" onclick="switchNav('tower', this)">
-            <div class="nav-icon">🗼</div>
-            <div>TOWER</div>
-        </div>
-        <div class="nav-item" onclick="switchNav('profile', this)">
-            <div class="nav-icon">👤</div>
-            <div>ПРОФИЛЬ</div>
-        </div>
-        <div class="nav-item" id="admin-nav" style="display:none;" onclick="switchNav('admin', this)">
-            <div class="nav-icon">⚙️</div>
-            <div>АДМИН</div>
-        </div>
-    </nav>
-</div>
+            // Убираем активный класс у кнопок навигации
+            const btns = document.querySelectorAll('.nav-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
 
-<script>
-    // ============ TON CONNECT INITIALIZATION ============
-    let tonConnectUI = null;
-    let connectedWallet = null;
-    
-    function initTonConnect() {
-        // Initialize TON Connect UI
-        const manifestUrl = 'https://your-domain.com/tonconnect-manifest.json';
-        
-        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: manifestUrl,
-            buttonRootId: 'ton-connect-container'
-        });
-        
-        // Listen for connection status changes
-        tonConnectUI.onStatusChange(wallet => {
-            if (wallet) {
-                connectedWallet = wallet;
-                console.log('Wallet connected:', wallet.account.address);
+            // Показываем нужную панель
+            document.getElementById(tabId).classList.add('active');
+
+            // Находим кнопку, на которую нажали, и делаем ее активной
+            event.target.classList.add('active');
+        }
+
+        // Фейковая функция активации промокода (просто для визуала)
+        function checkPromo() {
+            const input = document.getElementById('promo-input').value;
+            const message = document.getElementById('promo-message');
+            
+            if(input.trim() !== "") {
+                message.style.display = 'block';
+                message.style.color = '#22c55e';
+                message.innerText = `Промокод "${input}" успешно применен! +50 TON`;
+                document.getElementById('promo-input').value = "";
             } else {
-                connectedWallet = null;
-                console.log('Wallet disconnected');
-            }
-        });
-    }
-    
-    // ============ TELEGRAM & APP INIT ============
-    let tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.setHeaderColor('#0d1117');
-    tg.setBackgroundColor('#05070a');
-
-    let currentUser = {
-        id: tg.initDataUnsafe?.user?.id || Math.floor(Math.random() * 1000000),
-        username: tg.initDataUnsafe?.user?.username || 'Player' + Math.floor(Math.random() * 1000),
-        firstName: tg.initDataUnsafe?.user?.first_name || 'Player',
-        lastName: tg.initDataUnsafe?.user?.last_name || '',
-        photoUrl: tg.initDataUnsafe?.user?.photo_url || null,
-        balance: 100.0,
-        level: 1,
-        xp: 0,
-        isAdmin: false,
-        isVerified: false,
-        isSupport: false,
-        stats: {
-            totalGames: 0,
-            wins: 0,
-            totalBet: 0,
-            profit: 0
-        },
-        achievements: []
-    };
-
-    let currentRoom = null;
-    let gameState = {
-        players: [],
-        totalPot: 0,
-        isSpinning: false,
-        spinTimeout: null,
-        playerBets: {}
-    };
-
-    let towerState = {
-        active: false,
-        level: 0,
-        multiplier: 1.0,
-        betAmount: 0,
-        rows: 8,
-        safeCells: []
-    };
-
-    let buyTonState = {
-        selectedAmount: 10,
-        selectedPrice: 13,
-        isProcessing: false
-    };
-
-    const RANKS = [
-        { name: 'ROOKIE', minLevel: 1 },
-        { name: 'BRONZE', minLevel: 3 },
-        { name: 'SILVER', minLevel: 5 },
-        { name: 'GOLD', minLevel: 8 },
-        { name: 'PLATINUM', minLevel: 12 },
-        { name: 'DIAMOND', minLevel: 15 },
-        { name: 'MASTER', minLevel: 20 },
-        { name: 'LEGEND', minLevel: 25 }
-    ];
-
-    async function initApp() {
-        initTonConnect();
-        await loadUser();
-        updateUI();
-        setupWheel();
-        loadAvatar();
-        
-        // Auto-admin for specific user
-        if (currentUser.username === 'Kegovich') {
-            currentUser.isAdmin = true;
-            document.getElementById('admin-nav').style.display = 'flex';
-            await saveUser();
-        }
-
-        // Update online count
-        setInterval(() => {
-            document.getElementById('online-val').textContent = Math.floor(200 + Math.random() * 100);
-        }, 5000);
-        
-        // Listen for room changes
-        listenToRooms();
-    }
-
-    async function loadUser() {
-        const userRef = window.dbRef.ref(window.db, `users/${currentUser.id}`);
-        const snapshot = await window.dbRef.get(userRef);
-        
-        if (snapshot.exists()) {
-            const userData = snapshot.val();
-            currentUser = { ...currentUser, ...userData };
-        } else {
-            await saveUser();
-        }
-    }
-
-    async function saveUser() {
-        const userRef = window.dbRef.ref(window.db, `users/${currentUser.id}`);
-        await window.dbRef.set(userRef, currentUser);
-    }
-
-    function loadAvatar() {
-        if (currentUser.photoUrl) {
-            document.getElementById('head-avatar-img').src = currentUser.photoUrl;
-            document.getElementById('head-avatar-img').style.display = 'block';
-            document.getElementById('head-avatar-fallback').style.display = 'none';
-            
-            document.getElementById('prof-avatar-img').src = currentUser.photoUrl;
-            document.getElementById('prof-avatar-img').style.display = 'block';
-            document.getElementById('prof-avatar-fallback').style.display = 'none';
-        } else {
-            document.getElementById('head-avatar-img').style.display = 'none';
-            document.getElementById('head-avatar-fallback').style.display = 'flex';
-            document.getElementById('head-avatar-fallback').textContent = currentUser.firstName?.charAt(0) || '?';
-            
-            document.getElementById('prof-avatar-img').style.display = 'none';
-            document.getElementById('prof-avatar-fallback').style.display = 'flex';
-            document.getElementById('prof-avatar-fallback').textContent = currentUser.firstName?.charAt(0) || '?';
-        }
-    }
-
-    function updateUI() {
-        loadAvatar();
-        
-        document.getElementById('head-name').textContent = '@' + currentUser.username;
-        document.getElementById('prof-name').textContent = '@' + currentUser.username;
-        
-        document.getElementById('head-bal').textContent = currentUser.balance.toFixed(2);
-        
-        const rank = RANKS.slice().reverse().find(r => currentUser.level >= r.minLevel) || RANKS[0];
-        document.getElementById('head-rank').textContent = rank.name;
-        document.getElementById('prof-rank').textContent = rank.name;
-        
-        document.getElementById('head-lvl').textContent = currentUser.level;
-        document.getElementById('prof-lvl').textContent = currentUser.level;
-        
-        if (currentUser.isVerified) {
-            document.getElementById('v-badge').style.display = 'inline';
-        }
-
-        const xpForNext = currentUser.level * 100;
-        const xpPercent = Math.min((currentUser.xp / xpForNext) * 100, 100);
-        document.getElementById('xp-bar-fill').style.width = xpPercent + '%';
-        document.getElementById('xp-stat').textContent = `${currentUser.xp} / ${xpForNext} XP`;
-        document.getElementById('next-lvl-num').textContent = currentUser.level + 1;
-
-        document.getElementById('stat-games').textContent = currentUser.stats.totalGames;
-        document.getElementById('stat-wins').textContent = currentUser.stats.wins;
-        document.getElementById('stat-tbet').textContent = currentUser.stats.totalBet.toFixed(1);
-        document.getElementById('stat-profit').textContent = currentUser.stats.profit.toFixed(2);
-
-        ['ach-1', 'ach-2', 'ach-3', 'ach-4', 'ach-5'].forEach((id, i) => {
-            if (currentUser.achievements?.includes(i + 1)) {
-                document.getElementById(id).classList.add('unlocked');
-            }
-        });
-    }
-
-    function openBuyTonModal() {
-        document.getElementById('buy-ton-modal').style.display = 'block';
-        buyTonState.isProcessing = false;
-        
-        // Initialize TON Connect button if not already
-        if (tonConnectUI && !document.getElementById('ton-connect-container').children.length) {
-            setTimeout(() => {
-                tonConnectUI.buttonRootId = 'ton-connect-container';
-            }, 100);
-        }
-    }
-
-    function closeBuyTonModal() {
-        if (buyTonState.isProcessing) return;
-        document.getElementById('buy-ton-modal').style.display = 'none';
-    }
-
-    function selectTonPackage(amount, price, element) {
-        document.querySelectorAll('.ton-package').forEach(p => p.classList.remove('selected'));
-        element.classList.add('selected');
-        
-        buyTonState.selectedAmount = amount;
-        buyTonState.selectedPrice = price;
-        document.getElementById('buy-amount-display').textContent = amount;
-    }
-
-    async function processBuyTon() {
-        if (buyTonState.isProcessing) return;
-        
-        // Check if wallet is connected
-        if (!connectedWallet) {
-            alert('⚠️ Пожалуйста, подключите кошелек через TON Connect!');
-            return;
-        }
-        
-        buyTonState.isProcessing = true;
-        document.getElementById('processing-overlay').style.display = 'flex';
-        
-        try {
-            // Create transaction
-            const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 360,
-                messages: [
-                    {
-                        address: 'YOUR_WALLET_ADDRESS', // Replace with your TON wallet address
-                        amount: String(Math.floor(buyTonState.selectedPrice * 1000000000)) // Convert to nanoTON
-                    }
-                ]
-            };
-            
-            // Send transaction through TON Connect
-            const result = await tonConnectUI.sendTransaction(transaction);
-            
-            if (result) {
-                // Transaction successful
-                currentUser.balance += buyTonState.selectedAmount;
-                
-                // Check achievements
-                if (buyTonState.selectedAmount >= 10 && !currentUser.achievements?.includes(2)) {
-                    currentUser.achievements = currentUser.achievements || [];
-                    currentUser.achievements.push(2);
-                    alert('🎉 Достижение: МАЖОР!');
-                }
-                if (buyTonState.selectedAmount >= 100 && !currentUser.achievements?.includes(4)) {
-                    currentUser.achievements = currentUser.achievements || [];
-                    currentUser.achievements.push(4);
-                    alert('🐋 Достижение: КИТ!');
-                }
-                
-                await saveUser();
-                updateUI();
-                
-                document.getElementById('processing-overlay').style.display = 'none';
-                alert(`✅ Успешно! ${buyTonState.selectedAmount} TON зачислено!`);
-                closeBuyTonModal();
-                
-                // Reset processing state
-                setTimeout(() => {
-                    buyTonState.isProcessing = false;
-                }, 500);
-            }
-        } catch (error) {
-            console.error('Transaction failed:', error);
-            document.getElementById('processing-overlay').style.display = 'none';
-            alert('❌ Ошибка транзакции. Попробуйте снова.');
-            buyTonState.isProcessing = false;
-        }
-    }
-
-    function switchNav(screen, el) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        
-        const screenElement = document.getElementById('scr-' + screen);
-        if (screenElement) {
-            screenElement.classList.add('active');
-        }
-        if (el) {
-            el.classList.add('active');
-        }
-        
-        // Exit game room if navigating away
-        if (currentRoom && screen !== 'game') {
-            removePlayerFromRoom();
-        }
-    }
-
-    function setupWheel() {
-        const canvas = document.getElementById('mainWheel');
-        const ctx = canvas.getContext('2d');
-        const centerX = 320;
-        const centerY = 320;
-        const radius = 310;
-        
-        ctx.clearRect(0, 0, 640, 640);
-        
-        // Draw decorative segments
-        const colors = ['#1a1f2e', '#161b22', '#1a1f2e', '#161b22', '#1a1f2e', '#161b22'];
-        
-        for (let i = 0; i < 60; i++) {
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.arc(centerX, centerY, radius, (i * 6) * Math.PI / 180, ((i + 1) * 6) * Math.PI / 180);
-            ctx.closePath();
-            ctx.fillStyle = colors[i % colors.length];
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(36, 129, 204, 0.1)';
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-        }
-        
-        // Draw outer ring
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(36, 129, 204, 0.4)';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        
-        // Clear avatar overlay
-        document.getElementById('player-avatars-overlay').innerHTML = '';
-    }
-
-    function listenToRooms() {
-        const commonRoomRef = window.dbRef.ref(window.db, 'rooms/common');
-        const vipRoomRef = window.dbRef.ref(window.db, 'rooms/vip');
-        
-        window.dbRef.onValue(commonRoomRef, (snapshot) => {
-            if (currentRoom === 'common' && snapshot.exists()) {
-                updateRoomState(snapshot.val());
-            }
-        });
-        
-        window.dbRef.onValue(vipRoomRef, (snapshot) => {
-            if (currentRoom === 'vip' && snapshot.exists()) {
-                updateRoomState(snapshot.val());
-            }
-        });
-    }
-
-    function updateRoomState(data) {
-        gameState.players = Object.values(data.players || {});
-        gameState.totalPot = data.totalPot || 0;
-        gameState.isSpinning = data.isSpinning || false;
-        
-        updateGameUI();
-        
-        // Auto-spin if enough players and not already spinning
-        if (gameState.players.length >= 2 && !gameState.isSpinning && currentRoom) {
-            const myBet = gameState.players.find(p => p.id === currentUser.id);
-            if (myBet) {
-                autoSpinWheel();
-            }
-        }
-    }
-
-    async function openRoom(roomType) {
-        if (roomType === 'vip' && currentUser.level < 5) {
-            alert('❌ Требуется 5 уровень для VIP!');
-            return;
-        }
-
-        // Remove from current room first
-        await removePlayerFromRoom();
-        
-        currentRoom = roomType;
-        switchNav('game', document.querySelector('.nav-item'));
-        
-        if (roomType === 'vip') {
-            document.getElementById('game-room-name').textContent = '💎 HIGH ROLLERS';
-            document.getElementById('game-min-bet').textContent = 'Min: 10 TON';
-            document.getElementById('bet-input').value = '10.0';
-            document.getElementById('bet-input').min = '10.0';
-        } else {
-            document.getElementById('game-room-name').textContent = '⚔️ BATTLE ARENA';
-            document.getElementById('game-min-bet').textContent = 'Min: 0.1 TON';
-            document.getElementById('bet-input').value = '1.0';
-            document.getElementById('bet-input').min = '0.1';
-        }
-
-        document.getElementById('bet-btn').disabled = false;
-        document.getElementById('game-status-text').textContent = 'Ожидание игроков...';
-        setupWheel();
-    }
-
-    async function removePlayerFromRoom() {
-        if (currentRoom && currentUser.id) {
-            const playerRef = window.dbRef.ref(window.db, `rooms/${currentRoom}/players/${currentUser.id}`);
-            await window.dbRef.remove(playerRef);
-        }
-    }
-
-    function exitToLobby() {
-        removePlayerFromRoom();
-        currentRoom = null;
-        
-        // Clear spin timeout if exists
-        if (gameState.spinTimeout) {
-            clearTimeout(gameState.spinTimeout);
-            gameState.spinTimeout = null;
-        }
-        
-        gameState.players = [];
-        gameState.totalPot = 0;
-        gameState.isSpinning = false;
-        
-        switchNav('lobby', document.querySelectorAll('.nav-item')[0]);
-    }
-
-    function updateGameUI() {
-        const playersList = document.getElementById('game-players-list');
-        playersList.innerHTML = '';
-        
-        gameState.players.forEach(player => {
-            const card = document.createElement('div');
-            card.className = 'player-card';
-            
-            const avatarHTML = player.photoUrl 
-                ? `<div class="p-ava"><img src="${player.photoUrl}" alt="Avatar"></div>`
-                : `<div class="p-ava" style="display:flex; align-items:center; justify-content:center; font-weight:900; color:#ffffff; font-size:16px;">${player.firstName?.charAt(0) || '?'}</div>`;
-            
-            card.innerHTML = `
-                <div class="p-info">
-                    ${avatarHTML}
-                    <div>
-                        <div class="p-name">@${player.username}</div>
-                        <div style="font-size:11px; color:var(--sub);">Шанс: ${((player.bet / gameState.totalPot) * 100).toFixed(1)}%</div>
-                    </div>
-                </div>
-                <div class="p-bet">${player.bet.toFixed(2)} TON</div>
-            `;
-            playersList.appendChild(card);
-        });
-
-        document.getElementById('lobby-jackpot').textContent = gameState.totalPot.toFixed(2);
-        drawWheel();
-    }
-
-    function drawWheel() {
-        const canvas = document.getElementById('mainWheel');
-        const ctx = canvas.getContext('2d');
-        const centerX = 320;
-        const centerY = 320;
-        const radius = 300;
-        
-        ctx.clearRect(0, 0, 640, 640);
-        
-        // Clear avatar overlay
-        const avatarOverlay = document.getElementById('player-avatars-overlay');
-        avatarOverlay.innerHTML = '';
-        
-        if (gameState.players.length === 0) {
-            setupWheel();
-            return;
-        }
-
-        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd', '#2ed573', '#ff9ff3', '#54a0ff'];
-        let currentAngle = 0;
-        
-        gameState.players.forEach((player, i) => {
-            const angle = (player.bet / gameState.totalPot) * 360;
-            
-            // Draw segment with gradient
-            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-            gradient.addColorStop(0, colors[i % colors.length]);
-            gradient.addColorStop(1, colors[i % colors.length] + '88');
-            
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.arc(centerX, centerY, radius, currentAngle * Math.PI / 180, (currentAngle + angle) * Math.PI / 180);
-            ctx.closePath();
-            ctx.fillStyle = gradient;
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            // Draw player name in segment
-            ctx.save();
-            ctx.translate(centerX, centerY);
-            ctx.rotate((currentAngle + angle / 2) * Math.PI / 180);
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 16px Inter';
-            ctx.textAlign = 'center';
-            ctx.fillText('@' + player.username, 180, 5);
-            ctx.restore();
-            
-            // Add player avatar on the wheel
-            const avatarAngle = (currentAngle + angle / 2) * Math.PI / 180;
-            const avatarX = centerX + Math.cos(avatarAngle) * 200;
-            const avatarY = centerY + Math.sin(avatarAngle) * 200;
-            
-            const avatarDiv = document.createElement('div');
-            avatarDiv.className = 'player-segment-avatar';
-            avatarDiv.style.left = (avatarX - 20) + 'px';
-            avatarDiv.style.top = (avatarY - 20) + 'px';
-            avatarDiv.style.transform = `rotate(${(currentAngle + angle/2)}deg)`;
-            
-            if (player.photoUrl) {
-                avatarDiv.innerHTML = `<img src="${player.photoUrl}" alt="${player.username}">`;
-            } else {
-                avatarDiv.style.display = 'flex';
-                avatarDiv.style.alignItems = 'center';
-                avatarDiv.style.justifyContent = 'center';
-                avatarDiv.style.fontWeight = '900';
-                avatarDiv.style.color = '#ffffff';
-                avatarDiv.style.fontSize = '18px';
-                avatarDiv.textContent = player.firstName?.charAt(0) || '?';
+                message.style.display = 'block';
+                message.style.color = '#ef4444';
+                message.innerText = 'Введите промокод!';
             }
             
-            avatarOverlay.appendChild(avatarDiv);
-            
-            currentAngle += angle;
-        });
-        
-        // Draw outer ring
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(36, 129, 204, 0.5)';
-        ctx.lineWidth = 4;
-        ctx.stroke();
-    }
-
-    async function handlePlaceBet() {
-        if (gameState.isSpinning) {
-            alert('⏳ Спин уже запущен! Дождитесь завершения.');
-            return;
+            setTimeout(() => { message.style.display = 'none'; }, 3000);
         }
-        
-        const bet = parseFloat(document.getElementById('bet-input').value);
-        const minBet = currentRoom === 'vip' ? 10.0 : 0.1;
-        
-        if (!bet || bet < minBet || bet > currentUser.balance) {
-            alert(`❌ Неверная ставка! Мин: ${minBet} TON, Ваш баланс: ${currentUser.balance.toFixed(2)} TON`);
-            return;
-        }
-
-        // Check if already in game
-        const alreadyInGame = gameState.players.find(p => p.id === currentUser.id);
-        if (alreadyInGame) {
-            alert('❌ Вы уже в игре!');
-            return;
-        }
-
-        currentUser.balance -= bet;
-        currentUser.stats.totalGames++;
-        currentUser.stats.totalBet += bet;
-        await saveUser();
-        updateUI();
-
-        const playerData = {
-            id: currentUser.id,
-            username: currentUser.username,
-            firstName: currentUser.firstName,
-            photoUrl: currentUser.photoUrl,
-            bet: bet
-        };
-
-        const playerRef = window.dbRef.ref(window.db, `rooms/${currentRoom}/players/${currentUser.id}`);
-        await window.dbRef.set(playerRef, playerData);
-
-        const newTotalPot = gameState.totalPot + bet;
-        const potRef = window.dbRef.ref(window.db, `rooms/${currentRoom}/totalPot`);
-        await window.dbRef.set(potRef, newTotalPot);
-
-        document.getElementById('bet-btn').disabled = true;
-        document.getElementById('game-status-text').textContent = '✅ ВЫ В ИГРЕ!';
-    }
-
-    function autoSpinWheel() {
-        if (gameState.players.length < 2 || gameState.isSpinning) return;
-        
-        gameState.isSpinning = true;
-        const roomRef = window.dbRef.ref(window.db, `rooms/${currentRoom}/isSpinning`);
-        window.dbRef.set(roomRef, true);
-        
-        document.getElementById('game-status-text').textContent = '🎰 КРУТИМ...';
-        
-        const canvas = document.getElementById('mainWheel');
-        const totalRotation = 360 * 5 + Math.random() * 360;
-        canvas.style.transform = `rotate(${totalRotation}deg)`;
-        
-        gameState.spinTimeout = setTimeout(async () => {
-            await resolveSpin();
-        }, 5000);
-    }
-
-    async function resolveSpin() {
-        if (gameState.players.length === 0) return;
-        
-        const winnerIndex = Math.floor(Math.random() * gameState.players.length);
-        const winner = gameState.players[winnerIndex];
-        const totalPot = gameState.totalPot;
-        
-        // Reset wheel rotation
-        const canvas = document.getElementById('mainWheel');
-        canvas.style.transform = 'rotate(0deg)';
-        
-        if (winner.id === currentUser.id) {
-            // Current user won
-            currentUser.balance += totalPot;
-            currentUser.stats.wins++;
-            currentUser.stats.profit += (totalPot - (gameState.players.find(p => p.id === currentUser.id)?.bet || 0));
-            currentUser.xp += 50;
-            
-            if (currentUser.xp >= currentUser.level * 100) {
-                currentUser.level++;
-                currentUser.xp = 0;
-                setTimeout(() => alert(`🎉 УРОВЕНЬ ${currentUser.level}!`), 500);
-            }
-
-            if (!currentUser.achievements?.includes(1)) {
-                currentUser.achievements = currentUser.achievements || [];
-                currentUser.achievements.push(1);
-            }
-            
-            await saveUser();
-            updateUI();
-
-            document.getElementById('win-amount').textContent = totalPot.toFixed(2);
-            document.getElementById('win-overlay').style.display = 'flex';
-        } else {
-            document.getElementById('game-status-text').textContent = `Победил @${winner.username}`;
-        }
-        
-        // Clear room
-        await window.dbRef.remove(window.dbRef.ref(window.db, `rooms/${currentRoom}`));
-        
-        gameState.isSpinning = false;
-        gameState.players = [];
-        gameState.totalPot = 0;
-        
-        document.getElementById('bet-btn').disabled = false;
-        setupWheel();
-        
-        setTimeout(() => {
-            if (currentRoom) {
-                document.getElementById('game-status-text').textContent = 'Ожидание игроков...';
-            }
-        }, 3000);
-    }
-
-    function closeWinOverlay() {
-        document.getElementById('win-overlay').style.display = 'none';
-        document.getElementById('game-status-text').textContent = 'Ожидание игроков...';
-    }
-
-    // ============ ADMIN FUNCTIONS ============
-    async function adminResetWheel() {
-        if (!currentUser.isAdmin) {
-            alert('❌ Нет прав!');
-            return;
-        }
-        
-        if (!currentRoom) {
-            alert('❌ Вы не в игровой комнате!');
-            return;
-        }
-        
-        if (gameState.spinTimeout) {
-            clearTimeout(gameState.spinTimeout);
-            gameState.spinTimeout = null;
-        }
-        
-        // Return bets to all players
-        for (const player of gameState.players) {
-            const playerRef = window.dbRef.ref(window.db, `users/${player.id}`);
-            const snapshot = await window.dbRef.get(playerRef);
-            
-            if (snapshot.exists()) {
-                const userData = snapshot.val();
-                await window.dbRef.update(playerRef, {
-                    balance: (userData.balance || 0) + player.bet
-                });
-            }
-        }
-        
-        // Clear room
-        await window.dbRef.remove(window.dbRef.ref(window.db, `rooms/${currentRoom}`));
-        
-        gameState.isSpinning = false;
-        gameState.players = [];
-        gameState.totalPot = 0;
-        document.getElementById('bet-btn').disabled = false;
-        
-        const canvas = document.getElementById('mainWheel');
-        canvas.style.transform = 'rotate(0deg)';
-        setupWheel();
-        
-        document.getElementById('game-status-text').textContent = '🔄 Колесо сброшено';
-        
-        alert('✅ Колесо сброшено! Ставки возвращены игрокам.');
-    }
-
-    async function adminForceSpin() {
-        if (!currentUser.isAdmin) {
-            alert('❌ Нет прав!');
-            return;
-        }
-        
-        if (!currentRoom) {
-            alert('❌ Вы не в игровой комнате!');
-            return;
-        }
-        
-        if (gameState.players.length < 2) {
-            alert('❌ Недостаточно игроков для спина!');
-            return;
-        }
-        
-        if (gameState.isSpinning) {
-            alert('❌ Спин уже запущен!');
-            return;
-        }
-        
-        autoSpinWheel();
-        alert('✅ Спин запущен принудительно!');
-    }
-
-    async function adminAddBalance() {
-        if (!currentUser.isAdmin) return;
-        
-        const username = document.getElementById('admin-target-user').value.replace('@', '').trim();
-        const amount = parseFloat(document.getElementById('admin-add-balance').value);
-        
-        if (!username || !amount || amount <= 0) {
-            alert('❌ Неверные данные!');
-            return;
-        }
-
-        const usersRef = window.dbRef.ref(window.db, 'users');
-        const snapshot = await window.dbRef.get(usersRef);
-        
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            for (let [id, user] of Object.entries(users)) {
-                if (user.username === username) {
-                    await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), {
-                        balance: (user.balance || 0) + amount
-                    });
-                    
-                    if (id === String(currentUser.id)) {
-                        currentUser.balance += amount;
-                        updateUI();
-                    }
-                    
-                    alert(`✅ ${amount} TON начислено @${username}!`);
-                    return;
-                }
-            }
-        }
-        alert('❌ Пользователь не найден!');
-    }
-
-    async function adminVerifyUser() {
-        if (!currentUser.isAdmin) return;
-        
-        const username = document.getElementById('admin-verify-user').value.replace('@', '').trim();
-        if (!username) {
-            alert('❌ Введите username!');
-            return;
-        }
-
-        const usersRef = window.dbRef.ref(window.db, 'users');
-        const snapshot = await window.dbRef.get(usersRef);
-        
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            for (let [id, user] of Object.entries(users)) {
-                if (user.username === username) {
-                    await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), { isVerified: true });
-                    alert(`✅ Верификация выдана @${username}!`);
-                    return;
-                }
-            }
-        }
-        alert('❌ Пользователь не найден!');
-    }
-
-    async function adminMakeAdmin() {
-        if (!currentUser.isAdmin) return;
-        
-        const username = document.getElementById('admin-role-user').value.replace('@', '').trim();
-        if (!username) {
-            alert('❌ Введите username!');
-            return;
-        }
-
-        const usersRef = window.dbRef.ref(window.db, 'users');
-        const snapshot = await window.dbRef.get(usersRef);
-        
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            for (let [id, user] of Object.entries(users)) {
-                if (user.username === username) {
-                    await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), { isAdmin: true });
-                    alert(`✅ Права админа выданы @${username}!`);
-                    return;
-                }
-            }
-        }
-        alert('❌ Пользователь не найден!');
-    }
-
-    async function adminMakeSupport() {
-        if (!currentUser.isAdmin) return;
-        
-        const username = document.getElementById('admin-role-user').value.replace('@', '').trim();
-        if (!username) {
-            alert('❌ Введите username!');
-            return;
-        }
-
-        const usersRef = window.dbRef.ref(window.db, 'users');
-        const snapshot = await window.dbRef.get(usersRef);
-        
-        if (snapshot.exists()) {
-            const users = snapshot.val();
-            for (let [id, user] of Object.entries(users)) {
-                if (user.username === username) {
-                    await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), { isSupport: true });
-                    alert(`✅ Права саппорта выданы @${username}!`);
-                    return;
-                }
-            }
-        }
-        alert('❌ Пользователь не найден!');
-    }
-
-    // ============ TOWER GAME ============
-    function startTower() {
-        const bet = parseFloat(document.getElementById('tower-bet-input').value);
-        
-        if (!bet || bet < 0.1 || bet > currentUser.balance) {
-            alert(`❌ Неверная ставка! Ваш баланс: ${currentUser.balance.toFixed(2)} TON`);
-            return;
-        }
-
-        currentUser.balance -= bet;
-        updateUI();
-        saveUser();
-
-        towerState = {
-            active: true,
-            level: 0,
-            multiplier: 1.0,
-            betAmount: bet,
-            rows: 8,
-            safeCells: []
-        };
-
-        document.getElementById('tower-start-btn').style.display = 'none';
-        document.getElementById('tower-cashout-btn').style.display = 'block';
-        document.getElementById('tower-bet-input').disabled = true;
-
-        generateTowerGrid();
-    }
-
-    function generateTowerGrid() {
-        const grid = document.getElementById('tower-grid');
-        grid.innerHTML = '';
-
-        for (let row = towerState.rows - 1; row >= 0; row--) {
-            const rowDiv = document.createElement('div');
-            rowDiv.className = 'tower-row';
-
-            const safeCol = Math.floor(Math.random() * 3);
-            towerState.safeCells[row] = safeCol;
-
-            for (let col = 0; col < 3; col++) {
-                const cell = document.createElement('button');
-                cell.className = 'tower-cell';
-                cell.textContent = '?';
-                cell.disabled = row !== towerState.level;
-                cell.onclick = () => clickTowerCell(row, col, cell);
-                rowDiv.appendChild(cell);
-            }
-
-            grid.appendChild(rowDiv);
-        }
-    }
-
-    async function clickTowerCell(row, col, cell) {
-        if (row !== towerState.level) return;
-
-        const isSafe = towerState.safeCells[row] === col;
-
-        if (isSafe) {
-            cell.classList.add('safe');
-            cell.textContent = '✓';
-            cell.disabled = true;
-
-            towerState.level++;
-            towerState.multiplier *= 1.3;
-            document.getElementById('tower-mult').textContent = towerState.multiplier.toFixed(2);
-            
-            const winAmount = towerState.betAmount * towerState.multiplier;
-            document.getElementById('tower-win-amount').textContent = winAmount.toFixed(2);
-
-            if (towerState.level >= towerState.rows) {
-                await cashoutTower();
-                return;
-            }
-
-            document.querySelectorAll('.tower-cell').forEach(c => c.disabled = true);
-            const nextRow = document.querySelectorAll('.tower-row')[towerState.rows - 1 - towerState.level];
-            if (nextRow) {
-                nextRow.querySelectorAll('.tower-cell').forEach(c => c.disabled = false);
-            }
-
-        } else {
-            cell.classList.add('danger');
-            cell.textContent = '✗';
-            
-            document.querySelectorAll('.tower-cell').forEach(c => c.disabled = true);
-            
-            setTimeout(() => {
-                alert('💥 Игра окончена!');
-                resetTower();
-            }, 500);
-        }
-    }
-
-    async function cashoutTower() {
-        const winAmount = towerState.betAmount * towerState.multiplier;
-        currentUser.balance += winAmount;
-        currentUser.stats.wins++;
-        currentUser.stats.profit += (winAmount - towerState.betAmount);
-        currentUser.xp += Math.floor(towerState.level * 10);
-        
-        if (currentUser.xp >= currentUser.level * 100) {
-            currentUser.level++;
-            currentUser.xp = 0;
-        }
-        
-        await saveUser();
-        updateUI();
-
-        document.getElementById('win-amount').textContent = winAmount.toFixed(2);
-        document.getElementById('win-overlay').style.display = 'flex';
-
-        resetTower();
-    }
-
-    function resetTower() {
-        towerState.active = false;
-        document.getElementById('tower-start-btn').style.display = 'block';
-        document.getElementById('tower-cashout-btn').style.display = 'none';
-        document.getElementById('tower-bet-input').disabled = false;
-        document.getElementById('tower-mult').textContent = '1.00';
-        document.getElementById('tower-grid').innerHTML = '';
-    }
-
-    // ============ SUPPORT CHAT ============
-    function showSupport() {
-        document.getElementById('support-modal').style.display = 'block';
-        loadSupportChat();
-    }
-
-    function closeSupport() {
-        document.getElementById('support-modal').style.display = 'none';
-    }
-
-    async function loadSupportChat() {
-        const chatRef = window.dbRef.ref(window.db, `support/${currentUser.id}`);
-        window.dbRef.onValue(chatRef, (snapshot) => {
-            const chat = document.getElementById('support-chat');
-            chat.innerHTML = '';
-            
-            if (snapshot.exists()) {
-                const messages = snapshot.val();
-                Object.values(messages).forEach(msg => {
-                    const div = document.createElement('div');
-                    div.className = `message ${msg.from}`;
-                    div.textContent = msg.text;
-                    chat.appendChild(div);
-                });
-                chat.scrollTop = chat.scrollHeight;
-            } else {
-                chat.innerHTML = '<div style="text-align:center; color:var(--sub); padding:20px;">Начните диалог с поддержкой</div>';
-            }
-        });
-    }
-
-    async function sendSupportMessage() {
-        const input = document.getElementById('support-message-input');
-        const text = input.value.trim();
-        if (!text) return;
-
-        const msgRef = window.dbRef.push(window.dbRef.ref(window.db, `support/${currentUser.id}`));
-        await window.dbRef.set(msgRef, {
-            from: 'user',
-            text: text,
-            timestamp: Date.now()
-        });
-
-        input.value = '';
-    }
-
-    // Handle page unload
-    window.addEventListener('beforeunload', () => {
-        if (currentRoom) {
-            removePlayerFromRoom();
-        }
-    });
-
-    window.onload = initApp;
-</script>
-
+    </script>
 </body>
 </html>
