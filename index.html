@@ -3,84 +3,683 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Технические работы</title>
+    <title>Room Rolls Casino</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get, onValue, push, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQgyNz7P5K4_dlNQsKqniO-kEALW3_OWg",
+            authDomain: "casino-213b9.firebaseapp.com",
+            databaseURL: "https://casino-213b9-default-rtdb.firebaseio.com",
+            projectId: "casino-213b9",
+            storageBucket: "casino-213b9.firebasestorage.app",
+            messagingSenderId: "104292026196",
+            appId: "1:104292026196:web:4b33abbb085143ce69eac1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        window.db = db;
+        window.dbRef = { ref, set, get, onValue, push, update };
+    </script>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #0f172a;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
         }
 
-        .container {
-            text-align: center;
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        
+        .header {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             padding: 20px;
-        }
-
-        .icon {
-            font-size: 64px;
             margin-bottom: 20px;
-            animation: pulse 2s infinite;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
         }
 
-        p {
-            font-size: 1.1rem;
-            color: #94a3b8;
+        .user-info { flex: 1; }
+        .username { font-size: 18px; font-weight: 600; }
+        .balance { 
+            font-size: 24px; 
+            font-weight: 700;
+            color: #ffd700;
+            margin-top: 5px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 15px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 5px 15px rgba(245,87,108,0.4);
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        .game-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .roulette-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 30px auto;
+        }
+
+        .roulette-wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #f7b731, #5f27cd, #ff6b6b);
+            position: relative;
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            box-shadow: 0 0 30px rgba(0,0,0,0.3), inset 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .player-segment {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 16px;
+        }
+
+        .input-group input::placeholder { color: rgba(255,255,255,0.6); }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 15px;
+            border: none;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(245,87,108,0.4);
+        }
+
+        .tower-grid {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .tower-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .tower-cell {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tower-cell:hover:not(:disabled) {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .tower-cell.safe {
+            background: linear-gradient(135deg, #4ecdc4 0%, #45b7d1 100%);
+            animation: pulse 0.5s;
+        }
+
+        .tower-cell.danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            animation: shake 0.5s;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
-        /* Индикатор загрузки */
-        .loader {
-            width: 50px;
-            height: 5px;
-            background: #334155;
-            margin: 30px auto 0;
-            position: relative;
-            overflow: hidden;
-            border-radius: 5px;
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
 
-        .loader-line {
-            position: absolute;
-            width: 40%;
-            height: 100%;
-            background: #38bdf8;
-            animation: slide 1.5s infinite ease-in-out;
+        .multiplier {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffd700;
+            margin: 20px 0;
         }
 
-        @keyframes slide {
-            0% { left: -40%; }
-            100% { left: 100%; }
+        .admin-panel {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .admin-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+        }
+
+        .support-chat {
+            height: 400px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: rgba(255,255,255,0.2);
+            margin-left: auto;
+        }
+
+        .message.support {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .verified-badge {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #1DA1F2;
+            border-radius: 50%;
+            color: white;
+            text-align: center;
+            line-height: 20px;
+            font-size: 12px;
+            margin-left: 5px;
         }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <div class="icon">⚙️</div>
-        <h1>Идут технические работы</h1>
-        <p>Пожалуйста, ожидайте. Мы скоро вернемся.</p>
-        
-        <div class="loader">
-            <div class="loader-line"></div>
+        <div class="header">
+            <div class="avatar" id="userAvatar">👤</div>
+            <div class="user-info">
+                <div class="username" id="username">Загрузка...</div>
+                <div class="balance"><span id="balance">0</span> TON</div>
+            </div>
+        </div>
+
+        <div class="nav">
+            <button class="nav-btn active" onclick="switchScreen('rolls')">🎰 Rolls</button>
+            <button class="nav-btn" onclick="switchScreen('tower')">🗼 Tower</button>
+            <button class="nav-btn" onclick="switchScreen('profile')">👤 Профиль</button>
+            <button class="nav-btn" id="adminBtn" style="display:none" onclick="switchScreen('admin')">⚙️ Админ</button>
+        </div>
+
+        <div id="rolls" class="screen active">
+            <div class="game-card">
+                <h2 style="text-align:center; margin-bottom:20px">🎰 Room Rolls</h2>
+                <div class="input-group">
+                    <label>Ставка (TON)</label>
+                    <input type="number" id="rollBet" placeholder="Введите ставку" min="0.1" step="0.1">
+                </div>
+                <div class="roulette-container">
+                    <div class="roulette-wheel" id="rouletteWheel">
+                        <div class="wheel-center"></div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="playRolls()">Крутить рулетку</button>
+                <div id="rollResult" style="text-align:center; margin-top:20px; font-size:18px"></div>
+            </div>
+        </div>
+
+        <div id="tower" class="screen">
+            <div class="game-card">
+                <h2 style="text-align:center; margin-bottom:20px">🗼 Tower</h2>
+                <div class="input-group">
+                    <label>Ставка (TON)</label>
+                    <input type="number" id="towerBet" placeholder="Введите ставку" min="0.1" step="0.1">
+                </div>
+                <button class="btn btn-primary" onclick="startTower()">Начать игру</button>
+                <div class="multiplier">x<span id="multiplier">1.00</span></div>
+                <div id="towerGame" style="display:none">
+                    <div class="tower-grid" id="towerGrid"></div>
+                    <button class="btn btn-primary" onclick="cashout()">Забрать выигрыш</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="profile" class="screen">
+            <div class="game-card">
+                <h2 style="text-align:center; margin-bottom:20px">👤 Профиль</h2>
+                <div style="text-align:center; margin:20px 0">
+                    <div class="avatar" style="width:100px; height:100px; margin:0 auto; font-size:40px" id="profileAvatar">👤</div>
+                    <div style="margin-top:15px; font-size:24px; font-weight:600" id="profileUsername">Username</div>
+                    <div style="margin-top:10px; font-size:32px; color:#ffd700" id="profileBalance">0 TON</div>
+                </div>
+                <button class="btn btn-primary" onclick="showSupport()">💬 Тех. поддержка</button>
+                <div id="supportSection" style="display:none; margin-top:20px">
+                    <h3>Чат с поддержкой</h3>
+                    <div class="support-chat" id="supportChat"></div>
+                    <div class="input-group">
+                        <input type="text" id="supportMessage" placeholder="Введите сообщение...">
+                    </div>
+                    <button class="btn btn-primary" onclick="sendSupportMessage()">Отправить</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin" class="screen">
+            <div class="admin-panel">
+                <h2 style="text-align:center; margin-bottom:20px">⚙️ Админ панель</h2>
+                <div class="admin-section">
+                    <h3>Управление пользователями</h3>
+                    <div class="input-group">
+                        <label>Username</label>
+                        <input type="text" id="adminTargetUser" placeholder="@username">
+                    </div>
+                    <div class="input-group">
+                        <label>Добавить TON</label>
+                        <input type="number" id="adminAddBalance" placeholder="Количество TON">
+                    </div>
+                    <button class="btn btn-primary" onclick="adminAddBalance()">Начислить</button>
+                </div>
+                <div class="admin-section">
+                    <h3>Верификация</h3>
+                    <div class="input-group">
+                        <label>Username для галочки</label>
+                        <input type="text" id="adminVerifyUser" placeholder="@username">
+                    </div>
+                    <button class="btn btn-primary" onclick="adminVerifyUser()">Дать галочку</button>
+                </div>
+                <div class="admin-section">
+                    <h3>Назначить роли</h3>
+                    <div class="input-group">
+                        <label>Username</label>
+                        <input type="text" id="adminRoleUser" placeholder="@username">
+                    </div>
+                    <button class="btn btn-primary" onclick="adminMakeAdmin()">Сделать админом</button>
+                    <button class="btn btn-primary" onclick="adminMakeSupport()">Сделать саппортом</button>
+                </div>
+                <div class="admin-section">
+                    <h3>Тех. поддержка</h3>
+                    <div id="adminSupportTickets"></div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        let currentUser = {
+            id: tg.initDataUnsafe?.user?.id || 123456,
+            username: tg.initDataUnsafe?.user?.username || 'TestUser',
+            firstName: tg.initDataUnsafe?.user?.first_name || 'Test',
+            balance: 100,
+            isAdmin: false,
+            isVerified: false
+        };
+
+        async function initUser() {
+            const userRef = window.dbRef.ref(window.db, `users/${currentUser.id}`);
+            const snapshot = await window.dbRef.get(userRef);
+            
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                currentUser = { ...currentUser, ...userData };
+            } else {
+                await window.dbRef.set(userRef, currentUser);
+            }
+
+            if (currentUser.username === 'Kegovich') {
+                currentUser.isAdmin = true;
+                document.getElementById('adminBtn').style.display = 'block';
+            }
+
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('username').textContent = '@' + currentUser.username + (currentUser.isVerified ? ' ✓' : '');
+            document.getElementById('balance').textContent = currentUser.balance.toFixed(2);
+            document.getElementById('profileUsername').textContent = '@' + currentUser.username;
+            document.getElementById('profileBalance').textContent = currentUser.balance.toFixed(2) + ' TON';
+            
+            const initial = currentUser.firstName?.charAt(0) || currentUser.username?.charAt(0) || '?';
+            document.getElementById('userAvatar').textContent = initial;
+            document.getElementById('profileAvatar').textContent = initial;
+        }
+
+        function switchScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(screen).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function playRolls() {
+            const bet = parseFloat(document.getElementById('rollBet').value);
+            if (!bet || bet <= 0 || bet > currentUser.balance) {
+                alert('Неверная ставка!');
+                return;
+            }
+
+            const wheel = document.getElementById('rouletteWheel');
+            const spins = 5 + Math.random() * 3;
+            const rotation = spins * 360 + Math.random() * 360;
+            
+            wheel.style.transform = `rotate(${rotation}deg)`;
+
+            setTimeout(async () => {
+                const win = Math.random() > 0.5;
+                const multiplier = win ? 1.5 + Math.random() : 0;
+                const result = bet * multiplier - bet;
+
+                currentUser.balance += result;
+                await window.dbRef.update(window.dbRef.ref(window.db, `users/${currentUser.id}`), { balance: currentUser.balance });
+                
+                document.getElementById('rollResult').innerHTML = win 
+                    ? `<span style="color:#4ecdc4">🎉 Выигрыш: +${result.toFixed(2)} TON</span>`
+                    : `<span style="color:#ff6b6b">😔 Проигрыш: ${bet.toFixed(2)} TON</span>`;
+                
+                updateUI();
+            }, 3000);
+        }
+
+        let towerLevel = 0;
+        let towerMultiplier = 1;
+        let towerBetAmount = 0;
+        const towerRows = 8;
+
+        function startTower() {
+            const bet = parseFloat(document.getElementById('towerBet').value);
+            if (!bet || bet <= 0 || bet > currentUser.balance) {
+                alert('Неверная ставка!');
+                return;
+            }
+
+            towerBetAmount = bet;
+            currentUser.balance -= bet;
+            updateUI();
+            
+            towerLevel = 0;
+            towerMultiplier = 1;
+            document.getElementById('towerGame').style.display = 'block';
+            generateTowerLevel();
+        }
+
+        function generateTowerLevel() {
+            const grid = document.getElementById('towerGrid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < towerRows; i++) {
+                const row = document.createElement('div');
+                row.className = 'tower-row';
+                
+                const safeIndex = Math.floor(Math.random() * 3);
+                
+                for (let j = 0; j < 3; j++) {
+                    const cell = document.createElement('button');
+                    cell.className = 'tower-cell';
+                    cell.textContent = '?';
+                    cell.onclick = () => clickTowerCell(cell, j === safeIndex, i);
+                    cell.disabled = i !== towerLevel;
+                    row.appendChild(cell);
+                }
+                
+                grid.appendChild(row);
+            }
+        }
+
+        async function clickTowerCell(cell, isSafe, row) {
+            if (isSafe) {
+                cell.classList.add('safe');
+                cell.textContent = '✓';
+                towerLevel++;
+                towerMultiplier *= 1.3;
+                document.getElementById('multiplier').textContent = towerMultiplier.toFixed(2);
+                
+                if (towerLevel >= towerRows) {
+                    await cashout();
+                } else {
+                    generateTowerLevel();
+                }
+            } else {
+                cell.classList.add('danger');
+                cell.textContent = '✗';
+                alert('Игра окончена! Вы проиграли.');
+                document.getElementById('towerGame').style.display = 'none';
+                await window.dbRef.update(window.dbRef.ref(window.db, `users/${currentUser.id}`), { balance: currentUser.balance });
+            }
+        }
+
+        async function cashout() {
+            const winAmount = towerBetAmount * towerMultiplier;
+            currentUser.balance += winAmount;
+            await window.dbRef.update(window.dbRef.ref(window.db, `users/${currentUser.id}`), { balance: currentUser.balance });
+            updateUI();
+            alert(`Поздравляем! Вы выиграли ${winAmount.toFixed(2)} TON!`);
+            document.getElementById('towerGame').style.display = 'none';
+        }
+
+        function showSupport() {
+            const section = document.getElementById('supportSection');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+            loadSupportChat();
+        }
+
+        async function loadSupportChat() {
+            const chatRef = window.dbRef.ref(window.db, `support/${currentUser.id}`);
+            window.dbRef.onValue(chatRef, (snapshot) => {
+                const chat = document.getElementById('supportChat');
+                chat.innerHTML = '';
+                
+                if (snapshot.exists()) {
+                    const messages = snapshot.val();
+                    Object.values(messages).forEach(msg => {
+                        const div = document.createElement('div');
+                        div.className = `message ${msg.from === 'user' ? 'user' : 'support'}`;
+                        div.textContent = msg.text;
+                        chat.appendChild(div);
+                    });
+                    chat.scrollTop = chat.scrollHeight;
+                }
+            });
+        }
+
+        async function sendSupportMessage() {
+            const input = document.getElementById('supportMessage');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const msgRef = window.dbRef.push(window.dbRef.ref(window.db, `support/${currentUser.id}`));
+            await window.dbRef.set(msgRef, {
+                from: 'user',
+                text: text,
+                timestamp: Date.now()
+            });
+
+            input.value = '';
+        }
+
+        async function adminAddBalance() {
+            const username = document.getElementById('adminTargetUser').value.replace('@', '');
+            const amount = parseFloat(document.getElementById('adminAddBalance').value);
+            if (!username || !amount) return;
+
+            const usersRef = window.dbRef.ref(window.db, 'users');
+            const snapshot = await window.dbRef.get(usersRef);
+            
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                for (let [id, user] of Object.entries(users)) {
+                    if (user.username === username) {
+                        await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), {
+                            balance: (user.balance || 0) + amount
+                        });
+                        alert('Баланс обновлён!');
+                        return;
+                    }
+                }
+            }
+            alert('Пользователь не найден!');
+        }
+
+        async function adminVerifyUser() {
+            const username = document.getElementById('adminVerifyUser').value.replace('@', '');
+            if (!username) return;
+
+            const usersRef = window.dbRef.ref(window.db, 'users');
+            const snapshot = await window.dbRef.get(usersRef);
+            
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                for (let [id, user] of Object.entries(users)) {
+                    if (user.username === username) {
+                        await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), { isVerified: true });
+                        alert('Галочка выдана!');
+                        return;
+                    }
+                }
+            }
+        }
+
+        async function adminMakeAdmin() {
+            const username = document.getElementById('adminRoleUser').value.replace('@', '');
+            if (!username) return;
+
+            const usersRef = window.dbRef.ref(window.db, 'users');
+            const snapshot = await window.dbRef.get(usersRef);
+            
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                for (let [id, user] of Object.entries(users)) {
+                    if (user.username === username) {
+                        await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), { isAdmin: true });
+                        alert('Админ права выданы!');
+                        return;
+                    }
+                }
+            }
+        }
+
+        async function adminMakeSupport() {
+            const username = document.getElementById('adminRoleUser').value.replace('@', '');
+            if (!username) return;
+
+            const usersRef = window.dbRef.ref(window.db, 'users');
+            const snapshot = await window.dbRef.get(usersRef);
+            
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                for (let [id, user] of Object.entries(users)) {
+                    if (user.username === username) {
+                        await window.dbRef.update(window.dbRef.ref(window.db, `users/${id}`), { isSupport: true });
+                        alert('Права саппорта выданы!');
+                        return;
+                    }
+                }
+            }
+        }
+
+        window.onload = initUser;
+    </script>
 </body>
 </html>
