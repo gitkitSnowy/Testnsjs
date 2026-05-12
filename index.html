@@ -199,14 +199,14 @@
         }
         .wheel-pointer { 
             position: absolute; top: -20px; left: 50%; transform: translateX(-50%); 
-            z-index: 100; font-size: 36px; color: var(--accent); 
+            z-index: 100; font-size: 36px; color: #ffffff; 
             filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
         }
         .wheel-center-logo {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 60px; height: 60px; background: var(--panel); border: 4px solid var(--accent);
             border-radius: 50%; z-index: 50; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; color: var(--accent); font-size: 12px;
+            font-weight: 900; color: #ffffff; font-size: 12px;
         }
 
         .players-feed { margin-top: 30px; display: flex; flex-direction: column; gap: 12px; }
@@ -218,7 +218,7 @@
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .p-info { display: flex; align-items: center; gap: 12px; }
-        .p-ava { width: 34px; height: 34px; border-radius: 10px; background: #21262d; border: 1px solid var(--accent); }
+        .p-ava { width: 34px; height: 34px; border-radius: 10px; background: #21262d; border: 1px solid var(--accent); object-fit: cover; }
         .p-name { font-weight: 700; font-size: 14px; }
         .p-bet { font-weight: 900; color: var(--gold); }
 
@@ -233,7 +233,7 @@
             flex: 1; transition: 0.3s; opacity: 0.6;
         }
         .nav-item.active { color: var(--accent); opacity: 1; }
-        .nav-icon { font-size: 22px; }
+        .nav-icon { font-size: 22px; filter: brightness(0) invert(1); }
 
         .xp-container { margin: 20px 0; }
         .xp-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-bottom: 8px; }
@@ -253,7 +253,7 @@
             scroll-snap-align: start;
         }
         .achiev-card.unlocked { opacity: 1; filter: grayscale(0); border-color: var(--gold); background: rgba(255,204,0,0.05); }
-        .ach-icon { font-size: 28px; margin-bottom: 5px; }
+        .ach-icon { font-size: 28px; margin-bottom: 5px; filter: brightness(0) invert(1); }
         .ach-name { font-size: 8px; font-weight: 800; color: var(--sub); text-align: center; line-height: 1.2; }
 
         .modal { 
@@ -347,6 +347,82 @@
         .message.support {
             background: linear-gradient(135deg, var(--accent), var(--accent-dark));
         }
+
+        .buy-ton-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 9000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .buy-ton-card {
+            background: var(--panel);
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            border: 1px solid var(--card-border);
+        }
+        
+        .ton-package {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .ton-package:hover {
+            border-color: var(--accent);
+            background: rgba(36,129,204,0.05);
+        }
+        
+        .ton-package.selected {
+            border-color: var(--accent);
+            background: rgba(36,129,204,0.1);
+        }
+        
+        .wallet-option {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .wallet-option:hover {
+            border-color: var(--accent);
+        }
+        
+        .wallet-option.selected {
+            border-color: var(--accent);
+            background: rgba(36,129,204,0.1);
+        }
+        
+        .wallet-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
     </style>
 </head>
 <body>
@@ -355,20 +431,21 @@
     <header>
         <div class="user-block">
             <div class="u-avatar-wrapper">
-                <div id="head-avatar" class="u-avatar" style="display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900;">👤</div>
+                <img id="head-avatar" class="u-avatar" src="" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div id="head-avatar-fallback" class="u-avatar" style="display:none; align-items:center; justify-content:center; font-size:20px; font-weight:900; color:#ffffff;">👤</div>
                 <div class="u-lvl-float" id="head-lvl">1</div>
             </div>
             <div class="u-details">
                 <div class="u-name-row">
                     <span id="head-name" class="u-name">Loading...</span>
-                    <span id="v-badge" style="display:none; color:var(--accent);">✓</span>
+                    <span id="v-badge" style="display:none; color:#ffffff;">✓</span>
                 </div>
                 <span class="u-rank-text" id="head-rank">ROOKIE</span>
             </div>
         </div>
-        <div class="balance-block">
+        <div class="balance-block" onclick="openBuyTonModal()" style="cursor: pointer;">
             <div class="bal-label">TON BALANCE</div>
-            <div class="bal-val"><span id="head-bal">0.00</span></div>
+            <div class="bal-val"><span id="head-bal">0.00</span> 💎</div>
         </div>
     </header>
 
@@ -410,6 +487,21 @@
                     Только для элиты. Минимальный вход: 10.0 TON. Нужен 5 уровень.
                 </p>
                 <button class="btn-action btn-gold btn-small" id="vip-btn" onclick="event.stopPropagation(); openRoom('vip')">ВОЙТИ</button>
+            </div>
+
+            <!-- Кнопка покупки TON -->
+            <div class="card" onclick="openBuyTonModal()" style="border-color: var(--accent);">
+                <div class="card-header">
+                    <span>ПОПОЛНЕНИЕ</span>
+                    <span style="color:var(--accent);">💎</span>
+                </div>
+                <h2 style="margin:0 0 10px 0; font-size:22px;">Купить TON</h2>
+                <p style="color:var(--sub); font-size:12px; margin:0 0 20px 0;">
+                    Пополни баланс для участия в играх. Выбери удобный способ оплаты.
+                </p>
+                <button class="btn-action" onclick="event.stopPropagation(); openBuyTonModal()">
+                    💎 ПОПОЛНИТЬ БАЛАНС
+                </button>
             </div>
 
             <div class="card">
@@ -517,7 +609,8 @@
         <div id="scr-profile" class="screen">
             <div class="card" style="text-align:center; padding-top:40px; cursor: default;">
                 <div class="u-avatar-wrapper" style="display:inline-block; margin-bottom:20px;">
-                    <div id="prof-avatar" class="u-avatar" style="width:100px; height:100px; border-radius:30px; font-size:40px; display:flex; align-items:center; justify-content:center;">👤</div>
+                    <img id="prof-avatar" class="u-avatar" style="width:100px; height:100px; border-radius:30px; font-size:40px;" src="" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div id="prof-avatar-fallback" class="u-avatar" style="width:100px; height:100px; border-radius:30px; font-size:40px; display:none; align-items:center; justify-content:center; color:#ffffff;">👤</div>
                     <div class="u-lvl-float" style="width:30px; height:30px; font-size:14px; display:flex; align-items:center; justify-content:center; bottom:0; right:0;" id="prof-lvl">1</div>
                 </div>
                 <h2 style="margin:0;" id="prof-name">@Alexander</h2>
@@ -532,6 +625,9 @@
                 </div>
 
                 <button class="btn-action" onclick="showSupport()" style="margin-top:15px;">💬 Тех. поддержка</button>
+                <button class="btn-action" onclick="openBuyTonModal()" style="margin-top:10px; background: linear-gradient(135deg, var(--gold) 0%, #ccaa00 100%); color: #000;">
+                    💎 Купить TON
+                </button>
             </div>
 
             <div class="stats-grid">
@@ -597,6 +693,92 @@
         </div>
     </main>
 
+    <!-- Модальное окно покупки TON -->
+    <div id="buy-ton-modal" class="buy-ton-modal">
+        <div class="buy-ton-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="margin:0; font-size:24px; font-weight:900;">💎 Купить TON</h2>
+                <button class="btn-action btn-secondary btn-small" onclick="closeBuyTonModal()">✕</button>
+            </div>
+
+            <div class="card-header">ВЫБЕРИ ПАКЕТ</div>
+            
+            <div class="ton-package" onclick="selectTonPackage(1, 1, this)" data-package="1">
+                <div>
+                    <div style="font-weight:800; font-size:18px;">1 TON</div>
+                    <div style="font-size:11px; color:var(--sub);">≈ $1.50 USD</div>
+                </div>
+                <div style="color:var(--accent); font-weight:900;">$1.50</div>
+            </div>
+
+            <div class="ton-package" onclick="selectTonPackage(5, 7, this)" data-package="5">
+                <div>
+                    <div style="font-weight:800; font-size:18px;">5 TON</div>
+                    <div style="font-size:11px; color:var(--sub);">≈ $7.00 USD</div>
+                </div>
+                <div style="color:var(--accent); font-weight:900;">$7.00</div>
+            </div>
+
+            <div class="ton-package" onclick="selectTonPackage(10, 13, this)" data-package="10">
+                <div>
+                    <div style="font-weight:800; font-size:18px;">10 TON</div>
+                    <div style="font-size:11px; color:var(--sub);">≈ $13.00 USD (Скидка 15%)</div>
+                </div>
+                <div style="color:var(--accent); font-weight:900;">$13.00</div>
+            </div>
+
+            <div class="ton-package" onclick="selectTonPackage(25, 30, this)" data-package="25">
+                <div>
+                    <div style="font-weight:800; font-size:18px;">25 TON</div>
+                    <div style="font-size:11px; color:var(--sub);">≈ $30.00 USD (Скидка 20%)</div>
+                </div>
+                <div style="color:var(--accent); font-weight:900;">$30.00</div>
+            </div>
+
+            <div class="ton-package" onclick="selectTonPackage(100, 110, this)" data-package="100">
+                <div>
+                    <div style="font-weight:800; font-size:18px;">100 TON</div>
+                    <div style="font-size:11px; color:var(--sub);">≈ $110.00 USD (Скидка 25%)</div>
+                </div>
+                <div style="color:var(--accent); font-weight:900;">$110.00</div>
+            </div>
+
+            <div class="card-header" style="margin-top:20px;">ВЫБЕРИ КОШЕЛЕК</div>
+            
+            <div class="wallet-option selected" onclick="selectWallet('tonkeeper', this)" data-wallet="tonkeeper">
+                <div class="wallet-icon">💎</div>
+                <div>
+                    <div style="font-weight:700;">Tonkeeper</div>
+                    <div style="font-size:11px; color:var(--sub);">Рекомендуемый кошелек</div>
+                </div>
+            </div>
+
+            <div class="wallet-option" onclick="selectWallet('tonhub', this)" data-wallet="tonhub">
+                <div class="wallet-icon">🔷</div>
+                <div>
+                    <div style="font-weight:700;">Tonhub</div>
+                    <div style="font-size:11px; color:var(--sub);">Быстрые транзакции</div>
+                </div>
+            </div>
+
+            <div class="wallet-option" onclick="selectWallet('telegram', this)" data-wallet="telegram">
+                <div class="wallet-icon">✈️</div>
+                <div>
+                    <div style="font-weight:700;">@wallet (Telegram)</div>
+                    <div style="font-size:11px; color:var(--sub);">Встроенный кошелек</div>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="processBuyTon()" style="margin-top:20px; background: linear-gradient(135deg, var(--green) 0%, #1fa05a 100%);">
+                💎 ОПЛАТИТЬ И ПОЛУЧИТЬ TON
+            </button>
+            
+            <div style="text-align:center; margin-top:15px; font-size:11px; color:var(--sub);">
+                Вы получите TON моментально после оплаты
+            </div>
+        </div>
+    </div>
+
     <div id="support-modal" class="modal">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h2 style="margin:0; font-size:24px; font-weight:900;">💬 Тех. поддержка</h2>
@@ -654,6 +836,7 @@
         username: tg.initDataUnsafe?.user?.username || 'TestUser' + Math.floor(Math.random() * 1000),
         firstName: tg.initDataUnsafe?.user?.first_name || 'Test',
         lastName: tg.initDataUnsafe?.user?.last_name || 'User',
+        photoUrl: tg.initDataUnsafe?.user?.photo_url || null,
         balance: 100.0,
         level: 1,
         xp: 0,
@@ -685,6 +868,14 @@
         safeCells: []
     };
 
+    let buyTonState = {
+        selectedPackage: 1,
+        selectedAmount: 1,
+        selectedPrice: 1.5,
+        selectedWallet: 'tonkeeper',
+        isProcessing: false
+    };
+
     const RANKS = [
         { name: 'ROOKIE', minLevel: 1 },
         { name: 'BRONZE', minLevel: 3 },
@@ -700,6 +891,7 @@
         await loadUser();
         updateUI();
         setupWheel();
+        loadAvatar();
         
         if (currentUser.username === 'Kegovich') {
             currentUser.isAdmin = true;
@@ -729,10 +921,34 @@
         await window.dbRef.set(userRef, currentUser);
     }
 
+    function loadAvatar() {
+        if (currentUser.photoUrl) {
+            document.getElementById('head-avatar').src = currentUser.photoUrl;
+            document.getElementById('prof-avatar').src = currentUser.photoUrl;
+            document.getElementById('head-avatar').style.display = 'block';
+            document.getElementById('prof-avatar').style.display = 'block';
+            if (document.getElementById('head-avatar-fallback')) {
+                document.getElementById('head-avatar-fallback').style.display = 'none';
+            }
+            if (document.getElementById('prof-avatar-fallback')) {
+                document.getElementById('prof-avatar-fallback').style.display = 'none';
+            }
+        } else {
+            document.getElementById('head-avatar').style.display = 'none';
+            document.getElementById('prof-avatar').style.display = 'none';
+            if (document.getElementById('head-avatar-fallback')) {
+                document.getElementById('head-avatar-fallback').style.display = 'flex';
+                document.getElementById('head-avatar-fallback').textContent = currentUser.firstName?.charAt(0) || '👤';
+            }
+            if (document.getElementById('prof-avatar-fallback')) {
+                document.getElementById('prof-avatar-fallback').style.display = 'flex';
+                document.getElementById('prof-avatar-fallback').textContent = currentUser.firstName?.charAt(0) || '👤';
+            }
+        }
+    }
+
     function updateUI() {
-        const initial = currentUser.firstName?.charAt(0) || '?';
-        document.getElementById('head-avatar').textContent = initial;
-        document.getElementById('prof-avatar').textContent = initial;
+        loadAvatar();
         
         document.getElementById('head-name').textContent = '@' + currentUser.username;
         document.getElementById('prof-name').textContent = '@' + currentUser.username;
@@ -766,6 +982,73 @@
                 document.getElementById(id).classList.add('unlocked');
             }
         });
+    }
+
+    function openBuyTonModal() {
+        document.getElementById('buy-ton-modal').style.display = 'flex';
+        buyTonState.isProcessing = false;
+    }
+
+    function closeBuyTonModal() {
+        if (buyTonState.isProcessing) return;
+        document.getElementById('buy-ton-modal').style.display = 'none';
+    }
+
+    function selectTonPackage(amount, price, element) {
+        document.querySelectorAll('.ton-package').forEach(p => p.classList.remove('selected'));
+        element.classList.add('selected');
+        
+        buyTonState.selectedPackage = amount;
+        buyTonState.selectedAmount = amount;
+        buyTonState.selectedPrice = price;
+    }
+
+    function selectWallet(wallet, element) {
+        document.querySelectorAll('.wallet-option').forEach(w => w.classList.remove('selected'));
+        element.classList.add('selected');
+        
+        buyTonState.selectedWallet = wallet;
+    }
+
+    async function processBuyTon() {
+        if (buyTonState.isProcessing) return;
+        
+        buyTonState.isProcessing = true;
+        
+        // Симуляция процесса оплаты
+        const walletNames = {
+            'tonkeeper': 'Tonkeeper',
+            'tonhub': 'Tonhub',
+            'telegram': '@wallet (Telegram)'
+        };
+        
+        // Показываем процесс оплаты
+        alert(`🔄 Открываем ${walletNames[buyTonState.selectedWallet]} для оплаты...\n\nСумма к оплате: ${buyTonState.selectedAmount} TON = $${buyTonState.selectedPrice} USD\n\nСледуйте инструкциям в кошельке для завершения транзакции.`);
+        
+        // Симулируем успешную оплату через 3 секунды
+        setTimeout(async () => {
+            currentUser.balance += buyTonState.selectedAmount;
+            
+            // Проверяем достижения
+            if (buyTonState.selectedAmount >= 10 && !currentUser.achievements?.includes(2)) {
+                currentUser.achievements = currentUser.achievements || [];
+                currentUser.achievements.push(2);
+                alert('🎉 Достижение разблокировано: МАЖОР!');
+            }
+            if (buyTonState.selectedAmount >= 100 && !currentUser.achievements?.includes(4)) {
+                currentUser.achievements = currentUser.achievements || [];
+                currentUser.achievements.push(4);
+                alert('🐋 Достижение разблокировано: КИТ!');
+            }
+            
+            await saveUser();
+            updateUI();
+            
+            alert(`✅ Успешно! ${buyTonState.selectedAmount} TON добавлено на ваш баланс!`);
+            
+            buyTonState.isProcessing = false;
+            closeBuyTonModal();
+        }, 3000);
     }
 
     function switchNav(screen, el) {
@@ -841,9 +1124,15 @@
         gameState.players.forEach(player => {
             const card = document.createElement('div');
             card.className = 'player-card';
+            const avatarContent = player.photoUrl 
+                ? `<img class="p-ava" src="${player.photoUrl}" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+                : '';
+            const fallbackContent = `<div class="p-ava" style="display:${player.photoUrl ? 'none' : 'flex'}; align-items:center; justify-content:center; font-weight:900; color:#ffffff;">${player.firstName?.charAt(0) || '?'}</div>`;
+            
             card.innerHTML = `
                 <div class="p-info">
-                    <div class="p-ava" style="display:flex; align-items:center; justify-content:center; font-weight:900;">${player.firstName?.charAt(0) || '?'}</div>
+                    ${avatarContent}
+                    ${fallbackContent}
                     <div>
                         <div class="p-name">@${player.username}</div>
                         <div style="font-size:11px; color:var(--sub);">${((player.bet / gameState.totalPot) * 100).toFixed(1)}% шанс</div>
@@ -886,7 +1175,7 @@
             ctx.save();
             ctx.translate(300, 300);
             ctx.rotate((currentAngle + angle / 2) * Math.PI / 180);
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 20px Inter';
             ctx.textAlign = 'center';
             ctx.fillText(player.firstName?.charAt(0) || '?', 150, 10);
